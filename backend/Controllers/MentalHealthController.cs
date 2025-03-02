@@ -14,10 +14,6 @@ namespace MentalHealthApp.Controllers
             return Ok(new { message = "Backend is running!" });
         }
 
-        [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
-        }
+       
     }
 }
