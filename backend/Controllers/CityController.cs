@@ -26,26 +26,32 @@ namespace MentalHealthApp.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<City>>> SearchCities(
-            [FromQuery] string country = null,
-            [FromQuery] string name = null)
+        public async Task<ActionResult<IEnumerable<object>>> SearchCities([FromQuery] string name = null)
         {
-            var query = _context.Cities.AsQueryable();
+            if (string.IsNullOrEmpty(name))
+                return BadRequest("City name is required for search.");
 
-            if (!string.IsNullOrEmpty(country))
-                query = query.Where(c => c.Country == country);
-
-
-
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(c => c.Name.Contains(name));
+            var query = _context.Cities
+                .Where(c => EF.Functions.Like(c.Name, $"%{name}%")) // 🔹 Căutare case-insensitive
+                .Select(c => new { c.Id, c.Name, c.Country }) // 🔹 Returnăm doar datele necesare
+                .Take(10); // 🔹 Limităm rezultatele pentru performanță
 
             var results = await query.ToListAsync();
 
             if (!results.Any())
-                return NotFound("No cities found with the given filters.");
+                return NotFound("No cities found with the given name.");
 
-            return Ok(results);
+            return new JsonResult(results) { ContentType = "application/json" };
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<City>> GetCity(int id)
+        {
+            var city = await _context.Cities.FindAsync(id);
+
+            if (city == null)
+                return NotFound();
+
+            return city;
+        }   
     }
 }

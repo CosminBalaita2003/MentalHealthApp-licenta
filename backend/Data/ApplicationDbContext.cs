@@ -10,12 +10,12 @@ namespace MentalHealthApp.Data
         options)
         : base(options)
         {
-        } 
+        }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Progress> Progresses { get; set; }
         public DbSet<Emotion> Emotions { get; set; }
-        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<City> Cities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -35,13 +35,11 @@ namespace MentalHealthApp.Data
                 .HasOne(e => e.Category)
                 .WithMany()
                 .HasForeignKey(e => e.CategoryId);
-            builder.Entity<UserProfile>()
-               .HasOne(up => up.User)
-               .WithOne()
-               .HasForeignKey<UserProfile>(up => up.UserId);
+
+            builder.Entity<ApplicationUser>()
+                .HasOne(u => u.City)
+                .WithMany()
+                .HasForeignKey(u => u.CityId);
         }
-            
-                                                                        
-        }   
+    }
 }
-                                                                            

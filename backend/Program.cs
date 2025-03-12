@@ -40,7 +40,17 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
+// Permite frontend 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.AllowAnyOrigin()  // Permite toate originile
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 // 🔹 Configurare DbContext pentru SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -86,7 +96,7 @@ using (var scope = app.Services.CreateScope())
 
 
 
-
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication(); // 🔹 Activează autentificarea cu JWT
 app.UseAuthorization();
