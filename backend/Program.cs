@@ -8,8 +8,13 @@ using MentalHealthApp.Data;
 using MentalHealthApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // 🔹 Configurare Swagger pentru JWT
@@ -106,6 +111,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.MapGet("/api/get-backend-ip", (HttpContext context) =>
+{
+    var ip = context.Connection.LocalIpAddress?.ToString();
+    return Results.Json(new { backendIp = ip, port = 8080 });
+});
+
 
 app.MapControllers();
 app.Run();

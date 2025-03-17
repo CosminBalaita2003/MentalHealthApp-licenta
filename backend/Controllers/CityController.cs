@@ -32,7 +32,7 @@ namespace MentalHealthApp.Controllers
                 return BadRequest("City name is required for search.");
 
             var query = _context.Cities
-                .Where(c => EF.Functions.Like(c.Name, $"%{name}%")) // 🔹 Căutare case-insensitive
+                .Where(c => EF.Functions.Like(c.Name, $"{name}%")) // 🔹 Căutare case-insensitive
                 .Select(c => new { c.Id, c.Name, c.Country }) // 🔹 Returnăm doar datele necesare
                 .Take(10); // 🔹 Limităm rezultatele pentru performanță
 

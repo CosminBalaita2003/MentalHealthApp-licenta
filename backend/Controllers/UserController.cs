@@ -33,14 +33,20 @@ namespace MentalHealthApp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
+            // Verificăm dacă datele primite sunt valide
+            if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new { success = false, message = "Datele de înregistrare sunt incomplete." });
+            }
+
             var user = new ApplicationUser
             {
                 UserName = request.Email,
                 Email = request.Email,
                 FullName = request.FullName,
                 DateOfBirth = request.DateOfBirth,
-                TimeOfBirth = TimeSpan.Parse(request.TimeOfBirth),
-            CityId = request.CityId,
+                TimeOfBirth = TimeSpan.TryParse(request.TimeOfBirth, out var time) ? time : TimeSpan.Zero,
+                CityId = request.CityId,
                 Gender = request.Gender,
                 Pronouns = request.Pronouns,
                 Bio = request.Bio,
@@ -50,11 +56,38 @@ namespace MentalHealthApp.Controllers
             var result = await _userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Eroare la înregistrare.",
+                    errors = result.Errors.Select(e => e.Description)
+                });
+            }
 
             await _userManager.AddToRoleAsync(user, "User");
-            return Ok(new { Message = "User registered successfully" });
+
+            // Returnăm utilizatorul creat, dar fără câmpuri sensibile (ex. parole)
+            return Ok(new
+            {
+                success = true,
+                message = "User registered successfully",
+                user = new
+                {
+                    id = user.Id,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    dateOfBirth = user.DateOfBirth,
+                    timeOfBirth = user.TimeOfBirth.ToString(@"hh\:mm\:ss"),
+                    cityId = user.CityId,
+                    gender = user.Gender,
+                    pronouns = user.Pronouns,
+                    bio = user.Bio
+                }
+            });
         }
+
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)

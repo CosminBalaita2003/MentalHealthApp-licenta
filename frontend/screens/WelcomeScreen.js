@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import globalStyles from '../styles/globalStyles';
+import theme from '../styles/theme';
 
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Bine ai venit!</Text>
-      <Text style={globalStyles.text}>Alege o optiune pentru a continua:</Text>
+      <Text style={globalStyles.title}>MindEase</Text>
 
-      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('Login')}>
-        <Text style={globalStyles.buttonText}>Autentificare</Text>
+      <TouchableOpacity style={[globalStyles.button, { backgroundColor: theme.colors.semiaccent}]} onPress={() => navigation.navigate('LoginScreen')}>
+        <Text style={globalStyles.buttonText}>Log in</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[globalStyles.button, { backgroundColor: '#CBAACB' }]} onPress={() => navigation.navigate('Register')}>
-        <Text style={globalStyles.buttonText}>inregistreaza-te</Text>
+      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('RegisterScreen')}>
+        <Text style={globalStyles.buttonText}>Register</Text>
       </TouchableOpacity>
     </View>
   );

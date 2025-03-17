@@ -1,6 +1,8 @@
-﻿using MentalHealthApp.Models;
+﻿using backend.Models;
+using MentalHealthApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace MentalHealthApp.Data
 {
@@ -17,6 +19,8 @@ namespace MentalHealthApp.Data
         public DbSet<Emotion> Emotions { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<City> Cities { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<JournalEntry> JournalEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -40,6 +44,13 @@ namespace MentalHealthApp.Data
                 .HasOne(u => u.City)
                 .WithMany()
                 .HasForeignKey(u => u.CityId);
+
+            builder.Entity<TestResult>()
+               .HasOne(t => t.User)
+               .WithMany(u => u.TestResults)
+               .HasForeignKey(t => t.UserId)
+               .OnDelete(DeleteBehavior.Cascade); // Șterge testele dacă userul e șters
         }
     }
-}
+    }
+

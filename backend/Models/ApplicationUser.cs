@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using backend.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace MentalHealthApp.Models
 {
@@ -18,7 +19,8 @@ namespace MentalHealthApp.Models
         public string Bio { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
+        public ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
+        public ICollection<JournalEntry> JournalEntries { get; set; }
         private int CalculateAge()
         {
             DateTime now = DateTime.Today;
