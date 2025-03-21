@@ -50,6 +50,19 @@ namespace MentalHealthApp.Data
                .WithMany(u => u.TestResults)
                .HasForeignKey(t => t.UserId)
                .OnDelete(DeleteBehavior.Cascade); // Șterge testele dacă userul e șters
+
+            builder.Entity<JournalEntry>()
+            .HasOne(j => j.Emotion)
+            .WithMany()
+            .HasForeignKey(j => j.EmotionId)
+            .OnDelete(DeleteBehavior.Restrict); // Nu permite ștergerea emoțiilor asociate
+
+
+            builder.Entity<JournalEntry>()
+                .HasOne(j => j.User)
+                .WithMany(u => u.JournalEntries)
+                .HasForeignKey(j => j.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Șterge jurnalele dacă userul e șters
         }
     }
     }

@@ -1,45 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator 
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { Picker } from "@react-native-picker/picker";
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import userService from "../services/userService"; // 🔹 Importă serviciul userService
+import { fetchEmotions, addJournalEntry } from "../services/journalService";
 import GlobalStyles from "../styles/globalStyles";
 import theme from "../styles/theme";
+import EmotionSelector from "../components/EmotionSelector";
+import JournalTextBox from "../components/JournalTextBox";
 
 const NewEntryScreen = () => {
   const [content, setContent] = useState("");
   const [emotionId, setEmotionId] = useState(null);
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null); // 🔹 Stochează user-ul complet
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchEmotions();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      
+      // 🔹 Obține utilizatorul
+      const userResponse = await userService.getUser();
+      if (userResponse.success) {
+        setUser(userResponse.user); // 🔹 Stochează user-ul
+      } else {
+        Alert.alert("Error", "Failed to load user data.");
+        setLoading(false);
+        return;
+      }
 
-  const fetchEmotions = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) throw new Error("User not authenticated");
+      // 🔹 Obține emoțiile
+      const emotionsResponse = await fetchEmotions();
+      if (emotionsResponse.success) {
+        setEmotions(emotionsResponse.emotions);
+      } else {
+        Alert.alert("Error", emotionsResponse.message || "Failed to load emotions.");
+      }
 
-      const response = await axios.get(`${process.env.API_URL}/api/Emotion`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      console.log("🟢 API Response:", response.data);
-
-      const emotionsArray = response.data?.$values ?? [];
-      setEmotions(emotionsArray);
-    } catch (error) {
-      console.error("🔴 Error fetching emotions:", error);
-      Alert.alert("Error", "Failed to fetch emotions.");
-    } finally {
       setLoading(false);
-    }
-  };
+    };
+
+    loadData();
+  }, []);
 
   const handleSubmit = async () => {
     if (!content.trim() || !emotionId) {
@@ -47,67 +50,43 @@ const NewEntryScreen = () => {
       return;
     }
 
+    if (!user) {
+      Alert.alert("Error", "User data is missing. Please log in again.");
+      return;
+    }
+
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) throw new Error("User not authenticated");
+      console.log("📤 Sending data:", { content, emotionId, user });
 
-      await axios.post(
-        `${process.env.API_URL}/api/JournalEntry`,
-        { content, emotionId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      Alert.alert("Success", "Entry added successfully!");
+      const response = await addJournalEntry(content, emotionId, user);
+      console.log("✅ Success:", response);
+      Alert.alert("Success", response.message);
       navigation.goBack();
     } catch (error) {
-      console.error("🔴 Error submitting journal entry:", error);
-      Alert.alert("Error", "Failed to add journal entry.");
+      console.error("❌ Error adding journal entry:", error.response?.data || error.message);
+      Alert.alert("Error", error.response?.data?.message || "An error occurred while saving the entry.");
     }
   };
 
   return (
-    <View style={[GlobalStyles.container, { backgroundColor: theme.colors.background }]}>
-      <Text style={GlobalStyles.title}>New Journal Entry</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>  
+      <View style={[GlobalStyles.container]}>
+        <Text style={GlobalStyles.title}>New Journal Entry</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      ) : (
-        <>
-          <TextInput
-            style={[GlobalStyles.input, { height: 120 }]}
-            placeholder="Write your thoughts here..."
-            multiline
-            value={content}
-            onChangeText={setContent}
-          />
-
-          <Text style={GlobalStyles.text}>Select Emotion:</Text>
-          <View style={GlobalStyles.pickerContainer}>
-            {emotions.length > 0 ? (
-              <Picker
-                selectedValue={emotionId}
-                onValueChange={(itemValue) => setEmotionId(itemValue)}
-                style={GlobalStyles.picker}
-              >
-                <Picker.Item label="Select an emotion" value={null} />
-                {emotions.map((emotion) => (
-                  <Picker.Item key={emotion.id} label={emotion.name} value={emotion.id} />
-                ))}
-              </Picker>
-            ) : (
-              <Text style={{ color: "gray", textAlign: "center" }}>No emotions found</Text>
-            )}
+        {loading ? (
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        ) : (
+          <View style={{ flex: 1, justifyContent: "center", width: "100%" }}>
+            <JournalTextBox value={content} onChangeText={setContent} />
+            <EmotionSelector emotions={emotions} selectedEmotionId={emotionId} onSelectEmotion={setEmotionId} />
+            <TouchableOpacity style={GlobalStyles.button} onPress={handleSubmit}>
+              <Text style={GlobalStyles.buttonText}>Save Entry</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity style={GlobalStyles.button} onPress={handleSubmit}>
-            <Text style={GlobalStyles.buttonText}>Save Entry</Text>
-          </TouchableOpacity>
-        </>
-      )}
-      
+        )}
       </View>
-    
+    </TouchableWithoutFeedback>  
   );
-}
+};
 
 export default NewEntryScreen;

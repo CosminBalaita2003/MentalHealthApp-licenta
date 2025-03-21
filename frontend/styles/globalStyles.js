@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import theme from './theme'; // Importam paleta de culori
-import { all } from 'axios';
+import axios from 'axios';
 import { Dimensions } from "react-native";
 const screenWidth = Dimensions.get("window").width;
 export default {
@@ -39,6 +39,7 @@ export default {
     fontWeight: "bold",
     color: theme.colors.text,
     marginBottom: 20,
+    marginTop: 100,
     textAlign: "center", // 🔹 Centrare titlu
   },
   time: {
@@ -314,6 +315,110 @@ export default {
     bottom: 90, // Mută mai sus să nu fie acoperit
     alignSelf: "center",
   },
+  pickerContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  picker: {
+    height: 50,
+    color: "#000", // Text negru
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
+  cardText: {
+    fontSize: 14,
+    color: "#D3D3D3",
+    marginTop: 5,
+  },
+  emotionList: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    justifyContent: "center",
+  },
   
+  carouselContainer: {
+    alignItems: "center",
+    padding: 10,
+  },
   
+  carouselContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 20,
+  },
+  
+  emotionCard: {
+    width: 150,
+    height: 150,
+    backgroundColor: "#1E1B3A",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 15,
+    marginHorizontal: 10,
+    padding: 10,
+  },
+  
+  selectedEmotion: {
+    backgroundColor: "#4ECDC4",
+  },
+  
+  emotionText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  
+  emotionImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 8,
+  },
+  
+
+  journalCard: {
+    backgroundColor: "#1E1B3A",
+    borderRadius: 12,
+    padding: 15,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  
+    width: "100%", // 🔹 Ocupă toată lățimea posibilă
+    alignSelf: "center", // 🔹 Asigură că este centrat corect
+  },  
+
+
+  journalEmotionTitle: {
+    fontSize: 18,
+    color: "white", // ✅ Emoția este albă
+    marginBottom: 5,
+  },
+
+  journalContentText: {
+    fontSize: 14,
+    color: "white", // ✅ Textul jurnalului este alb
+    marginBottom: 8,
+    width: "90%",
+    maxWidth: screenWidth * 0.9, // Ensure text fits within the screen width
+    flexWrap: "wrap",
+  },
+
+  journalDateText: {
+    fontSize: 12,
+    color: "white", // ✅ Data este albă
+    textAlign: "right",
+    marginTop: 5,
+  },
 };
+
+  

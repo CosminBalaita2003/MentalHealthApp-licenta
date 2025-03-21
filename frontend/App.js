@@ -57,7 +57,7 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen name="Exercises" component={ExercicesScreen} />
-      <Tab.Screen name="Journaling" component={JournalScreen} />
+      <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Test" component={TestScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

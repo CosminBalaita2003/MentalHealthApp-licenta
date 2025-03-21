@@ -83,3 +83,4 @@ C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\obj\Debug\net7.0\ref\back
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Data\cities500.json
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Data\cities.json
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\backend.staticwebassets.runtime.json

@@ -33,16 +33,16 @@ namespace MentalHealthApp.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/JournalEntry/UserEntries
         [HttpGet("UserEntries")]
         public async Task<ActionResult<IEnumerable<JournalEntry>>> GetUserEntries()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return await _context.JournalEntries
                 .Where(e => e.UserId == userId)
-                .Include(e => e.Emotion)
+                .Include(e => e.Emotion) 
                 .ToListAsync();
         }
+
 
         // GET: api/JournalEntry/{id}
         [HttpGet("{id}")]
@@ -61,21 +61,35 @@ namespace MentalHealthApp.Controllers
         }
 
         // POST: api/JournalEntry
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<JournalEntry>> PostJournalEntry(JournalEntry entry)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            entry.UserId = userId;
 
-            if (!_context.Emotions.Any(e => e.Id == entry.EmotionId))
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            entry.UserId = userId;
+            entry.Date = entry.Date == default ? DateTime.UtcNow : entry.Date; // Setează automat data dacă lipsește
+
+            // Verifică dacă EmotionId există în baza de date
+            var emotionExists = await _context.Emotions.AnyAsync(e => e.Id == entry.EmotionId);
+            if (!emotionExists)
             {
                 return BadRequest("Invalid EmotionId.");
             }
 
+            // Asigură-te că nu este trimis un obiect User nou
+            entry.User = null;
+
             _context.JournalEntries.Add(entry);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction("GetJournalEntry", new { id = entry.Id }, entry);
         }
+
 
         // PUT: api/JournalEntry/{id}
         [HttpPut("{id}")]

@@ -19,14 +19,14 @@ namespace backend.Models
         [Required]
         public int EmotionId { get; set; }
 
-        [ForeignKey("EmotionId")]
-        public Emotion Emotion { get; set; }
+        
+        public Emotion? Emotion { get; set; }
 
         [Required]
         public string UserId { get; set; } // Legătură cu utilizatorul
 
-        [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; } // Relația cu User
+       
+        public ApplicationUser? User { get; set; }
     }
 }
 

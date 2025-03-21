@@ -16,11 +16,20 @@ namespace MentalHealthApp.Controllers
             _context = context;
         }
 
+        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Emotion>>> GetEmotions()
+        public IActionResult GetAllEmotions()
         {
-            return await _context.Emotions.ToListAsync();
+            var emotions = _context.Emotions.ToList();
+
+            foreach (var emotion in emotions)
+            {
+                emotion.ImagePath = $"{Request.Scheme}://{Request.Host}/images/{emotion.Name}.png";
+            }
+
+            return Ok(emotions);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Emotion>> GetEmotion(int id)

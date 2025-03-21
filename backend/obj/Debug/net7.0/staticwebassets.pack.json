@@ -1,0 +1,61 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anger.png",
+      "PackagePath": "staticwebassets\\images\\Anger.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anxiety.png",
+      "PackagePath": "staticwebassets\\images\\Anxiety.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Frustration.png",
+      "PackagePath": "staticwebassets\\images\\Frustration.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Gratitude.png",
+      "PackagePath": "staticwebassets\\images\\Gratitude.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.PNG",
+      "PackagePath": "staticwebassets\\images\\Guilt.PNG"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Happiness.png",
+      "PackagePath": "staticwebassets\\images\\Happiness.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Motivation.png",
+      "PackagePath": "staticwebassets\\images\\Motivation.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Relaxation.png",
+      "PackagePath": "staticwebassets\\images\\Relaxation.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Sadness.png",
+      "PackagePath": "staticwebassets\\images\\Sadness.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Self-Confidence.png",
+      "PackagePath": "staticwebassets\\images\\Self-Confidence.png"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.backend.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.build.backend.props",
+      "PackagePath": "build\\backend.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildMultiTargeting.backend.props",
+      "PackagePath": "buildMultiTargeting\\backend.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildTransitive.backend.props",
+      "PackagePath": "buildTransitive\\backend.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
