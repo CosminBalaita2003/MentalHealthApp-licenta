@@ -33,7 +33,6 @@ namespace MentalHealthApp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            // Verificăm dacă datele primite sunt valide
             if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
                 return BadRequest(new { success = false, message = "Datele de înregistrare sunt incomplete." });
@@ -45,7 +44,9 @@ namespace MentalHealthApp.Controllers
                 Email = request.Email,
                 FullName = request.FullName,
                 DateOfBirth = request.DateOfBirth,
-                TimeOfBirth = TimeSpan.TryParse(request.TimeOfBirth, out var time) ? time : TimeSpan.Zero,
+                TimeOfBirth = string.IsNullOrWhiteSpace(request.TimeOfBirth)
+                    ? (TimeSpan?)null
+                    : TimeSpan.TryParse(request.TimeOfBirth, out var time) ? time : (TimeSpan?)null,
                 CityId = request.CityId,
                 Gender = request.Gender,
                 Pronouns = request.Pronouns,
@@ -67,7 +68,6 @@ namespace MentalHealthApp.Controllers
 
             await _userManager.AddToRoleAsync(user, "User");
 
-            // Returnăm utilizatorul creat, dar fără câmpuri sensibile (ex. parole)
             return Ok(new
             {
                 success = true,
@@ -78,7 +78,7 @@ namespace MentalHealthApp.Controllers
                     fullName = user.FullName,
                     email = user.Email,
                     dateOfBirth = user.DateOfBirth,
-                    timeOfBirth = user.TimeOfBirth.ToString(@"hh\:mm\:ss"),
+                    timeOfBirth = user.TimeOfBirth?.ToString(@"hh\:mm\:ss"),
                     cityId = user.CityId,
                     gender = user.Gender,
                     pronouns = user.Pronouns,
@@ -86,8 +86,6 @@ namespace MentalHealthApp.Controllers
                 }
             });
         }
-
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -141,7 +139,7 @@ namespace MentalHealthApp.Controllers
                 user.FullName,
                 user.Email,
                 user.DateOfBirth,
-                user.TimeOfBirth,
+                timeOfBirth = user.TimeOfBirth?.ToString(@"hh\:mm\:ss"),
                 user.CityId,
                 CityName = user.City?.Name,
                 user.Gender,
@@ -181,10 +179,12 @@ namespace MentalHealthApp.Controllers
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound("User not found");
-            //to string to avoid error
-            user.FullName = request.FullName.ToString();
+
+            user.FullName = request.FullName;
             user.DateOfBirth = request.DateOfBirth;
-            user.TimeOfBirth = user.TimeOfBirth = TimeSpan.Parse(request.TimeOfBirth);
+            user.TimeOfBirth = string.IsNullOrWhiteSpace(request.TimeOfBirth)
+                ? (TimeSpan?)null
+                : TimeSpan.TryParse(request.TimeOfBirth, out var parsedTime) ? parsedTime : user.TimeOfBirth;
             user.CityId = request.CityId;
             user.Bio = request.Bio;
             user.Gender = request.Gender;
@@ -204,7 +204,7 @@ namespace MentalHealthApp.Controllers
         public string Email { get; set; }
         public string Password { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string TimeOfBirth { get; set; }
+        public string? TimeOfBirth { get; set; }
         public int CityId { get; set; }
         public string Gender { get; set; }
         public string Pronouns { get; set; }
@@ -221,7 +221,7 @@ namespace MentalHealthApp.Controllers
     {
         public string FullName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string TimeOfBirth { get; set; }
+        public string? TimeOfBirth { get; set; }
         public int CityId { get; set; }
         public string Bio { get; set; }
         public string Gender { get; set; }

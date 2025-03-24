@@ -61,9 +61,9 @@ const GAD7Test = ({ user, onClose }) => {
       if (!response.ok) {
         throw new Error("Failed to save test result");
       }
-
       Alert.alert("Test Submitted!", "Your results have been saved.");
       onClose();
+
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {

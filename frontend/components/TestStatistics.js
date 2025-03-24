@@ -1,8 +1,9 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
 import GlobalStyles from "../styles/globalStyles";
+import testService from "../services/testService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -25,13 +26,35 @@ const interpretResults = (testType, score) => {
   return "Unknown";
 };
 
-const getYAxisLabels = (testType) => {
-  return testType === "GAD-7"
-    ? ["0", "5", "10", "15", "20"] // 🔹 Scor numeric pentru GAD-7
-    : ["0", "10", "20", "30", "40"]; // 🔹 Scor numeric pentru PSS-10
-};
+const TestStatistics = ({ onBack }) => {
+  const [tests, setTests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const TestStatistics = ({ tests, onBack }) => {
+  const fetchTests = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) return;
+      const response = await testService.getUserTests(userId);
+      if (response.success) setTests(response.tests);
+    } catch (err) {
+      console.error("❌ Eroare la încărcarea testelor:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTests();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={GlobalStyles.infoContainer}>
+        <ActivityIndicator size="large" color="#4ECDC4" />
+      </View>
+    );
+  }
+
   if (tests.length === 0) {
     return (
       <View style={GlobalStyles.infoContainer}>
@@ -50,29 +73,35 @@ const TestStatistics = ({ tests, onBack }) => {
         </Text>
 
         {testTypes.map((type) => {
-          const filteredTests = tests.filter((test) => test.testType === type);
+          const filteredTests = tests
+          .filter((test) => test.testType === type)
+          .sort((a, b) => new Date(a.testDate) - new Date(b.testDate));
+        
+
           if (filteredTests.length === 0) return null;
 
           const scores = filteredTests.map((test) => test.score);
-          const lastScore = scores.length > 0 ? interpretResults(type, scores[scores.length - 1]) : "No data available.";
-          const yAxisLabels = getYAxisLabels(type);
+          const averageScore = scores.reduce((acc, val) => acc + val, 0) / scores.length;
+          const interpretation = interpretResults(type, averageScore);
 
           return (
             <View key={type} style={[GlobalStyles.chartContainer, { marginBottom: 30 }]}>
               <Text style={[GlobalStyles.subtitle, { fontSize: 20, textAlign: "center", marginBottom: 10 }]}>
                 {type} Score Progress
               </Text>
-              <Text style={[GlobalStyles.text, { textAlign: "center", marginBottom: 15 }]}>{testDescriptions[type]}</Text>
+              <Text style={[GlobalStyles.text, { textAlign: "center", marginBottom: 15 }]}>
+                {testDescriptions[type]}
+              </Text>
 
               <LineChart
                 data={{
-                  labels: Array(scores.length).fill(""), // 🔹 Fără date pe axa X
+                  labels: Array(filteredTests.length).fill(""),
+
                   datasets: [{ data: scores }],
                 }}
                 width={screenWidth * 0.9}
                 height={220}
                 yAxisSuffix=" pts"
-                yLabelsOffset={10}
                 chartConfig={{
                   backgroundGradientFrom: "#202040",
                   backgroundGradientTo: "#16132D",
@@ -95,45 +124,43 @@ const TestStatistics = ({ tests, onBack }) => {
                   padding: 10,
                   backgroundColor: "#1D1A39",
                 }}
-                formatYLabel={(value) => value} // 🔹 Afișează scorul pe axa Y
+                formatYLabel={(value) => value}
               />
 
-              {/* ✅ Interpretarea ultimului test */}
-              <View style={GlobalStyles.interpretationContainer}>
-                <Text style={[GlobalStyles.subtitle]}>
-                  Last {type} Result:
-                </Text>
-                <Text style={[GlobalStyles.interpretationText, { marginTop: 8 }]}>
-                  {lastScore}
-                </Text>
-              </View>
+<View style={GlobalStyles.interpretationContainer}>
+  <Text style={[GlobalStyles.subtitle]}>
+    Average {type} Result:
+  </Text>
+  <Text style={[GlobalStyles.interpretationText, { marginTop: 8 }]}>
+    {interpretation} ({averageScore.toFixed(1)} pts)
+  </Text>
+</View>
 
-              {/* ✅ Legenda sub fiecare grafic */}
-              <View style={GlobalStyles.legendContainer}>
-                <Text style={[GlobalStyles.subtitle, { fontSize: 16, textAlign: "center", marginBottom: 5 }]}>
-                  Interpretation Guide:
-                </Text>
-                {type === "GAD-7" ? (
-                  <>
-                    <Text style={GlobalStyles.legendText}>0-4: Minimal Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>5-9: Mild Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>10-14: Moderate Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>15+: Severe Anxiety</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={GlobalStyles.legendText}>0-13: Low Stress</Text>
-                    <Text style={GlobalStyles.legendText}>14-26: Moderate Stress</Text>
-                    <Text style={GlobalStyles.legendText}>27-40: High Stress</Text>
-                  </>
-                )}
-              </View>
+<View style={GlobalStyles.legendContainer}>
+  <Text style={[GlobalStyles.subtitle, { fontSize: 16, textAlign: "center", marginBottom: 5 }]}>
+    Interpretation Guide:
+  </Text>
+  {type === "GAD-7" ? (
+    <>
+      <Text style={GlobalStyles.legendText}>0-4: Minimal Anxiety</Text>
+      <Text style={GlobalStyles.legendText}>5-9: Mild Anxiety</Text>
+      <Text style={GlobalStyles.legendText}>10-14: Moderate Anxiety</Text>
+      <Text style={GlobalStyles.legendText}>15+: Severe Anxiety</Text>
+    </>
+  ) : (
+    <>
+      <Text style={GlobalStyles.legendText}>0-13: Low Stress</Text>
+      <Text style={GlobalStyles.legendText}>14-26: Moderate Stress</Text>
+      <Text style={GlobalStyles.legendText}>27-40: High Stress</Text>
+    </>
+  )}
+</View>
+              
             </View>
           );
         })}
       </ScrollView>
 
-      {/* ✅ Butonul `Back` mai sus și vizibil clar */}
       <TouchableOpacity style={GlobalStyles.backButton} onPress={onBack}>
         <Text style={[GlobalStyles.buttonText, { color: "#16132D", fontSize: 18 }]}>← Back</Text>
       </TouchableOpacity>

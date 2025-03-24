@@ -45,15 +45,28 @@ const StressTest = ({ user, onClose }) => {
         return;
       }
 
+      const reverseScoredQuestions = [3, 4, 6, 7];
+      const finalScore = answers.reduce((sum, val, index) => {
+        const score = reverseScoredQuestions.includes(index) ? 4 - val : val;
+        return sum + score;
+      }, 0);
+      
+      const interpretPSS = (score) => {
+        if (score <= 13) return "Low Stress";
+        if (score <= 26) return "Moderate Stress";
+        return "High Stress";
+      };
+      
       const requestBody = {
         id: 0,
         userId: user.id,
         testDate: new Date().toISOString(),
         testType: "PSS-10",
-        score: answers.reduce((sum, val) => sum + val, 0),
-        interpretation: "Result Interpretation Here...",
+        score: finalScore,
+        interpretation: interpretPSS(finalScore),
         recommendations: "Try relaxation techniques, mindfulness, and managing your daily workload.",
       };
+      
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
         method: "POST",
@@ -67,6 +80,9 @@ const StressTest = ({ user, onClose }) => {
       if (!response.ok) {
         throw new Error("Failed to save test result");
       }
+
+
+
 
       Alert.alert("Test Submitted!", "Your results have been saved.");
       onClose();

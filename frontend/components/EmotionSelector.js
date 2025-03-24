@@ -1,13 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Animated, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import GlobalStyles from "../styles/globalStyles";
+import MorphingImage from "./MorphingImage";
 
 const EmotionSelector = ({ emotions = [], selectedEmotionId, onSelectEmotion }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [previousImage, setPreviousImage] = useState(null);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
     if (emotions.length > 0 && !selectedEmotionId) {
@@ -17,56 +16,20 @@ const EmotionSelector = ({ emotions = [], selectedEmotionId, onSelectEmotion }) 
 
   const handleChange = (direction) => {
     if (emotions.length === 0) return;
-
     const nextIndex =
       direction === "next"
         ? (currentIndex + 1) % emotions.length
         : (currentIndex - 1 + emotions.length) % emotions.length;
 
-    setPreviousImage(emotions[currentIndex].imagePath);
-
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 0.85,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setCurrentIndex(nextIndex);
-      onSelectEmotion(emotions[nextIndex].id);
-
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(1.2);
-
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    });
+    setCurrentIndex(nextIndex);
+    onSelectEmotion(emotions[nextIndex].id);
+    setTrigger((prev) => prev + 1); // forțează re-renderul MorphingImage
   };
 
-  if (emotions.length === 0) {
-    return (
-      <View style={GlobalStyles.carouselContainer}>
-        <Text style={GlobalStyles.subtitle}>Nu există emoții disponibile</Text>
-      </View>
-    );
-  }
+  if (emotions.length === 0) return null;
 
   const currentEmotion = emotions[currentIndex];
+  const previousEmotion = emotions[(currentIndex - 1 + emotions.length) % emotions.length];
 
   return (
     <View style={GlobalStyles.carouselContainer}>
@@ -77,39 +40,10 @@ const EmotionSelector = ({ emotions = [], selectedEmotionId, onSelectEmotion }) 
         </TouchableOpacity>
 
         <View style={GlobalStyles.emotionCard}>
-          {previousImage && (
-            <Animated.Image
-              source={{ uri: previousImage }}
-              style={[
-                GlobalStyles.emotionImage,
-                {
-                  position: "absolute",
-                  opacity: fadeAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [1, 0],
-                  }),
-                  transform: [
-                    {
-                      scale: scaleAnim.interpolate({
-                        inputRange: [0.85, 1.2],
-                        outputRange: [1, 0.95],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            />
-          )}
-
-          <Animated.Image
-            source={{ uri: currentEmotion.imagePath }}
-            style={[
-              GlobalStyles.emotionImage,
-              {
-                opacity: fadeAnim,
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
+          <MorphingImage
+            fromUri={previousEmotion.imagePath}
+            toUri={currentEmotion.imagePath}
+            trigger={trigger}
           />
           <Text style={GlobalStyles.emotionText}>{currentEmotion.name}</Text>
         </View>

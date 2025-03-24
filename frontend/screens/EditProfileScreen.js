@@ -28,6 +28,8 @@ const EditProfileScreen = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showCityModal, setShowCityModal] = useState(false);
+  const [knowsBirthTime, setKnowsBirthTime] = useState(false);
+  
   
 
   const navigation = useNavigation();
@@ -108,11 +110,12 @@ const EditProfileScreen = () => {
       return;
     }
 
-    const formattedTime = profile.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-
+    const formattedTime = knowsBirthTime
+    ? profile.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : null;
     const profileData = { 
       ...profile, 
-      dateOfBirth: profile.dateOfBirth.toISOString(),
+      dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.toISOString() : new Date().toISOString(),
       timeOfBirth: formattedTime
     };
 
@@ -169,26 +172,54 @@ const EditProfileScreen = () => {
                   </TouchableOpacity>
                 </>
               )}
-                   <Text style={GlobalStyles.text}>Birth Hour</Text>
-              <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
-                <Text style={{ color: theme.colors.background }}>
-                  {profile.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-              </TouchableOpacity>
-              {showTimePicker && (
-                <>
-                  <DateTimePicker 
-                    value={profile.timeOfBirth} 
-                    mode="time" 
-                    display="spinner"
-                    textColor='white'
-                    onChange={(event, selectedTime) => setProfile({ ...profile, timeOfBirth: selectedTime || profile.timeOfBirth })}
-                  />
-                  <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
-                    <Text style={GlobalStyles.buttonText}>Save Time</Text>
-                  </TouchableOpacity>
-                </>
-              )}
+                    {/* Birth Hour */}
+             {/* Checkbox pentru ora nașterii */}
+<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+  <TouchableOpacity
+    onPress={() => setKnowsBirthTime(!knowsBirthTime)}
+    style={{
+      width: 20,
+      height: 20,
+      borderWidth: 1,
+      borderColor: theme.colors.text,
+      backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
+      marginRight: 10,
+      borderRadius: 5,
+    }}
+  />
+  <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
+</View>
+
+{/* Time Picker dacă se știe ora nașterii */}
+{knowsBirthTime && (
+  <>
+    <Text style={GlobalStyles.text}>Birth Hour</Text>
+    <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
+      <Text style={{ color: theme.colors.background }}>
+        {profile.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      </Text>
+    </TouchableOpacity>
+    {showTimePicker && (
+      <>
+        <DateTimePicker 
+          value={profile.timeOfBirth} 
+          mode="time" 
+          display="spinner"
+          textColor='white'
+          onChange={(event, selectedTime) =>
+            setProfile({ ...profile, timeOfBirth: selectedTime || profile.timeOfBirth })
+          }
+        />
+        <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
+          <Text style={GlobalStyles.buttonText}>Save Time</Text>
+        </TouchableOpacity>
+      </>
+    )}
+  </>
+)}
+
+              
+
               
 
                  {/* City */}

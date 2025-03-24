@@ -8,7 +8,7 @@ namespace MentalHealthApp.Models
         public string FullName { get; set; }
 
         public DateTime DateOfBirth { get; set; }
-        public TimeSpan TimeOfBirth { get; set; }
+        public TimeSpan? TimeOfBirth { get; set; }
 
         public int Age => CalculateAge();
         public int CityId { get; set; }

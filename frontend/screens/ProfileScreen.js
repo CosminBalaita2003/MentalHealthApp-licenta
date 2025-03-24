@@ -93,6 +93,10 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity style={[globalStyles.button, globalStyles.logoutButton]} onPress={handleLogout}>
             <Text style={globalStyles.buttonText}>Logout</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={globalStyles.button} onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}>
+             <Text style={globalStyles.buttonText}>View Astro Chart</Text>
+          </TouchableOpacity>
+
         </ScrollView>
       )}
     </View>

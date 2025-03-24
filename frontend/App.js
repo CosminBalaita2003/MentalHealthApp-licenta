@@ -18,7 +18,7 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import JournalScreen from "./screens/JournalScreen";
 import NewEntryScreen from "./screens/NewEntryScreen";
-
+import AstroChartScreen from "./screens/AstroChartScreen";
 export const AuthContext = createContext();
 
 const Stack = createStackNavigator();
@@ -105,6 +105,7 @@ export default function App() {
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
               <Stack.Screen name="JournalScreen" component={JournalScreen} />
               <Stack.Screen name="NewEntryScreen" component={NewEntryScreen} />
+              <Stack.Screen name="AstroChartScreen" component={AstroChartScreen} />
             </>
           )}
         </Stack.Navigator>

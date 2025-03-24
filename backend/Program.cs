@@ -8,6 +8,7 @@ using MentalHealthApp.Data;
 using MentalHealthApp.Models;
 using Microsoft.Extensions.FileProviders;
 
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -94,7 +95,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

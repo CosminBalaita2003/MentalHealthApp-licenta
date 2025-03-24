@@ -27,6 +27,8 @@ const RegisterScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
+  const [knowsBirthTime, setKnowsBirthTime] = useState(false);
+
 
   const [cities, setCities] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,21 +74,23 @@ const RegisterScreen = () => {
   };
   const handleRegister = async () => {
     if (!formData.fullName || !formData.email || !formData.password || 
-        !formData.city || !formData.gender || !formData.pronouns || !formData.bio) {
+      !formData.cityId || !formData.gender || !formData.pronouns || !formData.bio) 
+   {
         Alert.alert("Eroare", "Toate câmpurile sunt obligatorii.");
         return;
     }
 
     try {
-        const formattedTime = formData.timeOfBirth
-            ? formData.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-            : "00:00:00";  // Default value dacă timeOfBirth e null
-
-        const userData = { 
-            ...formData, 
-            dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth.toISOString() : new Date().toISOString(),
-            timeOfBirth: formattedTime,
-        };
+      const formattedTime = knowsBirthTime
+      ? formData.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      : null;
+    
+    const userData = { 
+      ...formData,
+      dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth.toISOString() : new Date().toISOString(),
+      timeOfBirth: formattedTime,
+    };
+      
 
         const response = await userService.register(userData);
         console.log("Register Response:", response);
@@ -181,26 +185,51 @@ const RegisterScreen = () => {
               )}
 
               {/* Birth Hour */}
-              <Text style={GlobalStyles.text}>Birth Hour</Text>
-              <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
-                <Text style={{ color: theme.colors.background }}>
-                  {formData.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-              </TouchableOpacity>
-              {showTimePicker && (
-                <>
-                  <DateTimePicker 
-                    value={formData.timeOfBirth} 
-                    mode="time" 
-                    display="spinner"
-                    textColor='white'
-                    onChange={(event, selectedTime) => setFormData({ ...formData, timeOfBirth: selectedTime || formData.timeOfBirth })}
-                  />
-                  <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
-                    <Text style={GlobalStyles.buttonText}>Save Time</Text>
-                  </TouchableOpacity>
-                </>
-              )}
+             {/* Checkbox pentru ora nașterii */}
+<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+  <TouchableOpacity
+    onPress={() => setKnowsBirthTime(!knowsBirthTime)}
+    style={{
+      width: 20,
+      height: 20,
+      borderWidth: 1,
+      borderColor: theme.colors.text,
+      backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
+      marginRight: 10,
+      borderRadius: 5,
+    }}
+  />
+  <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
+</View>
+
+{/* Time Picker dacă se știe ora nașterii */}
+{knowsBirthTime && (
+  <>
+    <Text style={GlobalStyles.text}>Birth Hour</Text>
+    <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
+      <Text style={{ color: theme.colors.background }}>
+        {formData.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      </Text>
+    </TouchableOpacity>
+    {showTimePicker && (
+      <>
+        <DateTimePicker 
+          value={formData.timeOfBirth} 
+          mode="time" 
+          display="spinner"
+          textColor='white'
+          onChange={(event, selectedTime) =>
+            setFormData({ ...formData, timeOfBirth: selectedTime || formData.timeOfBirth })
+          }
+        />
+        <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
+          <Text style={GlobalStyles.buttonText}>Save Time</Text>
+        </TouchableOpacity>
+      </>
+    )}
+  </>
+)}
+
               
 
              {/* City */}

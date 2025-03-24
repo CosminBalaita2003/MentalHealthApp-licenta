@@ -86,8 +86,10 @@ export default {
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+
     width: "80%", // 🔹 Butoanele sunt mai echilibrate
     marginTop: 15,
+
   },
   logoutButton: {
     backgroundColor: "#AE445A", // 🔹 Culoare specială pentru logout
@@ -98,6 +100,7 @@ export default {
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+    
   },
   linkText: {
     marginTop: 10,
@@ -300,6 +303,7 @@ export default {
     fontWeight: "bold",
     color: theme.colors.text,
     textAlign: "center",
+    marginBottom: 10,
   },
   
   backButton: {
@@ -351,6 +355,8 @@ export default {
     alignItems: "center",
     justifyContent: "space-between",
     gap: 20,
+    width: "100%",
+    marginTop: 10,
   },
   
   emotionCard: {
@@ -361,7 +367,8 @@ export default {
     alignItems: "center",
     borderRadius: 15,
     marginHorizontal: 10,
-    padding: 10,
+    padding: 20,
+    marginBottom: 80,
   },
   
   selectedEmotion: {
@@ -370,9 +377,9 @@ export default {
   
   emotionText: {
     color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
     textAlign: "center",
+    width: "100%",
   },
   
   emotionImage: {
