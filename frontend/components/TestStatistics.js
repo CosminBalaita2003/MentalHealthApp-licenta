@@ -37,7 +37,7 @@ const TestStatistics = ({ onBack }) => {
       const response = await testService.getUserTests(userId);
       if (response.success) setTests(response.tests);
     } catch (err) {
-      console.error("❌ Eroare la încărcarea testelor:", err);
+      console.error(" Eroare la încărcarea testelor:", err);
     } finally {
       setLoading(false);
     }
@@ -74,9 +74,9 @@ const TestStatistics = ({ onBack }) => {
 
         {testTypes.map((type) => {
           const filteredTests = tests
-          .filter((test) => test.testType === type)
-          .sort((a, b) => new Date(a.testDate) - new Date(b.testDate));
-        
+            .filter((test) => test.testType === type)
+            .sort((a, b) => new Date(a.testDate) - new Date(b.testDate));
+
 
           if (filteredTests.length === 0) return null;
 
@@ -127,35 +127,35 @@ const TestStatistics = ({ onBack }) => {
                 formatYLabel={(value) => value}
               />
 
-<View style={GlobalStyles.interpretationContainer}>
-  <Text style={[GlobalStyles.subtitle]}>
-    Average {type} Result:
-  </Text>
-  <Text style={[GlobalStyles.interpretationText, { marginTop: 8 }]}>
-    {interpretation} ({averageScore.toFixed(1)} pts)
-  </Text>
-</View>
+              <View style={GlobalStyles.interpretationContainer}>
+                <Text style={[GlobalStyles.subtitle]}>
+                  Average {type} Result:
+                </Text>
+                <Text style={[GlobalStyles.interpretationText, { marginTop: 8 }]}>
+                  {interpretation} ({averageScore.toFixed(1)} pts)
+                </Text>
+              </View>
 
-<View style={GlobalStyles.legendContainer}>
-  <Text style={[GlobalStyles.subtitle, { fontSize: 16, textAlign: "center", marginBottom: 5 }]}>
-    Interpretation Guide:
-  </Text>
-  {type === "GAD-7" ? (
-    <>
-      <Text style={GlobalStyles.legendText}>0-4: Minimal Anxiety</Text>
-      <Text style={GlobalStyles.legendText}>5-9: Mild Anxiety</Text>
-      <Text style={GlobalStyles.legendText}>10-14: Moderate Anxiety</Text>
-      <Text style={GlobalStyles.legendText}>15+: Severe Anxiety</Text>
-    </>
-  ) : (
-    <>
-      <Text style={GlobalStyles.legendText}>0-13: Low Stress</Text>
-      <Text style={GlobalStyles.legendText}>14-26: Moderate Stress</Text>
-      <Text style={GlobalStyles.legendText}>27-40: High Stress</Text>
-    </>
-  )}
-</View>
-              
+              <View style={GlobalStyles.legendContainer}>
+                <Text style={[GlobalStyles.subtitle, { fontSize: 16, textAlign: "center", marginBottom: 5 }]}>
+                  Interpretation Guide:
+                </Text>
+                {type === "GAD-7" ? (
+                  <>
+                    <Text style={GlobalStyles.legendText}>0-4: Minimal Anxiety</Text>
+                    <Text style={GlobalStyles.legendText}>5-9: Mild Anxiety</Text>
+                    <Text style={GlobalStyles.legendText}>10-14: Moderate Anxiety</Text>
+                    <Text style={GlobalStyles.legendText}>15+: Severe Anxiety</Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={GlobalStyles.legendText}>0-13: Low Stress</Text>
+                    <Text style={GlobalStyles.legendText}>14-26: Moderate Stress</Text>
+                    <Text style={GlobalStyles.legendText}>27-40: High Stress</Text>
+                  </>
+                )}
+              </View>
+
             </View>
           );
         })}

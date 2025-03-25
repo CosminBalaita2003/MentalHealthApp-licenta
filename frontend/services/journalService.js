@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "@env";
-import {fetchUserData} from "./authService";
+import { fetchUserData } from "./authService";
 
 
 
@@ -11,38 +11,56 @@ import {fetchUserData} from "./authService";
 export const fetchUserEntries = async () => {
   try {
     const token = await AsyncStorage.getItem("token");
-    console.log("🔹 Retrieved Auth Token in fetchUserEntries:", token);
+    console.log(" Retrieved Auth Token in fetchUserEntries:", token);
 
     if (!token) {
-      throw new Error("❌ No auth token found! User not authenticated.");
+      throw new Error(" No auth token found! User not authenticated.");
     }
 
     const response = await axios.get(`${API_URL}/api/JournalEntry/UserEntries`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    console.log("✅ Raw API Response:", JSON.stringify(response.data, null, 2));
+    console.log(" Raw API Response:", JSON.stringify(response.data, null, 2));
 
     // 📌 Extract `$values` if the response has this structure
     const entriesArray = response.data?.$values ?? response.data;
 
-    // 🔥 Rezolvăm referințele "$ref" din emoții
-    const processedEntries = entriesArray.map(entry => {
-      if (entry.emotion && entry.emotion.$ref) {
-        const referencedEmotion = entriesArray.find(e => `$id` in e && e.$id === entry.emotion.$ref);
-        return {
-          ...entry,
-          emotion: referencedEmotion ? referencedEmotion.emotion : entry.emotion, // Înlocuiește cu obiectul complet
-        };
-      }
-      return entry;
-    });
+// 📌 Construim un dicționar global de obiecte cu $id
+const idMap = {};
+entriesArray.forEach(item => {
+  if (item?.$id) {
+    idMap[item.$id] = item;
+  }
+});
 
-    console.log("✅ Processed Entries:", JSON.stringify(processedEntries, null, 2));
+// 📌 Rezolvare de referințe recursiv
+const resolveRef = (ref) => {
+  if (ref?.$ref && idMap[ref.$ref]) {
+    return resolveRef(idMap[ref.$ref]); // dacă e referință către alt obiect, recursiv
+  }
+  return ref;
+};
+
+// 📌 Procesăm doar obiectele de tip JournalEntry (care au id)
+const processedEntries = entriesArray
+  .filter(entry => entry?.id && typeof entry === 'object')
+  .map(entry => ({
+    ...entry,
+    emotion: resolveRef(entry.emotion),
+  }));
+
+
+
+  
+    
+    
+
+    console.log(" Processed Entries:", JSON.stringify(processedEntries, null, 2));
 
     return { success: true, entries: processedEntries };
   } catch (error) {
-    console.error("❌ Error fetching journal entries:", error.response?.data || error.message);
+    console.error(" Error fetching journal entries:", error.response?.data || error.message);
     return { success: false, message: "Failed to fetch journal entries" };
   }
 };
@@ -50,10 +68,10 @@ export const fetchUserEntries = async () => {
 export const addJournalEntry = async (content, emotionId, user) => {
   try {
     const token = await AsyncStorage.getItem("token");
-    console.log("🔹 Retrieved Auth Token:", token);
+    console.log(" Retrieved Auth Token:", token);
 
     if (!token) {
-      throw new Error("❌ No auth token found!");
+      throw new Error(" No auth token found!");
     }
 
     // 📌 Construiește obiectul corect pentru `User.City`
@@ -80,8 +98,8 @@ export const addJournalEntry = async (content, emotionId, user) => {
       pronouns: user.pronouns || "",
       gender: user.gender || "",
       createdAt: user.createdAt,
-      city: userCity, // ✅ Trimite un obiect complet City
-      journalEntries: [] // ✅ Array gol pentru a evita erori
+      city: userCity, //  Trimite un obiect complet City
+      journalEntries: [] //  Array gol pentru a evita erori
     };
 
     // 📌 Construiește obiectul final pentru JournalEntry
@@ -89,12 +107,12 @@ export const addJournalEntry = async (content, emotionId, user) => {
       id: 0, // Backend-ul așteaptă acest ID implicit
       content,
       date: new Date().toISOString(),
-      emotionId, // ✅ Trimitem doar ID-ul emoției, NU obiectul complet
+      emotionId, //  Trimitem doar ID-ul emoției, NU obiectul complet
       userId: user.id,
       user: userObject
     };
 
-    console.log("📤 Sending full data:", requestBody);
+    console.log(" Sending full data:", requestBody);
 
     const response = await axios.post(
       `${API_URL}/api/JournalEntry/add`,
@@ -105,10 +123,10 @@ export const addJournalEntry = async (content, emotionId, user) => {
       }
     );
 
-    console.log("✅ Success:", response.data);
+    console.log(" Success:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ Axios Error:", error.response?.data || error.message);
+    console.error(" Axios Error:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -117,17 +135,17 @@ export const addJournalEntry = async (content, emotionId, user) => {
 export const fetchEmotions = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/Emotion`);
-    
-    console.log("🔹 Raw API Response:", response.data);
-    
+
+    console.log(" Raw API Response:", response.data);
+
     // Dacă backend-ul returnează $values, extragem doar acel array
     const emotionsArray = response.data?.$values ?? response.data;
 
-    console.log("✅ Extracted Emotions:", emotionsArray);
+    console.log(" Extracted Emotions:", emotionsArray);
 
     return { success: true, emotions: emotionsArray };
   } catch (error) {
-    console.error("❌ Error fetching emotions:", error);
+    console.error(" Error fetching emotions:", error);
     return { success: false, emotions: [] };
   }
 };

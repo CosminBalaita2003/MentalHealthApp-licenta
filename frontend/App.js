@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import GlobalStyles from "./styles/globalStyles";
-import { fetchUserData } from "./services/authService"; // ✅ Import serviciul de autentificare
+import { fetchUserData } from "./services/authService"; //  Import serviciul de autentificare
 // Import screens
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
@@ -75,10 +75,10 @@ export default function App() {
       console.log("User data:", user);
       setLoading(false);
     };
-  
+
     checkAuth();
   }, []);
-  
+
 
   if (loading) {
     return (

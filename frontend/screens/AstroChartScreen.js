@@ -20,38 +20,38 @@ export default function AstroChartScreen({ route, navigation }) {
       try {
         const chartResult = await fetchNatalWheelChart(user);
         const chartUrl = chartResult?.output;
-  
+
         if (!chartUrl) {
           Alert.alert("Eroare", "Nu s-a putut obține link-ul către chart.");
           return;
         }
-  
+
         const svgRes = await axios.get(chartUrl);
         setSvgContent(svgRes.data);
-  
+
         // 👇 Delay între requesturi
         await sleep(1000);
-  
+
         const planetsResult = await fetchPlanets(user);
         console.log("Planets:", planetsResult?.output);
         setPlanets(planetsResult?.output || []);
-        
+
         await sleep(1000);
-  
+
         const housesResult = await fetchHouses(user);
         setHouses(housesResult?.output?.Houses || []);
-  
+
       } catch (error) {
-        console.error("❌ Eroare generală:", error.response?.data || error.message);
+        console.error(" Eroare generală:", error.response?.data || error.message);
         Alert.alert("Eroare", "Nu s-au putut încărca datele astrologice.");
       } finally {
         setLoading(false);
       }
     };
-  
+
     loadChartData();
   }, []);
-  
+
 
   const onWebViewMessage = (event) => {
     const base64 = event.nativeEvent.data;
@@ -128,18 +128,18 @@ export default function AstroChartScreen({ route, navigation }) {
                 const sign = p.zodiac_sign?.name?.en || 'Unknown sign';
                 const degree = p.normDegree?.toFixed(2) || '?';
                 const retro = p.isRetro?.toLowerCase() === 'true' ? ' (R)' : '';
-              
+
                 return (
                   <Text key={index} style={globalStyles.text}>
                     {name} is in {sign}{retro} at {degree}°
                   </Text>
                 );
               })
-              
-              
-              )}
-            
-            
+
+
+            )}
+
+
           </View>
 
           {/* Houses */}

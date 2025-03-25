@@ -7,7 +7,7 @@ import { API_URL } from "@env"; // URL-ul backend-ului tău
 const getAstroPayload = async (profile) => {
   const token = await AsyncStorage.getItem("token");
   if (!token) {
-    console.log("❌ No token found. Cannot fetch city data.");
+    console.log(" No token found. Cannot fetch city data.");
     return null;
   }
 
@@ -114,7 +114,7 @@ export const fetchNatalWheelChart = async (profile) => {
 
     return astroResponse.data;
   } catch (error) {
-    console.error("❌ Error fetching natal chart:", error.response?.data || error.message);
+    console.error(" Error fetching natal chart:", error.response?.data || error.message);
     return null;
   }
 };
@@ -149,7 +149,7 @@ export const fetchPlanets = async (profile) => {
 
     return response.data;
   } catch (error) {
-    console.error("❌ Error fetching planets:", error.response?.data || error.message);
+    console.error(" Error fetching planets:", error.response?.data || error.message);
     return null;
   }
 };
@@ -185,7 +185,7 @@ export const fetchHouses = async (profile) => {
 
     return response.data;
   } catch (error) {
-    console.error("❌ Error fetching houses:", error.response?.data || error.message);
+    console.error(" Error fetching houses:", error.response?.data || error.message);
     return null;
   }
 };

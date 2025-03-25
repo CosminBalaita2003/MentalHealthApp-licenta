@@ -50,13 +50,13 @@ const StressTest = ({ user, onClose }) => {
         const score = reverseScoredQuestions.includes(index) ? 4 - val : val;
         return sum + score;
       }, 0);
-      
+
       const interpretPSS = (score) => {
         if (score <= 13) return "Low Stress";
         if (score <= 26) return "Moderate Stress";
         return "High Stress";
       };
-      
+
       const requestBody = {
         id: 0,
         userId: user.id,
@@ -66,7 +66,7 @@ const StressTest = ({ user, onClose }) => {
         interpretation: interpretPSS(finalScore),
         recommendations: "Try relaxation techniques, mindfulness, and managing your daily workload.",
       };
-      
+
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
         method: "POST",

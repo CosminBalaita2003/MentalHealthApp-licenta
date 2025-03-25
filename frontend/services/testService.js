@@ -9,27 +9,27 @@ const testService = {
    */
   getUserTests: async (userId) => {
     try {
-      console.log("🔹 Fetching tests for user:", userId);
-  
+      console.log(" Fetching tests for user:", userId);
+
       const response = await axios.get(`${API_URL}/api/tests/${userId}`, {
         headers: {
           Authorization: `Bearer ${await AsyncStorage.getItem("token")}`,
         },
       });
-  
-      console.log("📊 Raw Test Data:", response.data);
-  
-      // 🔹 Verificăm dacă datele conțin `$values`
+
+      console.log(" Raw Test Data:", response.data);
+
+      //  Verificăm dacă datele conțin `$values`
       const testsArray = response.data?.$values || [];
-  
-      console.log("✅ Processed Test Data:", testsArray);
+
+      console.log("Processed Test Data:", testsArray);
       return { success: true, tests: testsArray };
     } catch (error) {
-      console.error("❌ Error fetching user tests:", error.response?.data || error.message);
+      console.error("Error fetching user tests:", error.response?.data || error.message);
       return { success: false, message: "Eroare la obținerea testelor utilizatorului" };
     }
   },
-  
+
 };
 
 export default testService;

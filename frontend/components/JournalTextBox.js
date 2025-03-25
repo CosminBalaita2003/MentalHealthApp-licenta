@@ -8,7 +8,7 @@ const JournalTextBox = ({ value, onChangeText }) => {
       <TextInput
         style={styles.textBox}
         placeholder="Write your thoughts here..."
-        placeholderTextColor="#aaa"  // 🔹 Placeholder mai vizibil pe fundal întunecat
+        placeholderTextColor="#aaa"  //  Placeholder mai vizibil pe fundal întunecat
         multiline
         value={value}
         onChangeText={onChangeText}
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   textBox: {
     height: 120,
     textAlignVertical: "top",
-    color: "#fff",  // 🔹 Face textul alb
+    color: "#fff",  //  Face textul alb
     fontSize: 16,
   },
 });

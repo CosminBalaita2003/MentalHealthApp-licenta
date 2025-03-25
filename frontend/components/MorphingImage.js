@@ -34,48 +34,48 @@ const MorphingImage = ({ fromUri, toUri, trigger }) => {
   return (
     <View style={styles.container}>
       {prevImage && (
-  <Animated.Image
-    source={{ uri: prevImage }}
-    style={[
-      styles.image,
-      {
-        opacity: fadeOut,
-        transform: [
-          {
-            scale: fadeOut.interpolate({
-              inputRange: [0, 1],
-              outputRange: [1.1, 1], // zoom out
-            }),
-          },
-        ],
-      },
-    ]}
-    resizeMode="cover"
-  />
-)}
+        <Animated.Image
+          source={{ uri: prevImage }}
+          style={[
+            styles.image,
+            {
+              opacity: fadeOut,
+              transform: [
+                {
+                  scale: fadeOut.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1.1, 1], // zoom out
+                  }),
+                },
+              ],
+            },
+          ]}
+          resizeMode="cover"
+        />
+      )}
 
-{currentImage && (
-  <Animated.Image
-    source={{ uri: currentImage }}
-    style={[
-      styles.image,
-      {
-        opacity: fadeIn,
-        transform: [
-          {
-            scale: fadeIn.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0.9, 1], // zoom in
-            }),
-          },
-        ],
-      },
-    ]}
-    resizeMode="cover"
-  />
-)}
-</View>
-);
+      {currentImage && (
+        <Animated.Image
+          source={{ uri: currentImage }}
+          style={[
+            styles.image,
+            {
+              opacity: fadeIn,
+              transform: [
+                {
+                  scale: fadeIn.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.9, 1], // zoom in
+                  }),
+                },
+              ],
+            },
+          ]}
+          resizeMode="cover"
+        />
+      )}
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   container: {

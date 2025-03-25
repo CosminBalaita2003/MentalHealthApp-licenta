@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import userService from "../services/userService"; // 🔹 Importă serviciul userService
+import userService from "../services/userService"; //  Importă serviciul userService
 import { fetchEmotions, addJournalEntry } from "../services/journalService";
 import GlobalStyles from "../styles/globalStyles";
 import theme from "../styles/theme";
@@ -13,24 +13,24 @@ const NewEntryScreen = () => {
   const [emotionId, setEmotionId] = useState(null);
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // 🔹 Stochează user-ul complet
+  const [user, setUser] = useState(null); //  Stochează user-ul complet
   const navigation = useNavigation();
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      
-      // 🔹 Obține utilizatorul
+
+      //  Obține utilizatorul
       const userResponse = await userService.getUser();
       if (userResponse.success) {
-        setUser(userResponse.user); // 🔹 Stochează user-ul
+        setUser(userResponse.user); //  Stochează user-ul
       } else {
         Alert.alert("Error", "Failed to load user data.");
         setLoading(false);
         return;
       }
 
-      // 🔹 Obține emoțiile
+      //  Obține emoțiile
       const emotionsResponse = await fetchEmotions();
       if (emotionsResponse.success) {
         setEmotions(emotionsResponse.emotions);
@@ -56,20 +56,20 @@ const NewEntryScreen = () => {
     }
 
     try {
-      console.log("📤 Sending data:", { content, emotionId, user });
+      console.log(" Sending data:", { content, emotionId, user });
 
       const response = await addJournalEntry(content, emotionId, user);
-      console.log("✅ Success:", response);
+      console.log(" Success:", response);
       Alert.alert("Success", response.message);
       navigation.goBack();
     } catch (error) {
-      console.error("❌ Error adding journal entry:", error.response?.data || error.message);
+      console.error(" Error adding journal entry:", error.response?.data || error.message);
       Alert.alert("Error", error.response?.data?.message || "An error occurred while saving the entry.");
     }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>  
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={[GlobalStyles.container]}>
         <Text style={GlobalStyles.title}>New Journal Entry</Text>
 
@@ -85,7 +85,7 @@ const NewEntryScreen = () => {
           </View>
         )}
       </View>
-    </TouchableWithoutFeedback>  
+    </TouchableWithoutFeedback>
   );
 };
 

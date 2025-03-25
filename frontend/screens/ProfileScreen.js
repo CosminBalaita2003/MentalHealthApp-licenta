@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Alert, ScrollView, ActivityIndicator } fr
 import userService from '../services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import globalStyles from '../styles/globalStyles';
-import { AuthContext } from '../App'; 
+import { AuthContext } from '../App';
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -26,7 +26,7 @@ export default function ProfileScreen({ navigation }) {
 
         console.log("Fetching user profile...");
         const result = await userService.getUser();
-        
+
         if (result.success) {
           setUser(result.user);
         } else {
@@ -51,14 +51,14 @@ export default function ProfileScreen({ navigation }) {
 
       // 🔥 Șterge toate datele din AsyncStorage
       await AsyncStorage.clear();
-      console.log("✅ AsyncStorage cleared!");
+      console.log(" AsyncStorage cleared!");
 
       // 🔥 Setează `isAuthenticated` la false
       setIsAuthenticated(false);
 
-      console.log("✅ User logged out, App.js will re-render.");
+      console.log(" User logged out, App.js will re-render.");
     } catch (error) {
-      console.error("❌ Error during logout:", error);
+      console.error(" Error during logout:", error);
     }
   };
 
@@ -94,7 +94,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={globalStyles.buttonText}>Logout</Text>
           </TouchableOpacity>
           <TouchableOpacity style={globalStyles.button} onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}>
-             <Text style={globalStyles.buttonText}>View Astro Chart</Text>
+            <Text style={globalStyles.buttonText}>View Astro Chart</Text>
           </TouchableOpacity>
 
         </ScrollView>

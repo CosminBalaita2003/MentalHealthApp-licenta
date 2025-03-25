@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, TextInput, TouchableOpacity, Alert, FlatList, Keyboard, 
+import {
+  View, Text, TextInput, TouchableOpacity, Alert, FlatList, Keyboard,
   TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ActivityIndicator, Modal, ScrollView
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -29,8 +29,8 @@ const EditProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [showCityModal, setShowCityModal] = useState(false);
   const [knowsBirthTime, setKnowsBirthTime] = useState(false);
-  
-  
+
+
 
   const navigation = useNavigation();
 
@@ -41,10 +41,10 @@ const EditProfileScreen = () => {
         if (userResponse.success) {
           setProfile({
             fullName: userResponse.user.fullName || '',
-            dateOfBirth: userResponse.user.dateOfBirth 
-              ? new Date(userResponse.user.dateOfBirth) 
+            dateOfBirth: userResponse.user.dateOfBirth
+              ? new Date(userResponse.user.dateOfBirth)
               : new Date(),
-            timeOfBirth: userResponse.user.timeOfBirth 
+            timeOfBirth: userResponse.user.timeOfBirth
               ? new Date(`1970-01-01T${userResponse.user.timeOfBirth}`)
               : new Date(new Date().setHours(12, 0, 0)),
             cityId: userResponse.user.cityId || '',
@@ -67,42 +67,42 @@ const EditProfileScreen = () => {
 
   const searchCities = async (text) => {
     setSearchTerm(text);
-    
+
     if (text.length < 2) {
       setCities([]);
       setShowCityList(false);
       return;
     }
-  
+
     try {
       console.log("🔍 Searching for cities:", text);
-  
+
       const response = await fetch(`${process.env.API_URL}/api/City/search?name=${text}`);
       const data = await response.json();
-  
+
       console.log("📥 API Response:", data); // Vezi ce returnează API-ul
-  
+
       // 🔥 Extragem array-ul de orașe din `$values`
       const citiesArray = data?.$values || [];
-  
+
       if (Array.isArray(citiesArray) && citiesArray.length > 0) {
         setCities(citiesArray);
         setShowCityList(true);
-        console.log("✅ Cities state updated:", citiesArray);
+        console.log(" Cities state updated:", citiesArray);
       } else {
         setCities([]);
         setShowCityList(false);
-        console.log("❌ No cities found.");
+        console.log(" No cities found.");
       }
     } catch (error) {
-      console.error("❌ Error fetching cities:", error);
+      console.error(" Error fetching cities:", error);
       setCities([]);
       setShowCityList(false);
     }
   };
-  
-  
-  
+
+
+
   const handleSave = async () => {
     if (!profile.fullName || !profile.cityId || !profile.gender || !profile.pronouns || !profile.bio) {
       Alert.alert("Eroare", "Toate câmpurile sunt obligatorii.");
@@ -111,10 +111,10 @@ const EditProfileScreen = () => {
     }
 
     const formattedTime = knowsBirthTime
-    ? profile.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-    : null;
-    const profileData = { 
-      ...profile, 
+      ? profile.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      : null;
+    const profileData = {
+      ...profile,
       dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.toISOString() : new Date().toISOString(),
       timeOfBirth: formattedTime
     };
@@ -130,29 +130,29 @@ const EditProfileScreen = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <KeyboardAvoidingView 
-            behavior={Platform.OS === "ios" ? "padding" : "height"} 
-            style={GlobalStyles.container}
-          >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={GlobalStyles.container}
+      >
         <ScrollView contentContainerStyle={GlobalStyles.scrollContainer}>
-          
-              <Text style={GlobalStyles.title}>Edit Profile</Text>
-  
-              {loading ? (
-                <ActivityIndicator size="large" color={theme.colors.text} />
-              ) : (
-                <>
-                   <Text style={GlobalStyles.text}>Full Name</Text>
-                                <View style={GlobalStyles.inputContainer}>
-                                  <TextInput 
-                                    style={GlobalStyles.input} 
-                                    placeholder="Full Name" 
-                                    placeholderTextColor={theme.colors.text}
-                                    value={profile.fullName} 
-                                    onChangeText={(text) => setProfile({ ...profile, fullName: text })}
-                                  />
-                                </View>
-                                <Text style={GlobalStyles.text}>Date of Birth</Text>
+
+          <Text style={GlobalStyles.title}>Edit Profile</Text>
+
+          {loading ? (
+            <ActivityIndicator size="large" color={theme.colors.text} />
+          ) : (
+            <>
+              <Text style={GlobalStyles.text}>Full Name</Text>
+              <View style={GlobalStyles.inputContainer}>
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Full Name"
+                  placeholderTextColor={theme.colors.text}
+                  value={profile.fullName}
+                  onChangeText={(text) => setProfile({ ...profile, fullName: text })}
+                />
+              </View>
+              <Text style={GlobalStyles.text}>Date of Birth</Text>
               <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowDatePicker(true)}>
                 <Text style={{ color: theme.colors.background }}>
                   {profile.dateOfBirth.toDateString()}
@@ -160,9 +160,9 @@ const EditProfileScreen = () => {
               </TouchableOpacity>
               {showDatePicker && (
                 <>
-                  <DateTimePicker 
-                    value={profile.dateOfBirth} 
-                    mode="date" 
+                  <DateTimePicker
+                    value={profile.dateOfBirth}
+                    mode="date"
                     display="spinner"
                     textColor='white'
                     onChange={(event, selectedDate) => setProfile({ ...profile, dateOfBirth: selectedDate || profile.dateOfBirth })}
@@ -172,158 +172,158 @@ const EditProfileScreen = () => {
                   </TouchableOpacity>
                 </>
               )}
-                    {/* Birth Hour */}
-             {/* Checkbox pentru ora nașterii */}
-<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-  <TouchableOpacity
-    onPress={() => setKnowsBirthTime(!knowsBirthTime)}
-    style={{
-      width: 20,
-      height: 20,
-      borderWidth: 1,
-      borderColor: theme.colors.text,
-      backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
-      marginRight: 10,
-      borderRadius: 5,
-    }}
-  />
-  <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
-</View>
+              {/* Birth Hour */}
+              {/* Checkbox pentru ora nașterii */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <TouchableOpacity
+                  onPress={() => setKnowsBirthTime(!knowsBirthTime)}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderWidth: 1,
+                    borderColor: theme.colors.text,
+                    backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
+                    marginRight: 10,
+                    borderRadius: 5,
+                  }}
+                />
+                <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
+              </View>
 
-{/* Time Picker dacă se știe ora nașterii */}
-{knowsBirthTime && (
-  <>
-    <Text style={GlobalStyles.text}>Birth Hour</Text>
-    <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
-      <Text style={{ color: theme.colors.background }}>
-        {profile.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </Text>
-    </TouchableOpacity>
-    {showTimePicker && (
-      <>
-        <DateTimePicker 
-          value={profile.timeOfBirth} 
-          mode="time" 
-          display="spinner"
-          textColor='white'
-          onChange={(event, selectedTime) =>
-            setProfile({ ...profile, timeOfBirth: selectedTime || profile.timeOfBirth })
-          }
-        />
-        <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
-          <Text style={GlobalStyles.buttonText}>Save Time</Text>
-        </TouchableOpacity>
-      </>
-    )}
-  </>
-)}
-
-              
-
-              
-
-                 {/* City */}
-                              <Text style={GlobalStyles.text}>City</Text>
-                               <TouchableOpacity style={GlobalStyles.inputContainer} onPress={() => setShowCityModal(true)}>
-                                 <Text style={[GlobalStyles.input, { textAlignVertical: 'center', paddingVertical: 15 }]}>
-                                   {profile.city || "Select City"}
-                                 </Text>
-                               </TouchableOpacity>
-                 
-                              {/* City Modal */}
-                              <Modal visible={showCityModal} animationType="slide" transparent>
-                                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                                   <View style={GlobalStyles.modalContainer}>
-                                     <View style={GlobalStyles.modalContent}>
-                                       <Text style={GlobalStyles.title}>Search City</Text>
-                                       <TextInput
-                                         style={GlobalStyles.modalInput}
-                                         placeholder="Type city name..."
-                                         placeholderTextColor={theme.colors.neutral} // 🔹 Mai contrastant
-                                         value={searchTerm}
-                                         onChangeText={(text) => {
-                                           setSearchTerm(text);
-                                           searchCities(text);
-                                         }}
-                                         autoFocus={true}
-                                       />
-                                       {showCityList && cities.length > 0 && (
-  <FlatList
-  
-    data={cities}
-    keyExtractor={(item) => item.id.toString()}
-    keyboardShouldPersistTaps="always"
-    style={GlobalStyles.flatListContainer} // 🔥 Aplicăm stilurile noi
-    renderItem={({ item }) => (
-      <TouchableOpacity 
-        style={GlobalStyles.cityListItem} 
-        onPress={() => {
-          setProfile({ ...profile, cityId: item.id, city: item.name });
-          setShowCityModal(false);
-          Keyboard.dismiss();
-        }}
-      >
-        <Text style={GlobalStyles.cityListItemText}>{item.name}, {item.country}</Text>
-      </TouchableOpacity>
-    )}
-  />
-)}
-
- 
-
-                                       
-                                     </View>
-                                   </View>
-                                 </TouchableWithoutFeedback>
-                               </Modal>
-  
-                   {/* Pronouns */}
-                                <Text style={GlobalStyles.text}>Pronouns</Text>
-                                <View style={GlobalStyles.inputContainer}>
-                                  <TextInput 
-                                    style={GlobalStyles.input} 
-                                    placeholder="Pronouns" 
-                                    placeholderTextColor={theme.colors.text}
-                                    value={profile.pronouns} 
-                                    onChangeText={(text) => setProfile({ ...profile, pronouns: text })}
-                                  />
-                                </View>
-                  
-                                {/* Gender */}
-                                <Text style={GlobalStyles.text}>Gender</Text>
-                                <View style={GlobalStyles.inputContainer}>
-                                  <TextInput 
-                                    style={GlobalStyles.input} 
-                                    placeholder="Gender" 
-                                    placeholderTextColor={theme.colors.text}
-                                    value={profile.gender} 
-                                    onChangeText={(text) => setProfile({ ...profile, gender: text })}
-                                  />
-                                </View>
-                  
-                                {/* Bio */}
-                                <Text style={GlobalStyles.text}>Bio</Text>
-                                <View style={GlobalStyles.inputContainer}>
-                                  <TextInput 
-                                    style={[GlobalStyles.input, { height: 100 }]} 
-                                    placeholder="Bio" 
-                                    placeholderTextColor={theme.colors.text}
-                                    value={profile.bio} 
-                                    onChangeText={(text) => setProfile({ ...profile, bio: text })}
-                                    multiline
-                                  />
-                                </View>
-                  <TouchableOpacity style={GlobalStyles.button} onPress={handleSave}>
-                    <Text style={GlobalStyles.buttonText}>Save Profile</Text>
+              {/* Time Picker dacă se știe ora nașterii */}
+              {knowsBirthTime && (
+                <>
+                  <Text style={GlobalStyles.text}>Birth Hour</Text>
+                  <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
+                    <Text style={{ color: theme.colors.background }}>
+                      {profile.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
                   </TouchableOpacity>
+                  {showTimePicker && (
+                    <>
+                      <DateTimePicker
+                        value={profile.timeOfBirth}
+                        mode="time"
+                        display="spinner"
+                        textColor='white'
+                        onChange={(event, selectedTime) =>
+                          setProfile({ ...profile, timeOfBirth: selectedTime || profile.timeOfBirth })
+                        }
+                      />
+                      <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
+                        <Text style={GlobalStyles.buttonText}>Save Time</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
                 </>
               )}
-             
-                    </ScrollView>
-                  </KeyboardAvoidingView>
+
+
+
+
+
+              {/* City */}
+              <Text style={GlobalStyles.text}>City</Text>
+              <TouchableOpacity style={GlobalStyles.inputContainer} onPress={() => setShowCityModal(true)}>
+                <Text style={[GlobalStyles.input, { textAlignVertical: 'center', paddingVertical: 15 }]}>
+                  {profile.city || "Select City"}
+                </Text>
+              </TouchableOpacity>
+
+              {/* City Modal */}
+              <Modal visible={showCityModal} animationType="slide" transparent>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                  <View style={GlobalStyles.modalContainer}>
+                    <View style={GlobalStyles.modalContent}>
+                      <Text style={GlobalStyles.title}>Search City</Text>
+                      <TextInput
+                        style={GlobalStyles.modalInput}
+                        placeholder="Type city name..."
+                        placeholderTextColor={theme.colors.neutral} //  Mai contrastant
+                        value={searchTerm}
+                        onChangeText={(text) => {
+                          setSearchTerm(text);
+                          searchCities(text);
+                        }}
+                        autoFocus={true}
+                      />
+                      {showCityList && cities.length > 0 && (
+                        <FlatList
+
+                          data={cities}
+                          keyExtractor={(item) => item.id.toString()}
+                          keyboardShouldPersistTaps="always"
+                          style={GlobalStyles.flatListContainer} // 🔥 Aplicăm stilurile noi
+                          renderItem={({ item }) => (
+                            <TouchableOpacity
+                              style={GlobalStyles.cityListItem}
+                              onPress={() => {
+                                setProfile({ ...profile, cityId: item.id, city: item.name });
+                                setShowCityModal(false);
+                                Keyboard.dismiss();
+                              }}
+                            >
+                              <Text style={GlobalStyles.cityListItemText}>{item.name}, {item.country}</Text>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      )}
+
+
+
+
+                    </View>
+                  </View>
                 </TouchableWithoutFeedback>
-              );
-            };
-          
+              </Modal>
+
+              {/* Pronouns */}
+              <Text style={GlobalStyles.text}>Pronouns</Text>
+              <View style={GlobalStyles.inputContainer}>
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Pronouns"
+                  placeholderTextColor={theme.colors.text}
+                  value={profile.pronouns}
+                  onChangeText={(text) => setProfile({ ...profile, pronouns: text })}
+                />
+              </View>
+
+              {/* Gender */}
+              <Text style={GlobalStyles.text}>Gender</Text>
+              <View style={GlobalStyles.inputContainer}>
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Gender"
+                  placeholderTextColor={theme.colors.text}
+                  value={profile.gender}
+                  onChangeText={(text) => setProfile({ ...profile, gender: text })}
+                />
+              </View>
+
+              {/* Bio */}
+              <Text style={GlobalStyles.text}>Bio</Text>
+              <View style={GlobalStyles.inputContainer}>
+                <TextInput
+                  style={[GlobalStyles.input, { height: 100 }]}
+                  placeholder="Bio"
+                  placeholderTextColor={theme.colors.text}
+                  value={profile.bio}
+                  onChangeText={(text) => setProfile({ ...profile, bio: text })}
+                  multiline
+                />
+              </View>
+              <TouchableOpacity style={GlobalStyles.button} onPress={handleSave}>
+                <Text style={GlobalStyles.buttonText}>Save Profile</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+};
+
 
 export default EditProfileScreen;

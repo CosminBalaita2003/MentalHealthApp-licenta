@@ -9,25 +9,25 @@ const userService = {
    */
   login: async (email, password) => {
     try {
-      console.log("🔹 Sending login request to:", `${API_URL}/api/User/login`);
-      console.log("🔹 With data:", { email, password });
+      console.log(" Sending login request to:", `${API_URL}/api/User/login`);
+      console.log(" With data:", { email, password });
 
       const response = await axios.post(`${API_URL}/api/User/login`, { email, password });
 
-      console.log("✅ Response from backend:", response.data);
+      console.log(" Response from backend:", response.data);
 
       const token = response.data?.token || response.data?.Token;
       if (!token) {
-        console.error("❌ Token missing in response!");
+        console.error(" Token missing in response!");
         return { success: false, message: "Token-ul lipseste în răspuns!" };
       }
 
-      await AsyncStorage.setItem("token", token); // ✅ Fix Here
-      console.log("✅ Token saved:", token);
+      await AsyncStorage.setItem("token", token); //  Fix Here
+      console.log(" Token saved:", token);
 
       return { success: true, token };
     } catch (error) {
-      console.error("❌ Login error:", error.response?.data || error.message);
+      console.error(" Login error:", error.response?.data || error.message);
       return { success: false, message: error.response?.data?.Message || "Eroare la autentificare" };
     }
   },
@@ -37,23 +37,23 @@ const userService = {
    */
   getUser: async () => {
     try {
-      const token = await AsyncStorage.getItem("token"); // ✅ Fix Here
+      const token = await AsyncStorage.getItem("token"); //  Fix Here
       if (!token) {
-        console.warn("❌ No token found!");
+        console.warn(" No token found!");
         return { success: false, message: "Utilizator neautentificat" };
       }
 
-      console.log("🔹 Fetching user with token:", token);
+      console.log(" Fetching user with token:", token);
 
       const response = await axios.get(`${API_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("✅ User fetched:", response.data);
+      console.log(" User fetched:", response.data);
 
       return { success: true, user: response.data };
     } catch (error) {
-      console.error("❌ GetUser error:", error.response?.data || error.message);
+      console.error(" GetUser error:", error.response?.data || error.message);
       return { success: false, message: "Eroare la obținerea utilizatorului" };
     }
   },
@@ -63,12 +63,12 @@ const userService = {
    */
   editUser: async (profile) => {
     try {
-      const token = await AsyncStorage.getItem("token"); // ✅ Fix Here
+      const token = await AsyncStorage.getItem("token"); //  Fix Here
       if (!token) {
         return { success: false, message: "Utilizator neautentificat" };
       }
 
-      console.log("🔹 Sending edit request with token:", token);
+      console.log(" Sending edit request with token:", token);
 
       const profileData = {
         fullName: profile.fullName && typeof profile.fullName === "string" ? profile.fullName.trim() : "",
@@ -80,7 +80,7 @@ const userService = {
         bio: profile.bio ? String(profile.bio).trim() : "",
       };
 
-      console.log("🔹 Sending data:", JSON.stringify(profileData, null, 2));
+      console.log(" Sending data:", JSON.stringify(profileData, null, 2));
 
       const response = await axios.put(`${API_URL}/api/user/edit`, profileData, {
         headers: {
@@ -89,14 +89,14 @@ const userService = {
         },
       });
 
-      console.log("✅ User updated:", response.data);
+      console.log(" User updated:", response.data);
 
       return { success: true, message: response.data?.Message || "Datele au fost actualizate" };
     } catch (error) {
-      console.error("❌ EditUser error:", error.response?.data || error.message);
+      console.error(" EditUser error:", error.response?.data || error.message);
 
       if (error.response) {
-        console.log("❌ Full error response:", JSON.stringify(error.response.data, null, 2));
+        console.log(" Full error response:", JSON.stringify(error.response.data, null, 2));
       }
 
       return { success: false, message: "Eroare la actualizarea datelor" };
@@ -108,34 +108,34 @@ const userService = {
    */
   logout: async () => {
     try {
-      await AsyncStorage.removeItem("token"); // ✅ Fix Here
-      console.log("✅ Token removed");
+      await AsyncStorage.removeItem("token"); //  Fix Here
+      console.log(" Token removed");
     } catch (error) {
-      console.error("❌ Logout error:", error.message);
+      console.error(" Logout error:", error.message);
     }
   },
 
   /**
  * Register - Trimite datele de înregistrare la backend.
  */
-register: async (userData) => {
-  try {
-    console.log("🔹 Sending register request to:", `${API_URL}/api/User/register`);
-    console.log("🔹 With data:", userData);
+  register: async (userData) => {
+    try {
+      console.log(" Sending register request to:", `${API_URL}/api/User/register`);
+      console.log(" With data:", userData);
 
-    const response = await axios.post(`${API_URL}/api/User/register`, userData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      const response = await axios.post(`${API_URL}/api/User/register`, userData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    console.log("✅ Registration response:", response.data);
-    return { success: true, message: response.data?.Message || "User registered successfully!" };
-  } catch (error) {
-    console.error("❌ Register error:", error.response?.data || error.message);
-    return { success: false, message: error.response?.data?.Message || "Eroare la înregistrare" };
-  }
-},
+      console.log(" Registration response:", response.data);
+      return { success: true, message: response.data?.Message || "User registered successfully!" };
+    } catch (error) {
+      console.error(" Register error:", error.response?.data || error.message);
+      return { success: false, message: error.response?.data?.Message || "Eroare la înregistrare" };
+    }
+  },
 
 };
 

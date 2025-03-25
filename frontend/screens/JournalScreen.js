@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
-  View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert 
+import {
+  View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { fetchUserEntries } from "../services/journalService";
@@ -19,26 +19,26 @@ const JournalScreen = () => {
   );
 
   const loadEntries = async () => {
-    console.log("🔹 Loading journal entries...");
+    console.log(" Loading journal entries...");
     setLoading(true);
 
     try {
-        const response = await fetchUserEntries();
-        console.log("🔹 Response from fetchUserEntries:", JSON.stringify(response, null, 2)); // 🔥 Vezi structura exactă
+      const response = await fetchUserEntries();
+      console.log(" Response from fetchUserEntries:", JSON.stringify(response, null, 2)); // 🔥 Vezi structura exactă
 
-        if (response.success && response.entries?.length > 0) {
-            setEntries(response.entries);
-        } else {
-            setEntries([]);
-            Alert.alert("Info", "No journal entries found.");
-        }
+      if (response.success && response.entries?.length > 0) {
+        setEntries(response.entries);
+      } else {
+        setEntries([]);
+        Alert.alert("Info", "No journal entries found.");
+      }
     } catch (error) {
-        console.error("❌ Error in loadEntries:", error);
-        Alert.alert("Error", "Something went wrong while loading journal entries.");
+      console.error(" Error in loadEntries:", error);
+      Alert.alert("Error", "Something went wrong while loading journal entries.");
     }
 
     setLoading(false);
-};
+  };
 
 
   const formatDate = (dateString) => {
@@ -54,7 +54,7 @@ const JournalScreen = () => {
   return (
     <View style={journalStyles.container}>
       <Text style={journalStyles.header}>Journal</Text>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={journalStyles.button}
         onPress={() => navigation.navigate("NewEntryScreen")}
       >
@@ -73,8 +73,8 @@ const JournalScreen = () => {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={journalStyles.listContainer}
           renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={journalStyles.journalCard} 
+            <TouchableOpacity
+              style={journalStyles.journalCard}
               onPress={() => Alert.alert(item.emotion?.name ?? "No Emotion", item.content)}
             >
               <Text style={journalStyles.journalEmotionTitle}>{item.emotion?.name ?? "Unknown"}</Text>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, 
+import {
+  View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView,
   ScrollView, TouchableWithoutFeedback, Keyboard, Platform, FlatList, Modal, Alert
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -36,83 +36,82 @@ const RegisterScreen = () => {
 
   const navigation = useNavigation();
 
- 
+
   const searchCities = async (text) => {
     setSearchTerm(text);
-    
+
     if (text.length < 2) {
       setCities([]);
       setShowCityList(false);
       return;
     }
-  
+
     try {
       console.log("🔍 Searching for cities:", text);
-  
+
       const response = await fetch(`${process.env.API_URL}/api/City/search?name=${text}`);
       const data = await response.json();
-  
+
       console.log("📥 API Response:", data); // Vezi ce returnează API-ul
-  
+
       // 🔥 Extragem array-ul de orașe din `$values`
       const citiesArray = data?.$values || [];
-  
+
       if (Array.isArray(citiesArray) && citiesArray.length > 0) {
         setCities(citiesArray);
         setShowCityList(true);
-        console.log("✅ Cities state updated:", citiesArray);
+        console.log(" Cities state updated:", citiesArray);
       } else {
         setCities([]);
         setShowCityList(false);
-        console.log("❌ No cities found.");
+        console.log(" No cities found.");
       }
     } catch (error) {
-      console.error("❌ Error fetching cities:", error);
+      console.error(" Error fetching cities:", error);
       setCities([]);
       setShowCityList(false);
     }
   };
   const handleRegister = async () => {
-    if (!formData.fullName || !formData.email || !formData.password || 
-      !formData.cityId || !formData.gender || !formData.pronouns || !formData.bio) 
-   {
-        Alert.alert("Eroare", "Toate câmpurile sunt obligatorii.");
-        return;
+    if (!formData.fullName || !formData.email || !formData.password ||
+      !formData.cityId || !formData.gender || !formData.pronouns || !formData.bio) {
+      Alert.alert("Eroare", "Toate câmpurile sunt obligatorii.");
+      return;
     }
 
     try {
       const formattedTime = knowsBirthTime
-      ? formData.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-      : null;
-    
-    const userData = { 
-      ...formData,
-      dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth.toISOString() : new Date().toISOString(),
-      timeOfBirth: formattedTime,
-    };
-      
+        ? formData.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+        : null;
 
-        const response = await userService.register(userData);
-        console.log("Register Response:", response);
+      const userData = {
+        ...formData,
+        dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth.toISOString() : new Date().toISOString(),
+        timeOfBirth: formattedTime,
+      };
 
-        if (response.success) {
-            // Afișăm mesajul și redirecționăm după ce userul apasă "OK"
-            Alert.alert("Success", "User registered successfully!", [
-                { text: "OK", onPress: () => navigation.replace("WelcomeScreen") }
-            ]);
-        } else {
-            Alert.alert("Eroare", response.message || "A apărut o eroare la înregistrare.");
-        }
+
+      const response = await userService.register(userData);
+      console.log("Register Response:", response);
+
+      if (response.success) {
+        // Afișăm mesajul și redirecționăm după ce userul apasă "OK"
+        Alert.alert("Success", "User registered successfully!", [
+          { text: "OK", onPress: () => navigation.replace("WelcomeScreen") }
+        ]);
+      } else {
+        Alert.alert("Eroare", response.message || "A apărut o eroare la înregistrare.");
+      }
     } catch (error) {
-        console.error("Register error:", error);
-        Alert.alert("Eroare", "A apărut o eroare. Te rugăm să încerci din nou.");
+      console.error("Register error:", error);
+      Alert.alert("Eroare", "A apărut o eroare. Te rugăm să încerci din nou.");
     }
-};
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"} 
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={GlobalStyles.container}
       >
         <ScrollView contentContainerStyle={GlobalStyles.scrollContainer}>
@@ -122,22 +121,22 @@ const RegisterScreen = () => {
             <>
               <Text style={GlobalStyles.text}>Full Name</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={GlobalStyles.input} 
-                  placeholder="Full Name" 
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Full Name"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.fullName} 
+                  value={formData.fullName}
                   onChangeText={(text) => setFormData({ ...formData, fullName: text })}
                 />
               </View>
 
               <Text style={GlobalStyles.text}>Email</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={GlobalStyles.input} 
-                  placeholder="Email" 
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Email"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.email} 
+                  value={formData.email}
                   onChangeText={(text) => setFormData({ ...formData, email: text })}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -146,11 +145,11 @@ const RegisterScreen = () => {
 
               <Text style={GlobalStyles.text}>Password</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={GlobalStyles.passwordInput} 
-                  placeholder="Password" 
+                <TextInput
+                  style={GlobalStyles.passwordInput}
+                  placeholder="Password"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.password} 
+                  value={formData.password}
                   onChangeText={(text) => setFormData({ ...formData, password: text })}
                   secureTextEntry
                 />
@@ -171,9 +170,9 @@ const RegisterScreen = () => {
               </TouchableOpacity>
               {showDatePicker && (
                 <>
-                  <DateTimePicker 
-                    value={formData.dateOfBirth} 
-                    mode="date" 
+                  <DateTimePicker
+                    value={formData.dateOfBirth}
+                    mode="date"
                     display="spinner"
                     textColor='white'
                     onChange={(event, selectedDate) => setFormData({ ...formData, dateOfBirth: selectedDate || formData.dateOfBirth })}
@@ -185,63 +184,63 @@ const RegisterScreen = () => {
               )}
 
               {/* Birth Hour */}
-             {/* Checkbox pentru ora nașterii */}
-<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-  <TouchableOpacity
-    onPress={() => setKnowsBirthTime(!knowsBirthTime)}
-    style={{
-      width: 20,
-      height: 20,
-      borderWidth: 1,
-      borderColor: theme.colors.text,
-      backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
-      marginRight: 10,
-      borderRadius: 5,
-    }}
-  />
-  <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
-</View>
+              {/* Checkbox pentru ora nașterii */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <TouchableOpacity
+                  onPress={() => setKnowsBirthTime(!knowsBirthTime)}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderWidth: 1,
+                    borderColor: theme.colors.text,
+                    backgroundColor: knowsBirthTime ? theme.colors.text : 'transparent',
+                    marginRight: 10,
+                    borderRadius: 5,
+                  }}
+                />
+                <Text style={GlobalStyles.text}>Do you know your birth time?</Text>
+              </View>
 
-{/* Time Picker dacă se știe ora nașterii */}
-{knowsBirthTime && (
-  <>
-    <Text style={GlobalStyles.text}>Birth Hour</Text>
-    <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
-      <Text style={{ color: theme.colors.background }}>
-        {formData.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </Text>
-    </TouchableOpacity>
-    {showTimePicker && (
-      <>
-        <DateTimePicker 
-          value={formData.timeOfBirth} 
-          mode="time" 
-          display="spinner"
-          textColor='white'
-          onChange={(event, selectedTime) =>
-            setFormData({ ...formData, timeOfBirth: selectedTime || formData.timeOfBirth })
-          }
-        />
-        <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
-          <Text style={GlobalStyles.buttonText}>Save Time</Text>
-        </TouchableOpacity>
-      </>
-    )}
-  </>
-)}
+              {/* Time Picker dacă se știe ora nașterii */}
+              {knowsBirthTime && (
+                <>
+                  <Text style={GlobalStyles.text}>Birth Hour</Text>
+                  <TouchableOpacity style={GlobalStyles.time} onPress={() => setShowTimePicker(true)}>
+                    <Text style={{ color: theme.colors.background }}>
+                      {formData.timeOfBirth.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showTimePicker && (
+                    <>
+                      <DateTimePicker
+                        value={formData.timeOfBirth}
+                        mode="time"
+                        display="spinner"
+                        textColor='white'
+                        onChange={(event, selectedTime) =>
+                          setFormData({ ...formData, timeOfBirth: selectedTime || formData.timeOfBirth })
+                        }
+                      />
+                      <TouchableOpacity style={GlobalStyles.button} onPress={() => setShowTimePicker(false)}>
+                        <Text style={GlobalStyles.buttonText}>Save Time</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </>
+              )}
 
-              
 
-             {/* City */}
-             <Text style={GlobalStyles.text}>City</Text>
+
+              {/* City */}
+              <Text style={GlobalStyles.text}>City</Text>
               <TouchableOpacity style={GlobalStyles.inputContainer} onPress={() => setShowCityModal(true)}>
                 <Text style={[GlobalStyles.input, { textAlignVertical: 'center', paddingVertical: 15 }]}>
                   {formData.city || "Select City"}
                 </Text>
               </TouchableOpacity>
 
-             {/* City Modal */}
-             <Modal visible={showCityModal} animationType="slide" transparent>
+              {/* City Modal */}
+              <Modal visible={showCityModal} animationType="slide" transparent>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <View style={GlobalStyles.modalContainer}>
                     <View style={GlobalStyles.modalContent}>
@@ -249,7 +248,7 @@ const RegisterScreen = () => {
                       <TextInput
                         style={GlobalStyles.modalInput}
                         placeholder="Type city name..."
-                        placeholderTextColor={theme.colors.neutral} // 🔹 Mai contrastant
+                        placeholderTextColor={theme.colors.neutral} //  Mai contrastant
                         value={searchTerm}
                         onChangeText={(text) => {
                           setSearchTerm(text);
@@ -263,8 +262,8 @@ const RegisterScreen = () => {
                           keyExtractor={(item) => item.id.toString()}
                           keyboardShouldPersistTaps="handled"
                           renderItem={({ item }) => (
-                            <TouchableOpacity 
-                              style={GlobalStyles.cityListItem} 
+                            <TouchableOpacity
+                              style={GlobalStyles.cityListItem}
                               onPress={() => {
                                 setFormData({ ...formData, cityId: item.id, city: item.name });
                                 setShowCityModal(false);
@@ -276,7 +275,7 @@ const RegisterScreen = () => {
                           )}
                         />
                       )}
-                      
+
                     </View>
                   </View>
                 </TouchableWithoutFeedback>
@@ -286,11 +285,11 @@ const RegisterScreen = () => {
               {/* Pronouns */}
               <Text style={GlobalStyles.text}>Pronouns</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={GlobalStyles.input} 
-                  placeholder="Pronouns" 
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Pronouns"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.pronouns} 
+                  value={formData.pronouns}
                   onChangeText={(text) => setFormData({ ...formData, pronouns: text })}
                 />
               </View>
@@ -298,11 +297,11 @@ const RegisterScreen = () => {
               {/* Gender */}
               <Text style={GlobalStyles.text}>Gender</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={GlobalStyles.input} 
-                  placeholder="Gender" 
+                <TextInput
+                  style={GlobalStyles.input}
+                  placeholder="Gender"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.gender} 
+                  value={formData.gender}
                   onChangeText={(text) => setFormData({ ...formData, gender: text })}
                 />
               </View>
@@ -310,11 +309,11 @@ const RegisterScreen = () => {
               {/* Bio */}
               <Text style={GlobalStyles.text}>Bio</Text>
               <View style={GlobalStyles.inputContainer}>
-                <TextInput 
-                  style={[GlobalStyles.input, { height: 100 }]} 
-                  placeholder="Bio" 
+                <TextInput
+                  style={[GlobalStyles.input, { height: 100 }]}
+                  placeholder="Bio"
                   placeholderTextColor={theme.colors.text}
-                  value={formData.bio} 
+                  value={formData.bio}
                   onChangeText={(text) => setFormData({ ...formData, bio: text })}
                   multiline
                 />

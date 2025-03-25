@@ -5,7 +5,7 @@ export default {
     card: '#451952',
     accent: '#662549',
     semiaccent: "#AE445A",
-    text:'#faf0ee',
+    text: '#faf0ee',
     neutral: '#4ECDC4',
     backgroundDark: "#16132D",
   },

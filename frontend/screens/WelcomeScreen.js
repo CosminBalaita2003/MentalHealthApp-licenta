@@ -8,7 +8,7 @@ export default function WelcomeScreen({ navigation }) {
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>MindEase</Text>
 
-      <TouchableOpacity style={[globalStyles.button, { backgroundColor: theme.colors.semiaccent}]} onPress={() => navigation.navigate('LoginScreen')}>
+      <TouchableOpacity style={[globalStyles.button, { backgroundColor: theme.colors.semiaccent }]} onPress={() => navigation.navigate('LoginScreen')}>
         <Text style={globalStyles.buttonText}>Log in</Text>
       </TouchableOpacity>
 

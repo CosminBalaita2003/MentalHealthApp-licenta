@@ -16,16 +16,16 @@ export default {
     flexGrow: 1,
     backgroundColor: theme.colors.background,
 
-    alignItems: "center", // 🔹 Centrare orizontală
-    justifyContent: "center", // 🔹 Centrare verticală
+    alignItems: "center", //  Centrare orizontală
+    justifyContent: "center", //  Centrare verticală
     width: "100%",
-    paddingVertical: 20, // 🔹 Spațiere mică pentru aspect echilibrat
+    paddingVertical: 20, //  Spațiere mică pentru aspect echilibrat
   },
-  
+
   text: {
     fontSize: 18,
     color: theme.colors.text,
-    textAlign: "center", // 🔹 Centrare text
+    textAlign: "center", //  Centrare text
     marginBottom: 10,
   },
   sstext: {
@@ -40,17 +40,17 @@ export default {
     color: theme.colors.text,
     marginBottom: 20,
     marginTop: 100,
-    textAlign: "center", // 🔹 Centrare titlu
+    textAlign: "center", //  Centrare titlu
   },
   time: {
     width: '100%',
     height: 45, // Dimensiune mai mare pentru lizibilitate
-    borderWidth: 2, // 🔹 Asigura ca exista un chenar vizibil
-    borderColor: theme.colors.semiaccent, // 🔹 Foloseste o culoare accentuata
-    borderRadius: 10, // 🔹 Colturi rotunjite pentru un aspect modern
+    borderWidth: 2, //  Asigura ca exista un chenar vizibil
+    borderColor: theme.colors.semiaccent, //  Foloseste o culoare accentuata
+    borderRadius: 10, //  Colturi rotunjite pentru un aspect modern
     paddingHorizontal: 15,
     marginBottom: 10,
-    backgroundColor: theme.colors.text, // 🔹 Fundal alb pentru contrast mai bunr
+    backgroundColor: theme.colors.text, //  Fundal alb pentru contrast mai bunr
     justifyContent: 'center',
 
   },
@@ -87,12 +87,12 @@ export default {
     alignItems: "center",
     justifyContent: "center",
 
-    width: "80%", // 🔹 Butoanele sunt mai echilibrate
+    width: "80%", //  Butoanele sunt mai echilibrate
     marginTop: 15,
 
   },
   logoutButton: {
-    backgroundColor: "#AE445A", // 🔹 Culoare specială pentru logout
+    backgroundColor: "#AE445A", //  Culoare specială pentru logout
   },
   buttonText: {
     padding: 10,
@@ -100,7 +100,7 @@ export default {
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-    
+
   },
   linkText: {
     marginTop: 10,
@@ -243,10 +243,10 @@ export default {
   flatListContainer: {
     maxHeight: 300, // 🔥 Asigură că lista are spațiu vizibil
     width: "100%",
-    backgroundColor: "rgba(29, 26, 57, 0.9)", // 🔹 Fundal semitransparent
+    backgroundColor: "rgba(29, 26, 57, 0.9)", //  Fundal semitransparent
     borderRadius: 10,
     padding: 10,
-    marginTop: 10, // 🔹 Distanță față de input
+    marginTop: 10, //  Distanță față de input
   },
 
   chartContainer: {
@@ -261,7 +261,7 @@ export default {
     shadowRadius: 4,
   },
 
-  // 🔹 Container pentru interpretarea ultimului test
+  //  Container pentru interpretarea ultimului test
   interpretationContainer: {
     backgroundColor: theme.colors.background, // Fundal mai puțin intens decât graficul
     padding: 12,
@@ -270,7 +270,7 @@ export default {
     marginTop: 15,
   },
 
-  // 🔹 Text pentru interpretarea scorului
+  //  Text pentru interpretarea scorului
   interpretationText: {
     fontSize: 16,
     color: theme.colors.neutral, // Verde-albăstrui pentru evidențiere
@@ -278,7 +278,7 @@ export default {
     textAlign: "center",
   },
 
-  // 🔹 Container pentru legendă
+  //  Container pentru legendă
   legendContainer: {
     backgroundColor: theme.colors.background, // Fundal mai puțin intens
     padding: 12,
@@ -289,7 +289,7 @@ export default {
     alignSelf: "center",
   },
 
-  // 🔹 Text pentru fiecare nivel din legendă
+  //  Text pentru fiecare nivel din legendă
   legendText: {
     fontSize: 14,
     color: theme.colors.text,
@@ -297,7 +297,7 @@ export default {
     marginVertical: 2, // Spațiere între rânduri
   },
 
-  // 🔹 Stil pentru titlurile secțiunilor (grafic, interpretare, legendă)
+  //  Stil pentru titlurile secțiunilor (grafic, interpretare, legendă)
   subtitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -305,7 +305,7 @@ export default {
     textAlign: "center",
     marginBottom: 10,
   },
-  
+
   backButton: {
     backgroundColor: theme.colors.accent,
     paddingHorizontal: 25,
@@ -344,12 +344,12 @@ export default {
     paddingVertical: 10,
     justifyContent: "center",
   },
-  
+
   carouselContainer: {
     alignItems: "center",
     padding: 10,
   },
-  
+
   carouselContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -358,7 +358,7 @@ export default {
     width: "100%",
     marginTop: 10,
   },
-  
+
   emotionCard: {
     width: 150,
     height: 150,
@@ -370,25 +370,25 @@ export default {
     padding: 20,
     marginBottom: 80,
   },
-  
+
   selectedEmotion: {
     backgroundColor: "#4ECDC4",
   },
-  
+
   emotionText: {
     color: "#ffffff",
     fontSize: 15,
     textAlign: "center",
     width: "100%",
   },
-  
+
   emotionImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 8,
   },
-  
+
 
   journalCard: {
     backgroundColor: "#1E1B3A",
@@ -399,21 +399,21 @@ export default {
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-  
-    width: "100%", // 🔹 Ocupă toată lățimea posibilă
-    alignSelf: "center", // 🔹 Asigură că este centrat corect
-  },  
+
+    width: "100%", //  Ocupă toată lățimea posibilă
+    alignSelf: "center", //  Asigură că este centrat corect
+  },
 
 
   journalEmotionTitle: {
     fontSize: 18,
-    color: "white", // ✅ Emoția este albă
+    color: "white", //  Emoția este albă
     marginBottom: 5,
   },
 
   journalContentText: {
     fontSize: 14,
-    color: "white", // ✅ Textul jurnalului este alb
+    color: "white", //  Textul jurnalului este alb
     marginBottom: 8,
     width: "90%",
     maxWidth: screenWidth * 0.9, // Ensure text fits within the screen width
@@ -422,10 +422,10 @@ export default {
 
   journalDateText: {
     fontSize: 12,
-    color: "white", // ✅ Data este albă
+    color: "white", //  Data este albă
     textAlign: "right",
     marginTop: 5,
   },
 };
 
-  
+
