@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import theme from './theme'; // Importam paleta de culori
 import axios from 'axios';
 import { Dimensions } from "react-native";
+import { min } from 'moment-timezone';
 const screenWidth = Dimensions.get("window").width;
 export default {
   container: {
@@ -82,18 +83,41 @@ export default {
   button: {
     backgroundColor: theme.colors.accent,
     paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-
-    width: "80%", //  Butoanele sunt mai echilibrate
-    marginTop: 15,
-
+    minHeight: 48,
+    minWidth: 250,
+    width: "100%",
+    marginVertical: 8, // spațiu între butoane
   },
-  logoutButton: {
-    backgroundColor: "#AE445A", //  Culoare specială pentru logout
+  buttonTest: {
+    backgroundColor: theme.colors.accent,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 48,
+   
+    width: "80%",
+    marginVertical: 8, // spațiu între butoane
   },
+  
+  buttonLogout: {
+    backgroundColor: theme.colors.semiaccent, // altă culoare pentru logout
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 48,
+    minWidth: 250,
+    width: "100%",
+    marginVertical: 8,
+  },
+  
   buttonText: {
     padding: 10,
     color: theme.colors.text,
@@ -339,93 +363,7 @@ export default {
     color: "#D3D3D3",
     marginTop: 5,
   },
-  emotionList: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    justifyContent: "center",
-  },
 
-  carouselContainer: {
-    alignItems: "center",
-    padding: 10,
-  },
-
-  carouselContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 20,
-    width: "100%",
-    marginTop: 10,
-  },
-
-  emotionCard: {
-    width: 150,
-    height: 150,
-    backgroundColor: "#1E1B3A",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 15,
-    marginHorizontal: 10,
-    padding: 20,
-    marginBottom: 80,
-  },
-
-  selectedEmotion: {
-    backgroundColor: "#4ECDC4",
-  },
-
-  emotionText: {
-    color: "#ffffff",
-    fontSize: 15,
-    textAlign: "center",
-    width: "100%",
-  },
-
-  emotionImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 8,
-  },
-
-
-  journalCard: {
-    backgroundColor: "#1E1B3A",
-    borderRadius: 12,
-    padding: 15,
-    marginVertical: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-
-    width: "100%", //  Ocupă toată lățimea posibilă
-    alignSelf: "center", //  Asigură că este centrat corect
-  },
-
-
-  journalEmotionTitle: {
-    fontSize: 18,
-    color: "white", //  Emoția este albă
-    marginBottom: 5,
-  },
-
-  journalContentText: {
-    fontSize: 14,
-    color: "white", //  Textul jurnalului este alb
-    marginBottom: 8,
-    width: "90%",
-    maxWidth: screenWidth * 0.9, // Ensure text fits within the screen width
-    flexWrap: "wrap",
-  },
-
-  journalDateText: {
-    fontSize: 12,
-    color: "white", //  Data este albă
-    textAlign: "right",
-    marginTop: 5,
-  },
 };
 
 

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
-import GlobalStyles from "../styles/globalStyles";
+import { Ionicons } from "@expo/vector-icons";
 import userService from "../services/userService";
 import testService from "../services/testService";
 import TestStatistics from "../components/TestStatistics";
 import GAD7Test from "../components/GAD7Test";
 import PSS10Test from "../components/StressTest";
-
+import styles from "../styles/testScreenStyles";
+import PHQ9Test from "../components/PHQ9Test";
 const TestScreen = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [user, setUser] = useState(null);
@@ -31,42 +32,56 @@ const TestScreen = () => {
 
   if (loading) {
     return (
-      <View style={[GlobalStyles.container, { backgroundColor: "#16132D" }]}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" color="#4ECDC4" />
+      </View>
+    );
+  }
+
+  if (activeSection) {
+    return (
+      <View style={{ flex: 1 }}>
+        {activeSection === "statistics" ? (
+          <TestStatistics tests={tests} onBack={() => setActiveSection(null)} />
+        ) : (
+          <View style={{ flex: 1 }}>
+  {activeSection === "GAD7Test" && <GAD7Test user={user} onClose={() => setActiveSection(null)} />}
+{activeSection === "PSS10Test" && <PSS10Test user={user} onClose={() => setActiveSection(null)} />}
+{activeSection === "PHQ9Test" && <PHQ9Test user={user} onClose={() => setActiveSection(null)} />}
+
+</View>
+
+        )}
       </View>
     );
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#16132D" }}>
-      {activeSection ? (
-        <View style={{ flex: 1 }}>
-          {activeSection === "statistics" ? (
-            <TestStatistics tests={tests} onBack={() => setActiveSection(null)} />
-          ) : (
-            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
-              {activeSection === "GAD7Test" && <GAD7Test user={user} onClose={() => setActiveSection(null)} />}
-              {activeSection === "PSS10Test" && <PSS10Test user={user} onClose={() => setActiveSection(null)} />}
-            </ScrollView>
-          )}
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>Mental Health Tests</Text>
+        <View style={styles.divider}>
+          <TouchableOpacity style={styles.card} onPress={() => setActiveSection("statistics")}>
+            <Ionicons name="bar-chart-outline" size={20} color="#fff" />
+            <Text style={styles.cardText}>Show Statistics</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} onPress={() => setActiveSection("GAD7Test")}>
+            <Ionicons name="pulse-outline" size={20} color="#fff" />
+            <Text style={styles.cardText}>Start Anxiety Test (GAD-7)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} onPress={() => setActiveSection("PSS10Test")}>
+            <Ionicons name="flash-outline" size={20} color="#fff" />
+            <Text style={styles.cardText}>Start Stress Test (PSS-10)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => setActiveSection("PHQ9Test")}>
+  <Ionicons name="cloud-outline" size={20} color="#fff" />
+  <Text style={styles.cardText}>Start Depression Test (PHQ-9)</Text>
+</TouchableOpacity>
+
         </View>
-      ) : (
-        <ScrollView contentContainerStyle={[GlobalStyles.scrollContainer, { paddingBottom: 120 }]} keyboardShouldPersistTaps="handled">
-          <Text style={GlobalStyles.title}>Mental Health Tests</Text>
-
-          <TouchableOpacity style={GlobalStyles.button} onPress={() => setActiveSection("statistics")}>
-            <Text style={GlobalStyles.buttonText}>Show Statistics</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={GlobalStyles.button} onPress={() => setActiveSection("GAD7Test")}>
-            <Text style={GlobalStyles.buttonText}>Start Anxiety Test (GAD-7)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={GlobalStyles.button} onPress={() => setActiveSection("PSS10Test")}>
-            <Text style={GlobalStyles.buttonText}>Start Stress Test (PSS-10)</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      )}
+      </ScrollView>
     </View>
   );
 };

@@ -1,41 +1,55 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Keyboard, TouchableWithoutFeedback } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import userService from "../services/userService"; //  Importă serviciul userService
-import { fetchEmotions, addJournalEntry } from "../services/journalService";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import userService from "../services/userService";
+import { fetchEmotions, updateJournalEntry } from "../services/journalService";
 import JournalStyles from "../styles/journalStyles";
 import theme from "../styles/theme";
 import EmotionSelector from "../components/EmotionSelector";
 import JournalTextBox from "../components/JournalTextBox";
 
-const NewEntryScreen = () => {
+const EditEntryScreen = () => {
   const [content, setContent] = useState("");
   const [emotionId, setEmotionId] = useState(null);
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); //  Stochează user-ul complet
+  const [user, setUser] = useState(null);
+
   const navigation = useNavigation();
+  const route = useRoute();
+  const entry = route.params?.entry;
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
 
-      //  Obține utilizatorul
       const userResponse = await userService.getUser();
       if (userResponse.success) {
-        setUser(userResponse.user); //  Stochează user-ul
+        setUser(userResponse.user);
       } else {
         Alert.alert("Error", "Failed to load user data.");
         setLoading(false);
         return;
       }
 
-      //  Obține emoțiile
       const emotionsResponse = await fetchEmotions();
       if (emotionsResponse.success) {
         setEmotions(emotionsResponse.emotions);
       } else {
         Alert.alert("Error", emotionsResponse.message || "Failed to load emotions.");
+      }
+
+      if (entry) {
+        setContent(entry.content);
+        setEmotionId(entry.emotionId);
       }
 
       setLoading(false);
@@ -51,36 +65,50 @@ const NewEntryScreen = () => {
     }
 
     if (!user) {
-      Alert.alert("Error", "User data is missing. Please log in again.");
+      Alert.alert("Error", "User data is missing.");
       return;
     }
 
     try {
-      console.log(" Sending data:", { content, emotionId, user });
+      // 🔧 Reconstruim city manual din cityId și cityName
+      const updatedEntry = {
+        ...entry,
+        content,
+        emotionId,
+        user
+      };
 
-      const response = await addJournalEntry(content, emotionId, user);
-      console.log(" Success:", response);
-      Alert.alert("Success", response.message);
+
+      const response = await updateJournalEntry(updatedEntry, user);
+
+
+      console.log("Update Success:", response);
+
+      Alert.alert("Success", "Entry updated successfully.");
       navigation.goBack();
     } catch (error) {
-      console.error(" Error adding journal entry:", error.response?.data || error.message);
-      Alert.alert("Error", error.response?.data?.message || "An error occurred while saving the entry.");
+      console.error("Error updating journal entry:", error.response?.data || error.message);
+      Alert.alert("Error", error.response?.data?.message || "Could not update the entry.");
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={[JournalStyles.container]}>
-        <Text style={JournalStyles.title}>New Journal Entry</Text>
+      <View style={JournalStyles.container}>
+        <Text style={JournalStyles.title}>Edit Journal Entry</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color={theme.colors.primary} />
         ) : (
           <View style={{ flex: 1, justifyContent: "center", width: "100%" }}>
             <JournalTextBox value={content} onChangeText={setContent} />
-            <EmotionSelector emotions={emotions} selectedEmotionId={emotionId} onSelectEmotion={setEmotionId} />
+            <EmotionSelector
+              emotions={emotions}
+              selectedEmotionId={emotionId}
+              onSelectEmotion={setEmotionId}
+            />
             <TouchableOpacity style={JournalStyles.button} onPress={handleSubmit}>
-              <Text style={JournalStyles.buttonText}>Save Entry</Text>
+              <Text style={JournalStyles.buttonText}>Update Entry</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -89,4 +117,4 @@ const NewEntryScreen = () => {
   );
 };
 
-export default NewEntryScreen;
+export default EditEntryScreen;

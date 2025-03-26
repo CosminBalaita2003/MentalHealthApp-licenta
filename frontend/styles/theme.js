@@ -8,6 +8,8 @@ export default {
     text: '#faf0ee',
     neutral: '#4ECDC4',
     backgroundDark: "#16132D",
+    backgroundLight: "#39397d",
+    black: "#000",
   },
   font: {
     fontFamily: 'Nunito',

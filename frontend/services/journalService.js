@@ -150,3 +150,70 @@ export const fetchEmotions = async () => {
   }
 };
 
+export const updateJournalEntry = async (entry, user) => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    console.log(" Retrieved Auth Token:", token);
+
+    if (!token) {
+      throw new Error(" No auth token found!");
+    }
+
+    // 📌 Construim `user.city` din `user.city` SAU `user.cityId` + `user.cityName`
+    const userCity = {
+      id: user.city?.id || 0,
+      name: user.city?.name || "Unknown",
+      nameAscii: user.city?.nameAscii || "Unknown",
+      country: user.city?.country || "Unknown",
+      iso2: user.city?.iso2 || "XX",
+      iso3: user.city?.iso3 || "XXX",
+      admin1: user.city?.admin1 || "Unknown",
+      capital: user.city?.capital || "Unknown",
+      lat: user.city?.lat || 0,
+      lon: user.city?.lon || 0,
+      pop: user.city?.pop || 0
+    };
+  
+
+
+    // 📌 Construim user complet
+    const userObject = {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      bio: user.bio || "",
+      pronouns: user.pronouns || "",
+      gender: user.gender || "",
+      createdAt: user.createdAt,
+      city: userCity,
+      journalEntries: [],
+    };
+
+    // 📌 Construim corpul requestului
+    const requestBody = {
+      ...entry,
+      userId: user.id,
+      user: userObject,
+      emotionId: entry.emotionId,
+      content: entry.content,
+      date: entry.date,
+    };
+
+    console.log("Updating entry:", requestBody);
+
+    const response = await axios.put(
+      `${API_URL}/api/JournalEntry/${entry.id}`,
+      requestBody,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      }
+    );
+
+    console.log("Update success:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating journal entry:", error.response?.data || error.message);
+    throw error;
+  }
+};

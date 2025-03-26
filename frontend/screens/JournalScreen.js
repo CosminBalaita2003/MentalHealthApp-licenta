@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { fetchUserEntries } from "../services/journalService";
 import journalStyles from "../styles/journalStyles";
 import theme from "../styles/theme";
+import { Ionicons } from "@expo/vector-icons"; // pentru iconul de edit
 
 const JournalScreen = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEntry, setSelectedEntry] = useState(null); // 🔥 pentru modal
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -19,13 +29,10 @@ const JournalScreen = () => {
   );
 
   const loadEntries = async () => {
-    console.log(" Loading journal entries...");
     setLoading(true);
 
     try {
       const response = await fetchUserEntries();
-      console.log(" Response from fetchUserEntries:", JSON.stringify(response, null, 2)); // 🔥 Vezi structura exactă
-
       if (response.success && response.entries?.length > 0) {
         setEntries(response.entries);
       } else {
@@ -40,7 +47,6 @@ const JournalScreen = () => {
     setLoading(false);
   };
 
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -49,6 +55,17 @@ const JournalScreen = () => {
       day: "numeric",
       year: "numeric"
     });
+  };
+
+  const handleEntryPress = (entry) => {
+    setSelectedEntry(entry);
+    setModalVisible(true);
+  };
+
+  const handleEdit = () => {
+
+    navigation.navigate("EditEntryScreen", { entry: selectedEntry });
+    setModalVisible(false);
   };
 
   return (
@@ -75,15 +92,85 @@ const JournalScreen = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={journalStyles.journalCard}
-              onPress={() => Alert.alert(item.emotion?.name ?? "No Emotion", item.content)}
+              onPress={() => handleEntryPress(item)}
             >
-              <Text style={journalStyles.journalEmotionTitle}>{item.emotion?.name ?? "Unknown"}</Text>
+              {/* <Text style={journalStyles.journalEmotionTitle}>Your Emotion: {item.emotion?.name ?? "Unknown"}</Text> */}
               <Text style={journalStyles.journalContentText}>{item.content}</Text>
-              <Text style={journalStyles.journalDateText}>{formatDate(item.date)}</Text>
+
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <Text style={journalStyles.journalEmotionLabel}>
+                  Your Emotion:{" "}
+                  <Text style={journalStyles.journalEmotionValue}>
+                    {item.emotion?.name ?? "Unknown"}
+                  </Text>
+                </Text>
+
+                <Text style={journalStyles.journalDateText}>
+                  {formatDate(item.date)}
+                </Text>
+              </View>
+
             </TouchableOpacity>
           )}
         />
       )}
+
+      {/* 🔥 Modal nativ scrollabil */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.2)",
+          justifyContent: "flex-end"
+        }}>
+          <View style={{
+            backgroundColor: theme.colors.backgroundLight,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 20,
+            height: "80%",
+
+
+          }}>
+            <TouchableOpacity
+              onPress={handleEdit}
+              style={{ position: "absolute", top: 10, right: 10 }}
+            >
+              <Ionicons name="pencil" size={22} color={theme.colors.text} />
+            </TouchableOpacity>
+
+            <ScrollView>
+              <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, color: theme.colors.text }}>
+                {selectedEntry?.emotion?.name ?? "Emotion"}
+              </Text>
+              <Text style={{ color: "gray", marginBottom: 10 }}>
+                {formatDate(selectedEntry?.date)}
+              </Text>
+              <Text style={{ fontSize: 16, lineHeight: 22, color: theme.colors.text }}>
+                {selectedEntry?.content}
+              </Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={{
+                marginTop: 15,
+                alignSelf: "center",
+                backgroundColor: theme.colors.primary,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 10
+              }}
+            >
+              <Text style={{ color: "white" }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

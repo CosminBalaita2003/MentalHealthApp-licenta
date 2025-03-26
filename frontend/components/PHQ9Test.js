@@ -12,13 +12,15 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/testStyles";
 
 const questions = [
-  "How often have you felt nervous, anxious, or on edge?",
-  "How often have you had trouble controlling your worries?",
-  "How often have you had difficulty relaxing?",
-  "How often have you felt restless?",
-  "How often have you been easily annoyed or irritable?",
-  "How often have you felt afraid that something terrible might happen?",
-  "How often have you felt like you're losing control?",
+  "Little interest or pleasure in doing things",
+  "Feeling down, depressed or hopeless",
+  "Trouble falling asleep, staying asleep, or sleeping too much",
+  "Feeling tired or having little energy",
+  "Poor appetite or overeating",
+  "Feeling bad about yourself – or that you’re a failure or have let yourself or your family down",
+  "Trouble concentrating on things, such as reading the newspaper or watching television",
+  "Moving or speaking so slowly that other people could have noticed. Or the opposite – being so fidgety or restless that you have been moving around a lot more than usual",
+  "Thoughts that you would be better off dead or of hurting yourself in some way",
 ];
 
 const options = [
@@ -28,44 +30,39 @@ const options = [
   { label: "Nearly every day", value: 3 },
 ];
 
-const GAD7Test = ({ user, onClose }) => {
+const PHQ9Test = ({ user, onClose }) => {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleSelect = (value) => {
-    const updatedAnswers = [...answers];
-    updatedAnswers[currentQuestion] = value;
-    setAnswers(updatedAnswers);
+    const updated = [...answers];
+    updated[currentQuestion] = value;
+    setAnswers(updated);
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert("Error", "User is not authenticated!");
-        return;
-      }
-
       const score = answers.reduce((sum, val) => sum + val, 0);
-      const interpretation =
-        score <= 4
-          ? "Minimal Anxiety"
-          : score <= 9
-          ? "Mild Anxiety"
-          : score <= 14
-          ? "Moderate Anxiety"
-          : "Severe Anxiety";
+
+      let interpretation = "Unknown";
+      if (score <= 4) interpretation = "None-minimal";
+      else if (score <= 9) interpretation = "Mild";
+      else if (score <= 14) interpretation = "Moderate";
+      else if (score <= 19) interpretation = "Moderately Severe";
+      else interpretation = "Severe";
 
       const requestBody = {
         id: 0,
         userId: user.id,
         testDate: new Date().toISOString(),
-        testType: "GAD-7",
+        testType: "PHQ-9",
         score,
         interpretation,
-        recommendations: "Try breathing exercises and relaxation techniques.",
+        recommendations:
+          "Based on score: consider treatment plan with counseling, pharmacotherapy or referral if needed.",
       };
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
@@ -96,10 +93,10 @@ const GAD7Test = ({ user, onClose }) => {
         <TouchableOpacity onPress={onClose} style={styles.iconButton}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>GAD-7 Anxiety Test</Text>
+        <Text style={styles.title}>PHQ-9 Depression Test</Text>
       </View>
 
-      {/* Progress Indicator */}
+      {/* Progress */}
       <Text style={styles.progressText}>
         Question {currentQuestion + 1} of {questions.length}
       </Text>
@@ -114,7 +111,7 @@ const GAD7Test = ({ user, onClose }) => {
         />
       </View>
 
-      {/* Question Area */}
+      {/* Question */}
       <View style={styles.questionWrapper}>
         <Text style={styles.questionText}>{questions[currentQuestion]}</Text>
         {options.map((option) => (
@@ -122,7 +119,8 @@ const GAD7Test = ({ user, onClose }) => {
             key={option.value}
             style={[
               styles.optionButton,
-              answers[currentQuestion] === option.value && styles.selectedOption,
+              answers[currentQuestion] === option.value &&
+                styles.selectedOption,
             ]}
             onPress={() => handleSelect(option.value)}
           >
@@ -131,7 +129,7 @@ const GAD7Test = ({ user, onClose }) => {
         ))}
       </View>
 
-      {/* Navigation buttons */}
+      {/* Navigation */}
       <View style={styles.navButtons}>
         {currentQuestion > 0 && (
           <TouchableOpacity
@@ -173,4 +171,4 @@ const GAD7Test = ({ user, onClose }) => {
   );
 };
 
-export default GAD7Test;
+export default PHQ9Test;

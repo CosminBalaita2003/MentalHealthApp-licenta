@@ -1,7 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
-import GlobalStyles from "../styles/globalStyles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  StatusBar,
+} from "react-native";import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import styles from "../styles/testStyles";
+
 
 const questions = [
   "In the last month, how often have you been upset because something that happened unexpectedly?",
@@ -25,37 +33,32 @@ const options = [
 ];
 
 const StressTest = ({ user, onClose }) => {
-  const [answers, setAnswers] = useState(Array(questions.length).fill(0));
+  const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [loading, setLoading] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
 
-  const handleChange = (index, value) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = value;
-    setAnswers(newAnswers);
+  const handleSelect = (value) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentQuestion] = value;
+    setAnswers(updatedAnswers);
   };
 
   const handleSubmit = async () => {
     setLoading(true);
-
     try {
       const token = await AsyncStorage.getItem("token");
-
       if (!token) {
         Alert.alert("Error", "User is not authenticated!");
         return;
       }
 
-      const reverseScoredQuestions = [3, 4, 6, 7];
-      const finalScore = answers.reduce((sum, val, index) => {
-        const score = reverseScoredQuestions.includes(index) ? 4 - val : val;
-        return sum + score;
-      }, 0);
+      const reverseScored = [3, 4, 6, 7];
+      const finalScore = answers.reduce((sum, val, i) =>
+        sum + (reverseScored.includes(i) ? 4 - val : val), 0);
 
-      const interpretPSS = (score) => {
-        if (score <= 13) return "Low Stress";
-        if (score <= 26) return "Moderate Stress";
-        return "High Stress";
-      };
+      const interpretation =
+        finalScore <= 13 ? "Low Stress" :
+        finalScore <= 26 ? "Moderate Stress" : "High Stress";
 
       const requestBody = {
         id: 0,
@@ -63,10 +66,9 @@ const StressTest = ({ user, onClose }) => {
         testDate: new Date().toISOString(),
         testType: "PSS-10",
         score: finalScore,
-        interpretation: interpretPSS(finalScore),
+        interpretation,
         recommendations: "Try relaxation techniques, mindfulness, and managing your daily workload.",
       };
-
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
         method: "POST",
@@ -77,13 +79,7 @@ const StressTest = ({ user, onClose }) => {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to save test result");
-      }
-
-
-
-
+      if (!response.ok) throw new Error("Failed to save test result");
       Alert.alert("Test Submitted!", "Your results have been saved.");
       onClose();
     } catch (error) {
@@ -93,35 +89,90 @@ const StressTest = ({ user, onClose }) => {
     }
   };
 
-  return (
-    <View style={{ flex: 1, justifyContent: "space-between", alignItems: "center", padding: 20 }}>
-      <Text style={GlobalStyles.title}>Perceived Stress Scale (PSS-10)</Text>
-
-      <View style={{ flex: 1, width: "100%" }}>
-        {questions.map((question, index) => (
-          <View key={index} style={GlobalStyles.questionContainer}>
-            <Text style={GlobalStyles.questionText}>{question}</Text>
-            {options.map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[
-                  GlobalStyles.optionButton,
-                  answers[index] === option.value && GlobalStyles.selectedOption,
-                ]}
-                onPress={() => handleChange(index, option.value)}
-              >
-                <Text style={GlobalStyles.buttonText}>{option.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
+   return (
+      <View style={{ flex: 1, backgroundColor: "#16132D", padding: 20 }}>
+        <StatusBar barStyle="light-content" backgroundColor="#16132D" />
+  
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onClose} style={styles.iconButton}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>GAD-7 Anxiety Test</Text>
+        </View>
+  
+        {/* Progress Indicator */}
+        <Text style={styles.progressText}>
+          Question {currentQuestion + 1} of {questions.length}
+        </Text>
+        <View style={styles.progressBarBackground}>
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width: `${((currentQuestion + 1) / questions.length) * 100}%`,
+              },
+            ]}
+          />
+        </View>
+  
+        {/* Question Area */}
+        <View style={styles.questionWrapper}>
+          <Text style={styles.questionText}>{questions[currentQuestion]}</Text>
+          {options.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={[
+                styles.optionButton,
+                answers[currentQuestion] === option.value && styles.selectedOption,
+              ]}
+              onPress={() => handleSelect(option.value)}
+            >
+              <Text style={styles.buttonText}>{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+  
+        {/* Navigation buttons */}
+        <View style={styles.navButtons}>
+          {currentQuestion > 0 && (
+            <TouchableOpacity
+              style={[styles.navButton, { marginRight: 8 }]}
+              onPress={() => setCurrentQuestion(currentQuestion - 1)}
+            >
+              <Text style={styles.buttonText}>Back</Text>
+            </TouchableOpacity>
+          )}
+          {currentQuestion < questions.length - 1 ? (
+            <TouchableOpacity
+              style={[
+                styles.navButton,
+                answers[currentQuestion] === null && styles.disabledButton,
+              ]}
+              onPress={() => setCurrentQuestion(currentQuestion + 1)}
+              disabled={answers[currentQuestion] === null}
+            >
+              <Text style={styles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[
+                styles.navButton,
+                answers[currentQuestion] === null && styles.disabledButton,
+              ]}
+              onPress={handleSubmit}
+              disabled={loading || answers[currentQuestion] === null}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Submit</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-
-      <TouchableOpacity style={GlobalStyles.submitButton} onPress={handleSubmit} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={GlobalStyles.buttonText}>Submit Answers</Text>}
-      </TouchableOpacity>
-    </View>
-  );
+    );
 };
 
 export default StressTest;

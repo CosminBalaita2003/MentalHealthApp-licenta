@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import GlobalStyles from "../styles/globalStyles";
-import testService from "../services/testService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import testService from "../services/testService";
+import styles from "../styles/statisticsStyles";
+import theme from "../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 const screenWidth = Dimensions.get("window").width;
 
 const testDescriptions = {
-  "GAD-7": "The GAD-7 (Generalized Anxiety Disorder) test measures the severity of anxiety symptoms.",
-  "PSS-10": "The PSS-10 (Perceived Stress Scale) test evaluates your perceived stress over the past month.",
+  "GAD-7": "The GAD-7 test measures how often you've been bothered by anxiety symptoms.",
+  "PSS-10": "The PSS-10 evaluates your perceived stress levels in the last month.",
+  "PHQ-9": "The PHQ-9 helps identify and measure the severity of depression symptoms.",
 };
+
 
 const interpretResults = (testType, score) => {
   if (testType === "GAD-7") {
@@ -23,33 +26,37 @@ const interpretResults = (testType, score) => {
     if (score <= 26) return "Moderate Stress";
     return "High Stress";
   }
-  return "Unknown";
+  else if (testType === "PHQ-9") {
+    if (score <= 4) return "Minimal Depression";
+    if (score <= 9) return "Mild Depression";
+    if (score <= 14) return "Moderate Depression";
+    if (score <= 19) return "Moderately Severe Depression";
+    return "Severe Depression";
+  }
 };
 
 const TestStatistics = ({ onBack }) => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTests = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      if (!userId) return;
-      const response = await testService.getUserTests(userId);
-      if (response.success) setTests(response.tests);
-    } catch (err) {
-      console.error(" Eroare la încărcarea testelor:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchTests = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        const response = await testService.getUserTests(userId);
+        if (response.success) setTests(response.tests);
+      } catch (err) {
+        console.error("Error fetching tests:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchTests();
   }, []);
 
   if (loading) {
     return (
-      <View style={GlobalStyles.infoContainer}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" color="#4ECDC4" />
       </View>
     );
@@ -57,113 +64,102 @@ const TestStatistics = ({ onBack }) => {
 
   if (tests.length === 0) {
     return (
-      <View style={GlobalStyles.infoContainer}>
-        <Text style={GlobalStyles.text}>No test data available.</Text>
+      <View style={styles.container}>
+        <Text style={styles.text}>No test data available.</Text>
       </View>
     );
   }
 
-  const testTypes = ["GAD-7", "PSS-10"];
+  const testTypes = ["GAD-7", "PSS-10", "PHQ-9"];
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#16132D", paddingBottom: 100 }}>
-      <ScrollView contentContainerStyle={[GlobalStyles.statsContainer, { paddingBottom: 150 }]}>
-        <Text style={[GlobalStyles.title, { textAlign: "center", marginBottom: 20, marginTop: 50 }]}>
-          Test Statistics
-        </Text>
+    <View style={{ flex: 1, backgroundColor: "#16132D" }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onBack} style={styles.iconButton}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Test Statistics</Text>
+        </View>
+
 
         {testTypes.map((type) => {
-          const filteredTests = tests
+          const filtered = tests
             .filter((test) => test.testType === type)
             .sort((a, b) => new Date(a.testDate) - new Date(b.testDate));
 
+          if (filtered.length === 0) return null;
 
-          if (filteredTests.length === 0) return null;
-
-          const scores = filteredTests.map((test) => test.score);
-          const averageScore = scores.reduce((acc, val) => acc + val, 0) / scores.length;
-          const interpretation = interpretResults(type, averageScore);
+          const scores = filtered.map((t) => t.score);
+          const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+          const interpretation = interpretResults(type, avgScore);
 
           return (
-            <View key={type} style={[GlobalStyles.chartContainer, { marginBottom: 30 }]}>
-              <Text style={[GlobalStyles.subtitle, { fontSize: 20, textAlign: "center", marginBottom: 10 }]}>
-                {type} Score Progress
-              </Text>
-              <Text style={[GlobalStyles.text, { textAlign: "center", marginBottom: 15 }]}>
-                {testDescriptions[type]}
-              </Text>
+            <View key={type} style={styles.card}>
+              <Text style={styles.cardTitle}>{type} Score Progress</Text>
+              <Text style={styles.text}>{testDescriptions[type]}</Text>
+              <View style={styles.chartWrapper}>
+                <LineChart
+                  data={{
 
-              <LineChart
-                data={{
-                  labels: Array(filteredTests.length).fill(""),
+                    datasets: [{ data: scores }],
+                  }}
+                  width={screenWidth * 0.8} // lățime relativă (mai echilibrat)
+                  height={200}
+                  yAxisSuffix=" pts"
+                  chartConfig={{
+                    backgroundGradientFrom: theme.colors.background,
+                    backgroundGradientTo: theme.colors.background,
+                    color: (opacity = 1) => `rgba(255, 244, 247, ${opacity})`,
 
-                  datasets: [{ data: scores }],
-                }}
-                width={screenWidth * 0.9}
-                height={220}
-                yAxisSuffix=" pts"
-                chartConfig={{
-                  backgroundGradientFrom: "#202040",
-                  backgroundGradientTo: "#16132D",
-                  color: (opacity = 1) => `rgba(78, 205, 196, ${opacity})`,
-                  strokeWidth: 3,
-                  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                  decimalPlaces: 0,
-                  propsForDots: {
-                    r: "5",
-                    strokeWidth: "2",
-                    stroke: "#4ECDC4",
-                  },
-                  propsForBackgroundLines: {
-                    stroke: "rgba(255, 255, 255, 0.2)",
-                  },
-                }}
-                style={{
-                  marginVertical: 10,
-                  borderRadius: 10,
-                  padding: 10,
-                  backgroundColor: "#1D1A39",
-                }}
-                formatYLabel={(value) => value}
-              />
-
-              <View style={GlobalStyles.interpretationContainer}>
-                <Text style={[GlobalStyles.subtitle]}>
-                  Average {type} Result:
-                </Text>
-                <Text style={[GlobalStyles.interpretationText, { marginTop: 8 }]}>
-                  {interpretation} ({averageScore.toFixed(1)} pts)
-                </Text>
+                    strokeWidth: 5,
+                    decimalPlaces: 0,
+                    propsForDots: {
+                      r: "5",
+                      strokeWidth: "2",
+                      stroke: "#fff",
+                    },
+                  }}
+                  style={{ borderRadius: 12 }}
+                  formatYLabel={(val) => `${parseInt(val)}`}
+                />
               </View>
 
-              <View style={GlobalStyles.legendContainer}>
-                <Text style={[GlobalStyles.subtitle, { fontSize: 16, textAlign: "center", marginBottom: 5 }]}>
-                  Interpretation Guide:
-                </Text>
-                {type === "GAD-7" ? (
-                  <>
-                    <Text style={GlobalStyles.legendText}>0-4: Minimal Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>5-9: Mild Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>10-14: Moderate Anxiety</Text>
-                    <Text style={GlobalStyles.legendText}>15+: Severe Anxiety</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={GlobalStyles.legendText}>0-13: Low Stress</Text>
-                    <Text style={GlobalStyles.legendText}>14-26: Moderate Stress</Text>
-                    <Text style={GlobalStyles.legendText}>27-40: High Stress</Text>
-                  </>
-                )}
-              </View>
+
+              <Text style={styles.interpretation}>
+                Average Result: <Text style={styles.bold}>{interpretation}</Text> ({avgScore.toFixed(1)} pts)
+              </Text>
+
+              <Text style={styles.subtitle}>Interpretation Guide:</Text>
+              {type === "PHQ-9" ? (
+  <>
+    <Text style={styles.legend}>0-4: None-minimal</Text>
+    <Text style={styles.legend}>5-9: Mild</Text>
+    <Text style={styles.legend}>10-14: Moderate</Text>
+    <Text style={styles.legend}>15-19: Moderately Severe</Text>
+    <Text style={styles.legend}>20-27: Severe</Text>
+  </>
+) : type === "GAD-7" ? (
+  <>
+    <Text style={styles.legend}>0-4: Minimal Anxiety</Text>
+    <Text style={styles.legend}>5-9: Mild Anxiety</Text>
+    <Text style={styles.legend}>10-14: Moderate Anxiety</Text>
+    <Text style={styles.legend}>15+: Severe Anxiety</Text>
+  </>
+) : (
+  <>
+    <Text style={styles.legend}>0-13: Low Stress</Text>
+    <Text style={styles.legend}>14-26: Moderate Stress</Text>
+    <Text style={styles.legend}>27+: High Stress</Text>
+  </>
+)}
 
             </View>
           );
         })}
-      </ScrollView>
 
-      <TouchableOpacity style={GlobalStyles.backButton} onPress={onBack}>
-        <Text style={[GlobalStyles.buttonText, { color: "#16132D", fontSize: 18 }]}>← Back</Text>
-      </TouchableOpacity>
+
+      </ScrollView>
     </View>
   );
 };

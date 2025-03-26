@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import userService from '../services/userService';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import globalStyles from '../styles/globalStyles';
 import { AuthContext } from '../App';
+import userService from '../services/userService';
+import styles from '../styles/profileStyles';
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -24,9 +25,7 @@ export default function ProfileScreen({ navigation }) {
           return;
         }
 
-        console.log("Fetching user profile...");
         const result = await userService.getUser();
-
         if (result.success) {
           setUser(result.user);
         } else {
@@ -35,7 +34,6 @@ export default function ProfileScreen({ navigation }) {
         }
       } catch (error) {
         setError(true);
-        console.error("Eroare la obținerea profilului:", error.message);
         Alert.alert('Eroare', 'Nu s-a putut încărca profilul.');
       } finally {
         setLoading(false);
@@ -47,58 +45,51 @@ export default function ProfileScreen({ navigation }) {
 
   const handleLogout = async () => {
     try {
-      console.log("🚀 Logging out...");
-
-      // 🔥 Șterge toate datele din AsyncStorage
       await AsyncStorage.clear();
-      console.log(" AsyncStorage cleared!");
-
-      // 🔥 Setează `isAuthenticated` la false
       setIsAuthenticated(false);
-
-      console.log(" User logged out, App.js will re-render.");
     } catch (error) {
-      console.error(" Error during logout:", error);
+      console.error("Logout error:", error);
     }
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#E8BCB9" style={styles.loader} />;
+  }
+
+  if (error || !user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Unable to load data...</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.replace('ProfileScreen')}>
+          <Text style={styles.buttonText}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
-    <View style={globalStyles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#E8BCB9" />
-      ) : error ? (
-        <>
-          <Text style={globalStyles.text}>Unable to load data...</Text>
-          <TouchableOpacity style={globalStyles.button} onPress={() => navigation.replace('ProfileScreen')}>
-            <Text style={globalStyles.buttonText}>Try Again</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-          <Text style={globalStyles.title}>Welcome</Text>
+    <View style={{ flex: 1, backgroundColor: "#16132D" }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Welcome, {user.fullName?.split(" ")[0] || "User"}!</Text>
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={styles.iconButton}>
+              <Ionicons name="create-outline" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+              <Ionicons name="log-out-outline" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-          <Text style={globalStyles.text}>Email: {user.email || "unknown"}</Text>
-          <Text style={globalStyles.text}>Name: {user.fullName || "unknown"}</Text>
-          <Text style={globalStyles.text}>Birthday: {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "unknown"}</Text>
-          <Text style={globalStyles.text}>BirthTime: {user.timeOfBirth || "unknown"}</Text>
-          <Text style={globalStyles.text}>City: {user.cityName || "unknown"}</Text>
-          <Text style={globalStyles.text}>Gender: {user.gender || "unknown"}</Text>
-          <Text style={globalStyles.text}>Pronouns: {user.pronouns || "unknown"}</Text>
-          <Text style={globalStyles.text}>Bio: {user.bio || "unknown unknown"}</Text>
-
-          <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('EditProfile')}>
-            <Text style={globalStyles.buttonText}>Edit your profile</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[globalStyles.button, globalStyles.logoutButton]} onPress={handleLogout}>
-            <Text style={globalStyles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={globalStyles.button} onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}>
-            <Text style={globalStyles.buttonText}>View Astro Chart</Text>
-          </TouchableOpacity>
-
-        </ScrollView>
-      )}
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}
+        >
+          <Ionicons name="planet-outline" size={22} color="#5A4E4D" />
+          <Text style={styles.cardText}>View Astro Chart</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }

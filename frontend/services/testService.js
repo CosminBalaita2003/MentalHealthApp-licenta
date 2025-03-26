@@ -19,8 +19,10 @@ const testService = {
 
       console.log(" Raw Test Data:", response.data);
 
-      //  Verificăm dacă datele conțin `$values`
-      const testsArray = response.data?.$values || [];
+      const testsArray = Array.isArray(response.data)
+  ? response.data
+  : response.data?.$values || [];
+
 
       console.log("Processed Test Data:", testsArray);
       return { success: true, tests: testsArray };
