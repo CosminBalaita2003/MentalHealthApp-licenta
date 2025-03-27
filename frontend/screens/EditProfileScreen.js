@@ -6,7 +6,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import userService from '../services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import editStyles from '../styles/editProfileStyle';
+import editStyles from '../styles/editProfileStyles';
 import theme from '../styles/theme';
 import { useNavigation } from '@react-navigation/native';
 
@@ -162,20 +162,20 @@ const EditProfileScreen = () => {
               </TouchableOpacity>
               {showDatePicker && (
                 <>
-                 <DateTimePicker
-  value={profile.dateOfBirth}
-  mode="date"
-  display="spinner"
-  textColor="white"
-  onChange={(event, selectedDate) => {
-    const today = new Date();
-    if (selectedDate && selectedDate > today) {
-      Alert.alert("Dată invalidă", "Data de naștere nu poate fi în viitor.");
-      return; // nu actualizăm
-    }
-    setProfile({ ...profile, dateOfBirth: selectedDate || profile.dateOfBirth });
-  }}
-/>
+                  <DateTimePicker
+                    value={profile.dateOfBirth}
+                    mode="date"
+                    display="spinner"
+                    textColor="white"
+                    onChange={(event, selectedDate) => {
+                      const today = new Date();
+                      if (selectedDate && selectedDate > today) {
+                        Alert.alert("Dată invalidă", "Data de naștere nu poate fi în viitor.");
+                        return; // nu actualizăm
+                      }
+                      setProfile({ ...profile, dateOfBirth: selectedDate || profile.dateOfBirth });
+                    }}
+                  />
 
 
                   <TouchableOpacity style={editStyles.button} onPress={() => setShowDatePicker(false)}>

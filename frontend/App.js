@@ -49,18 +49,20 @@ function TabNavigator() {
         },
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
-          if (route.name === "Exercises") iconName = "barbell-outline";
+          if (route.name === "Profile") iconName = "person-outline";
+          else  if (route.name === "Exercises") iconName = "barbell-outline";
           else if (route.name === "Journal") iconName = "book-outline";
           else if (route.name === "Test") iconName = "clipboard-outline";
-          else if (route.name === "Profile") iconName = "person-outline";
+         
           return <Ionicons name={iconName} size={size} color={focused ? "#4ECDC4" : "#ffffff"} />;
         },
       })}
     >
+      <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Exercises" component={ExercicesScreen} />
       <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Test" component={TestScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      
     </Tab.Navigator>
   );
 }
@@ -99,6 +101,7 @@ export default function App() {
               <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
               <Stack.Screen name="LoginScreen" component={LoginScreen} />
               <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+              
             </>
           ) : (
             <>

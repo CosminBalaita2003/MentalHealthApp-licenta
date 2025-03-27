@@ -4,7 +4,7 @@ import { WebView } from 'react-native-webview';
 import { fetchNatalWheelChart, fetchPlanets, fetchHouses } from '../services/astroChartService';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import globalStyles from '../styles/globalStyles';
+import astroStyles from '../styles/astroChartStyles';
 
 export default function AstroChartScreen({ route, navigation }) {
   const { user } = route.params;
@@ -86,28 +86,24 @@ export default function AstroChartScreen({ route, navigation }) {
   `;
 
   return (
-    <View style={globalStyles.container}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#FFFFFF" />
+    <View style={astroStyles.container}>
+      <View style={astroStyles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={astroStyles.backIcon}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={[globalStyles.title, { marginLeft: 12 }]}>Your Natal Chart</Text>
+        <Text style={astroStyles.title}>Your Natal Chart</Text>
       </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#E8BCB9" style={{ flex: 1 }} />
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-          {/* Chart */}
+          {/* Chart Image */}
           {pngBase64 && (
-            <Image
-              source={{ uri: pngBase64 }}
-              style={{ width: '90%', height: undefined, aspectRatio: 1, alignSelf: 'center', marginVertical: 20 }}
-              resizeMode="contain"
-            />
+            <Image source={{ uri: pngBase64 }} style={astroStyles.chartImage} resizeMode="contain" />
           )}
 
-          {/* Hidden WebView to convert SVG */}
+          {/* WebView for PNG conversion */}
           {svgContent && !pngBase64 && (
             <WebView
               originWhitelist={['*']}
@@ -118,39 +114,46 @@ export default function AstroChartScreen({ route, navigation }) {
           )}
 
           {/* Planets */}
-          <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
-            <Text style={[globalStyles.title, { fontSize: 18 }]}>🪐 Planets</Text>
+          <View style={astroStyles.sectionContainer}>
+            <View style={astroStyles.sectionHeader}>
+              <Ionicons name="planet" size={20} color="#fff" style={astroStyles.sectionIcon} />
+              <Text style={astroStyles.sectionTitle}>Planets</Text>
+            </View>
+            <Text style={astroStyles.explanation}>
+              The planets represent fundamental psychological functions. For example, the Sun reflects your ego, the Moon your emotions, and Mercury your communication style.
+            </Text>
             {planets.length === 0 ? (
-              <Text style={globalStyles.text}>No planet data received.</Text>
+              <Text style={astroStyles.text}>No planet data received.</Text>
             ) : (
               planets.map((p, index) => {
                 const name = p.planet?.en || 'Unknown';
                 const sign = p.zodiac_sign?.name?.en || 'Unknown sign';
                 const degree = p.normDegree?.toFixed(2) || '?';
                 const retro = p.isRetro?.toLowerCase() === 'true' ? ' (R)' : '';
-
                 return (
-                  <Text key={index} style={globalStyles.text}>
-                    {name} is in {sign}{retro} at {degree}°
+                  <Text key={index} style={astroStyles.text}>
+                    <Text style={{ fontWeight: 'bold' }}>{name}</Text> is in {sign}{retro} at {degree}°
                   </Text>
                 );
               })
-
-
             )}
-
-
           </View>
 
           {/* Houses */}
-          <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
-            <Text style={[globalStyles.title, { fontSize: 18 }]}>🏠 Houses</Text>
+          <View style={astroStyles.sectionContainer}>
+            <View style={astroStyles.sectionHeader}>
+              <Ionicons name="home" size={20} color="#fff" style={astroStyles.sectionIcon} />
+              <Text style={astroStyles.sectionTitle}>Houses</Text>
+            </View>
+            <Text style={astroStyles.explanation}>
+              Houses describe "where" in your life the planetary energy manifests. For example, House 1 relates to identity, House 7 to relationships, and House 10 to career.
+            </Text>
             {houses.length === 0 ? (
-              <Text style={globalStyles.text}>No house data received.</Text>
+              <Text style={astroStyles.text}>No house data received.</Text>
             ) : (
               houses.map((h, index) => (
-                <Text key={index} style={globalStyles.text}>
-                  House {h.House}: {h.zodiac_sign?.name?.en} {h.degree?.toFixed(2)}°
+                <Text key={index} style={astroStyles.text}>
+                  <Text style={{ fontWeight: 'bold' }}>House {h.House}</Text>: {h.zodiac_sign?.name?.en} {h.degree?.toFixed(2)}°
                 </Text>
               ))
             )}
@@ -158,5 +161,7 @@ export default function AstroChartScreen({ route, navigation }) {
         </ScrollView>
       )}
     </View>
+
+
   );
 }

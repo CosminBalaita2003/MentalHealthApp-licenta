@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView,
   ScrollView, TouchableWithoutFeedback, Keyboard, Platform
@@ -7,9 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import userService from '../services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import GlobalStyles from '../styles/globalStyles';
+import styles from '../styles/authStyles';
 import theme from '../styles/theme';
-import { useContext } from 'react';
 import { AuthContext } from '../App';
 
 const LoginScreen = () => {
@@ -18,6 +17,7 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
   const { setIsAuthenticated } = useContext(AuthContext);
+
   const handleLogin = async () => {
     if (!email || !password) {
       alert("Te rog introdu un email și o parolă.");
@@ -28,22 +28,13 @@ const LoginScreen = () => {
     if (response.success) {
       const userResponse = await userService.getUser();
       if (userResponse.success) {
-        await AsyncStorage.setItem('user', JSON.stringify(userResponse.user));
-
-        console.log(" User authenticated, updating state...");
-
-        // 🔥 Setează `isAuthenticated` înainte de a naviga
+        const user = userResponse.user;
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem('userId', user.id);
         setIsAuthenticated(true);
-
-        console.log("📌 Waiting for authentication state to update...");
-
-        // 🔥 Așteptăm puțin pentru a lăsa `App.js` să proceseze schimbarea
         setTimeout(() => {
           console.log(" Navigating to Main...");
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{ name: 'Main' }],
-          // });
+          // navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         }, 500);
       } else {
         alert("Eroare: " + userResponse.message);
@@ -53,55 +44,53 @@ const LoginScreen = () => {
     }
   };
 
-
-
-
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={GlobalStyles.container}
+        style={styles.container}
       >
-        <ScrollView contentContainerStyle={GlobalStyles.scrollContainer}>
-          <Text style={GlobalStyles.title}>Login</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text style={styles.title}>Login</Text>
 
           {/* Email Input */}
-          <View style={GlobalStyles.inputContainer}>
-            <TextInput
-              style={GlobalStyles.input}
-              placeholder="Email"
-              placeholderTextColor={theme.colors.background}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#fff"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
           {/* Password Input */}
-          <View style={GlobalStyles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <View style={[styles.input, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
             <TextInput
-              style={GlobalStyles.passwordInput}
+              style={{ color: '#fff', flex: 1 }}
               placeholder="Password"
-              placeholderTextColor={theme.colors.background}
+              placeholderTextColor="#fff"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={GlobalStyles.eyeIcon}>
-              <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color={theme.colors.text} />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color={theme.colors.text} />
             </TouchableOpacity>
           </View>
 
           {/* Login Button */}
-          <TouchableOpacity style={GlobalStyles.button} onPress={handleLogin}>
-            <Text style={GlobalStyles.buttonText}>Login</Text>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
 
-          {/* Register Navigation */}
+          {/* Navigation */}
           <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
-            <Text style={GlobalStyles.linkText}>Nu ai cont? Creează unul</Text>
+            <Text style={[styles.text, { textAlign: 'center', marginTop: 20 }]}>
+              Nu ai cont? Creează unul
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

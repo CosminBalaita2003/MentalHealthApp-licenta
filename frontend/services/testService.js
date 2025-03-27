@@ -27,7 +27,7 @@ const testService = {
       console.log("Processed Test Data:", testsArray);
       return { success: true, tests: testsArray };
     } catch (error) {
-      console.error("Error fetching user tests:", error.response?.data || error.message);
+      console.log("Error fetching user tests:", error.response?.data || error.message);
       return { success: false, message: "Eroare la obținerea testelor utilizatorului" };
     }
   },

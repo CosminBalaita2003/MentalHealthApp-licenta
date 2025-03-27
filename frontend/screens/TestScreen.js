@@ -29,7 +29,20 @@ const TestScreen = () => {
 
     fetchUserData();
   }, []);
-
+  const handleCloseSection = async () => {
+    setActiveSection(null);
+  
+    // 🔄 Reîncarcă testele după revenirea dintr-un test
+    const userResponse = await userService.getUser();
+    if (userResponse.success) {
+      setUser(userResponse.user);
+      const testResponse = await testService.getUserTests(userResponse.user.id);
+      if (testResponse.success) {
+        setTests(testResponse.tests);
+      }
+    }
+  };
+  
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -45,10 +58,11 @@ const TestScreen = () => {
           <TestStatistics tests={tests} onBack={() => setActiveSection(null)} />
         ) : (
           <View style={{ flex: 1 }}>
-  {activeSection === "GAD7Test" && <GAD7Test user={user} onClose={() => setActiveSection(null)} />}
-{activeSection === "PSS10Test" && <PSS10Test user={user} onClose={() => setActiveSection(null)} />}
-{activeSection === "PHQ9Test" && <PHQ9Test user={user} onClose={() => setActiveSection(null)} />}
+  {activeSection === "GAD7Test" && <GAD7Test user={user} onClose={handleCloseSection} />}
+{activeSection === "PSS10Test" && <PSS10Test user={user} onClose={handleCloseSection} />}
+{activeSection === "PHQ9Test" && <PHQ9Test user={user} onClose={handleCloseSection} />}
 
+        
 </View>
 
         )}
@@ -61,10 +75,14 @@ const TestScreen = () => {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Mental Health Tests</Text>
         <View style={styles.divider}>
-          <TouchableOpacity style={styles.card} onPress={() => setActiveSection("statistics")}>
-            <Ionicons name="bar-chart-outline" size={20} color="#fff" />
-            <Text style={styles.cardText}>Show Statistics</Text>
-          </TouchableOpacity>
+
+         {tests.length > 0 && (
+  <TouchableOpacity style={styles.card} onPress={() => setActiveSection("statistics")}>
+    <Ionicons name="bar-chart-outline" size={20} color="#fff" />
+    <Text style={styles.cardText}>Show Statistics</Text>
+  </TouchableOpacity>
+)}
+
 
           <TouchableOpacity style={styles.card} onPress={() => setActiveSection("GAD7Test")}>
             <Ionicons name="pulse-outline" size={20} color="#fff" />

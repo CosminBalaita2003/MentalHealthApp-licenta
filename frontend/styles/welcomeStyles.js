@@ -5,48 +5,34 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    padding: 20,
-  },
-  scrollContainer: {
-    paddingBottom: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
   },
   title: {
-    fontSize: 26,
+    fontSize: 36,
     fontWeight: 'bold',
     color: theme.colors.text,
-    marginTop: 40,
     marginBottom: 20,
   },
-  label: {
+  subtitle: {
     fontSize: 16,
     color: theme.colors.text,
-    marginTop: 12,
-  },
-  input: {
-    backgroundColor: '#2B2A4C',
-    color: '#fff',
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 6,
-  },
-  inputError: {
-    borderColor: 'red',
-    borderWidth: 1,
-  },
-  error: {
-    fontSize: 13,
-    color: 'red',
-    marginTop: 4,
+    textAlign: 'center',
+    marginBottom: 40,
+    paddingHorizontal: 10,
   },
   button: {
-    backgroundColor: theme.colors.semiaccent,
+    width: '100%',
+    backgroundColor: theme.colors.accent,
     padding: 14,
     borderRadius: 14,
-    marginTop: 30,
+    marginBottom: 16,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+    fontSize: 16,
   },
 });

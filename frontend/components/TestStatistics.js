@@ -43,10 +43,13 @@ const TestStatistics = ({ onBack }) => {
     const fetchTests = async () => {
       try {
         const userId = await AsyncStorage.getItem("userId");
+        console.log (" Retrieved User ID in TestStatistics:", userId);
         const response = await testService.getUserTests(userId);
         if (response.success) setTests(response.tests);
       } catch (err) {
         console.error("Error fetching tests:", err);
+        
+
       } finally {
         setLoading(false);
       }

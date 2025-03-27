@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../App';
 import userService from '../services/userService';
 import styles from '../styles/profileStyles';
+import StreakIndicator from '../components/StreakIndicator';
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -81,6 +82,7 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
+        <StreakIndicator />
 
         <TouchableOpacity
           style={styles.card}

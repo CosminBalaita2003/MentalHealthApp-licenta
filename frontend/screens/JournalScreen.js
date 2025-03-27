@@ -37,11 +37,11 @@ const JournalScreen = () => {
         setEntries(response.entries);
       } else {
         setEntries([]);
-        Alert.alert("Info", "No journal entries found.");
+        console.log("Info", "No journal entries found.");
       }
     } catch (error) {
-      console.error(" Error in loadEntries:", error);
-      Alert.alert("Error", "Something went wrong while loading journal entries.");
+      console.log(" Error in loadEntries:", error);
+      console.log("Error", "Something went wrong while loading journal entries.");
     }
 
     setLoading(false);

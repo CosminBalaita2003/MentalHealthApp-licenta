@@ -1,19 +1,26 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import globalStyles from '../styles/globalStyles';
+import styles from '../styles/welcomeStyles';
 import theme from '../styles/theme';
 
 export default function WelcomeScreen({ navigation }) {
   return (
-    <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>MindEase</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>MindEase</Text>
+      <Text style={styles.subtitle}>Welcome! Let’s take care of your mental wellbeing.</Text>
 
-      <TouchableOpacity style={[globalStyles.button, { backgroundColor: theme.colors.semiaccent }]} onPress={() => navigation.navigate('LoginScreen')}>
-        <Text style={globalStyles.buttonText}>Log in</Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: theme.colors.semiaccent }]}
+        onPress={() => navigation.navigate('LoginScreen')}
+      >
+        <Text style={styles.buttonText}>Log in</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('RegisterScreen')}>
-        <Text style={globalStyles.buttonText}>Register</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('RegisterScreen')}
+      >
+        <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
     </View>
   );
