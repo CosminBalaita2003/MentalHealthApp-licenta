@@ -10,7 +10,8 @@ import { fetchUserData } from "./services/authService"; //  Import serviciul de 
 // Import screens
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
-import ExercicesScreen from "./screens/ExercicesScreen";
+import ExercisesScreen from "./screens/ExercisesScreen";
+import ExerciseListScreen from "./screens/ExerciseListScreen";
 
 import TestScreen from "./screens/TestScreen";
 import ProfileScreen from "./screens/ProfileScreen";
@@ -59,7 +60,7 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Exercises" component={ExercicesScreen} />
+      <Tab.Screen name="Exercises" component={ExercisesScreen} />
       <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Test" component={TestScreen} />
       
@@ -111,6 +112,8 @@ export default function App() {
               <Stack.Screen name="NewEntryScreen" component={NewEntryScreen} />
               <Stack.Screen name="EditEntryScreen" component={EditEntryScreen} />
               <Stack.Screen name="AstroChartScreen" component={AstroChartScreen} />
+              <Stack.Screen name="ExerciseListScreen" component={ExerciseListScreen} />
+              
             </>
           )}
         </Stack.Navigator>

@@ -19,7 +19,8 @@ namespace MentalHealthApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises()
         {
-            return await _context.Exercises.ToListAsync();
+
+            return await _context.Exercises.Include(e => e.Category).ToListAsync();
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(int id)

@@ -25,14 +25,14 @@ export const fetchUserData = async (setIsAuthenticated) => {
       await AsyncStorage.setItem("userId", response.data.id);
       console.log(" Saved userId in AsyncStorage:", response.data.id);
     } else {
-      console.error(" No userId in response! Authentication might be failing.");
+      console.log(" No userId in response! Authentication might be failing.");
       return null;
     }
 
     setIsAuthenticated(true);
     return response.data;
   } catch (error) {
-    console.error(" Authentication check failed:", error.response?.data || error.message);
+    console.log(" Authentication check failed:", error.response?.data || error.message);
 
     if (error.response?.status === 401) {
       await AsyncStorage.removeItem("token");
