@@ -16,6 +16,13 @@ const StreakIndicator = () => {
     return date;
   };
 
+  const formatDateLocal = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const calculateStreak = async () => {
     try {
       const userResponse = await userService.getUser();
@@ -32,33 +39,52 @@ const StreakIndicator = () => {
         .map((item) => getDateOnly(item.timestamp || item.date))
         .filter(date => !isNaN(date));
 
+      console.log("📅 Toate datele brute (cu ore resetate):", allDates.map(d => formatDateLocal(d)));
+
       const uniqueTimestamps = [...new Set(allDates.map(d => d.getTime()))].sort((a, b) => b - a);
 
+      const dateSet = new Set(uniqueTimestamps.map(ts => {
+        const d = new Date(ts);
+        d.setHours(0, 0, 0, 0);
+        return formatDateLocal(d);
+      }));
+
+      console.log("🗓️ Date unice (YYYY-MM-DD):", Array.from(dateSet));
+
       let streakCount = 0;
-      let currentDate = new Date();
-      currentDate.setHours(0, 0, 0, 0);
-
-      setActiveToday(uniqueTimestamps.includes(currentDate.getTime()));
-
-      for (let i = 0; i < uniqueTimestamps.length; i++) {
-        if (uniqueTimestamps[i] === currentDate.getTime()) {
-          streakCount++;
-          currentDate.setDate(currentDate.getDate() - 1);
-        } else if (uniqueTimestamps[i] === currentDate.getTime() - 86400000) {
-          streakCount++;
-          currentDate.setDate(currentDate.getDate() - 1);
-        } else {
-          break;
-        }
+      const now = new Date();
+      let currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      let currentDateStr = formatDateLocal(currentDate);
+      
+      // detectăm dacă e activ azi
+      const todayActive = dateSet.has(currentDateStr);
+      setActiveToday(todayActive);
+      
+      // dacă NU e activ azi, începem streak-ul de la ieri
+      if (!todayActive) {
+        currentDate.setDate(currentDate.getDate() - 1);
+        currentDateStr = formatDateLocal(currentDate);
       }
-
+      
+      // acum calculăm streak-ul
+      while (dateSet.has(currentDateStr)) {
+        console.log("Streak activ pentru:", currentDateStr);
+        streakCount++;
+        currentDate.setDate(currentDate.getDate() - 1);
+        currentDateStr = formatDateLocal(currentDate);
+      }
+      console.log("Streak-ul final:", streakCount);
+      
       setStreak(streakCount);
-    } catch (err) {
-      console.error('Error calculating streak:', err);
     }
+    catch (error) {
+      console.error("Error calculating streak:", error);
+      setStreak(0);
+      setActiveToday(false);
+    }
+
   };
 
-  // 🔁 Se apelează de fiecare dată când revii pe ecran
   useFocusEffect(
     useCallback(() => {
       calculateStreak();
@@ -73,7 +99,10 @@ const StreakIndicator = () => {
         color={activeToday ? "#fff" : "#aaa"}
         style={styles.icon}
       />
-      <Text style={styles.text}>{streak} day{streak === 1 ? '' : 's'} streak</Text>
+      <Text style={styles.text}>
+        {streak} day{streak === 1 ? '' : 's'} streak
+        {activeToday ? '' : ''}
+      </Text>
     </View>
   );
 };

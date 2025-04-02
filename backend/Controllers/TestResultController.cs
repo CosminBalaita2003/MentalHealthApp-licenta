@@ -2,6 +2,7 @@
 using MentalHealthApp.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TimeZoneConverter;
 
 namespace backend.Controllers
 {
@@ -25,7 +26,9 @@ namespace backend.Controllers
             if (user == null)
                 return NotFound("Utilizatorul nu există.");
 
-            testResult.TestDate = DateTime.UtcNow;
+            var timeZone = TZConvert.GetTimeZoneInfo("Europe/Bucharest");
+            testResult.TestDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
             _context.TestResults.Add(testResult);
             await _context.SaveChangesAsync();
 

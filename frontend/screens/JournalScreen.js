@@ -49,11 +49,14 @@ const JournalScreen = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("ro-RO", {
+      timeZone: "Europe/Bucharest",
       weekday: "short",
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
+      
+
     });
   };
 

@@ -8,6 +8,8 @@ using MentalHealthApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TimeZoneConverter;
+
 
 namespace MentalHealthApp.Controllers
 {
@@ -72,16 +74,26 @@ namespace MentalHealthApp.Controllers
             }
 
             entry.UserId = userId;
-            entry.Date = entry.Date == default ? DateTime.UtcNow : entry.Date; // Setează automat data dacă lipsește
 
-            // Verifică dacă EmotionId există în baza de date
+            // ✅ Convertim ora din UTC în Europe/Bucharest dacă este trimisă din frontend
+            if (entry.Date != default)
+            {
+                var timeZone = TZConvert.GetTimeZoneInfo("Europe/Bucharest");
+                entry.Date = TimeZoneInfo.ConvertTimeFromUtc(entry.Date, timeZone);
+            }
+            else
+            {
+                entry.Date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TZConvert.GetTimeZoneInfo("Europe/Bucharest"));
+            }
+
+            // Verifică dacă EmotionId există
             var emotionExists = await _context.Emotions.AnyAsync(e => e.Id == entry.EmotionId);
             if (!emotionExists)
             {
                 return BadRequest("Invalid EmotionId.");
             }
 
-            // Asigură-te că nu este trimis un obiect User nou
+            // Asigură-te că nu e trimis un obiect User nou
             entry.User = null;
 
             _context.JournalEntries.Add(entry);

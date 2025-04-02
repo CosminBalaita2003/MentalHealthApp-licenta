@@ -9,29 +9,34 @@ const userService = {
    */
   login: async (email, password) => {
     try {
-      console.log(" Sending login request to:", `${API_URL}/api/User/login`);
-      console.log(" With data:", { email, password });
-
       const response = await axios.post(`${API_URL}/api/User/login`, { email, password });
-
-      console.log(" Response from backend:", response.data);
-
       const token = response.data?.token || response.data?.Token;
+  
       if (!token) {
-        console.error(" Token missing in response!");
         return { success: false, message: "Token-ul lipseste în răspuns!" };
       }
-
-      await AsyncStorage.setItem("token", token); //  Fix Here
+  
+      await AsyncStorage.setItem("token", token);
       console.log(" Token saved:", token);
-
-      return { success: true, token };
+  
+      // 👇 Fetch user info imediat după login
+      const userResponse = await axios.get(`${API_URL}/api/user/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      const user = userResponse.data;
+      console.log("User loaded after login:", user);
+  
+      await AsyncStorage.setItem("user", JSON.stringify(user)); // ✅ Salvăm user complet
+      await AsyncStorage.setItem("userId", user.id); // optional fallback
+  
+      return { success: true, token, user };
     } catch (error) {
       console.error(" Login error:", error.response?.data || error.message);
-      return { success: false, message: error.response?.data?.Message || "Eroare la autentificare" };
+      return { success: false, message: "Eroare la autentificare" };
     }
-  },
-
+  }
+  ,
   /**
    * Get User - Obține informațiile despre utilizatorul logat folosind token-ul JWT.
    */

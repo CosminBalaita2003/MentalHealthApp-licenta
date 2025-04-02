@@ -6,6 +6,7 @@ import { AuthContext } from '../App';
 import userService from '../services/userService';
 import styles from '../styles/profileStyles';
 import StreakIndicator from '../components/StreakIndicator';
+import ExerciseProgressSummary from "../components/ExerciseProgressSummary";
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -83,6 +84,8 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
         <StreakIndicator />
+        <ExerciseProgressSummary />
+
 
         <TouchableOpacity
           style={styles.card}

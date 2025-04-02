@@ -13,6 +13,24 @@ const getAllExercises = async () => {
   }
 };
 
+const getExerciseById = async (id) => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+
+    const response = await axios.get(`${API_URL}/api/Exercise/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Failed to fetch exercise with ID ${id}`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export default {
   getAllExercises,
+  getExerciseById, 
 };

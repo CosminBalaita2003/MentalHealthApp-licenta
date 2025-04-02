@@ -21,7 +21,7 @@ export const fetchUserEntries = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    console.log(" Raw API Response:", JSON.stringify(response.data, null, 2));
+    // console.log(" Raw API Response:", JSON.stringify(response.data, null, 2));
 
     // 📌 Extract `$values` if the response has this structure
     const entriesArray = response.data?.$values ?? response.data;
@@ -56,11 +56,11 @@ const processedEntries = entriesArray
     
     
 
-    console.log(" Processed Entries:", JSON.stringify(processedEntries, null, 2));
+    // console.log(" Processed Entries:", JSON.stringify(processedEntries, null, 2));
 
     return { success: true, entries: processedEntries };
   } catch (error) {
-    console.error(" Error fetching journal entries:", error.response?.data || error.message);
+    // console.error(" Error fetching journal entries:", error.response?.data || error.message);
     return { success: false, message: "Failed to fetch journal entries" };
   }
 };
@@ -68,7 +68,7 @@ const processedEntries = entriesArray
 export const addJournalEntry = async (content, emotionId, user) => {
   try {
     const token = await AsyncStorage.getItem("token");
-    console.log(" Retrieved Auth Token:", token);
+    // console.log(" Retrieved Auth Token:", token);
 
     if (!token) {
       throw new Error(" No auth token found!");
@@ -112,7 +112,7 @@ export const addJournalEntry = async (content, emotionId, user) => {
       user: userObject
     };
 
-    console.log(" Sending full data:", requestBody);
+    // console.log(" Sending full data:", requestBody);
 
     const response = await axios.post(
       `${API_URL}/api/JournalEntry/add`,
@@ -123,7 +123,7 @@ export const addJournalEntry = async (content, emotionId, user) => {
       }
     );
 
-    console.log(" Success:", response.data);
+    // console.log(" Success:", response.data);
     return response.data;
   } catch (error) {
     console.error(" Axios Error:", error.response?.data || error.message);
@@ -136,16 +136,16 @@ export const fetchEmotions = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/Emotion`);
 
-    console.log(" Raw API Response:", response.data);
+    // console.log(" Raw API Response:", response.data);
 
     // Dacă backend-ul returnează $values, extragem doar acel array
     const emotionsArray = response.data?.$values ?? response.data;
 
-    console.log(" Extracted Emotions:", emotionsArray);
+    // console.log(" Extracted Emotions:", emotionsArray);
 
     return { success: true, emotions: emotionsArray };
   } catch (error) {
-    console.error(" Error fetching emotions:", error);
+    // console.error(" Error fetching emotions:", error);
     return { success: false, emotions: [] };
   }
 };
@@ -153,7 +153,7 @@ export const fetchEmotions = async () => {
 export const updateJournalEntry = async (entry, user) => {
   try {
     const token = await AsyncStorage.getItem("token");
-    console.log(" Retrieved Auth Token:", token);
+    // console.log(" Retrieved Auth Token:", token);
 
     if (!token) {
       throw new Error(" No auth token found!");
@@ -199,7 +199,7 @@ export const updateJournalEntry = async (entry, user) => {
       date: entry.date,
     };
 
-    console.log("Updating entry:", requestBody);
+    // console.log("Updating entry:", requestBody);
 
     const response = await axios.put(
       `${API_URL}/api/JournalEntry/${entry.id}`,
@@ -210,7 +210,7 @@ export const updateJournalEntry = async (entry, user) => {
       }
     );
 
-    console.log("Update success:", response.data);
+    // console.log("Update success:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error updating journal entry:", error.response?.data || error.message);

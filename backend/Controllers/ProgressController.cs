@@ -3,6 +3,8 @@ using MentalHealthApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TimeZoneConverter;
+
 namespace MentalHealthApp.Controllers
 {
     [Route("api/[controller]")]
@@ -33,24 +35,30 @@ namespace MentalHealthApp.Controllers
         }
 
         [HttpPost]
-        [Authorize (Roles = "Admin")]
         public async Task<ActionResult<Progress>> PostProgress(Progress progress)
         {
             if (!_context.Users.Any(u => u.Id == progress.UserId))
             {
                 return BadRequest("User does not exist");
             }
+
             if (!_context.Exercises.Any(e => e.Id == progress.ExerciseId))
             {
                 return BadRequest("Exercise does not exist");
             }
+            
+            var timeZone = TZConvert.GetTimeZoneInfo("Europe/Bucharest");
+            progress.Date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
             _context.Progresses.Add(progress);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction("GetProgress", new { id = progress.Id }, progress);
         }
 
+
         [HttpDelete("{id}")]
-        [Authorize (Roles = "Admin")]
+        
         public async Task<IActionResult> DeleteProgress(int id)
         {
             var progress = await _context.Progresses.FindAsync(id);

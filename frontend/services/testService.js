@@ -9,7 +9,7 @@ const testService = {
    */
   getUserTests: async (userId) => {
     try {
-      console.log(" Fetching tests for user:", userId);
+      // console.log(" Fetching tests for user:", userId);
 
       const response = await axios.get(`${API_URL}/api/tests/${userId}`, {
         headers: {
@@ -17,17 +17,17 @@ const testService = {
         },
       });
 
-      console.log(" Raw Test Data:", response.data);
+      // console.log(" Raw Test Data:", response.data);
 
       const testsArray = Array.isArray(response.data)
   ? response.data
   : response.data?.$values || [];
 
 
-      console.log("Processed Test Data:", testsArray);
+      // console.log("Processed Test Data:", testsArray);
       return { success: true, tests: testsArray };
     } catch (error) {
-      console.log("Error fetching user tests:", error.response?.data || error.message);
+      // console.log("Error fetching user tests:", error.response?.data || error.message);
       return { success: false, message: "Eroare la obținerea testelor utilizatorului" };
     }
   },
