@@ -5,6 +5,8 @@ import testService from '../services/testService';
 import userService from '../services/userService';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { getAllProgress } from '../services/progressService';
+
 
 const StreakIndicator = () => {
   const [streak, setStreak] = useState(0);
@@ -32,12 +34,15 @@ const StreakIndicator = () => {
       const entriesRes = await fetchUserEntries(userId);
       const testsRes = await testService.getUserTests(userId);
 
-      const allDates = [
-        ...(entriesRes.entries || []),
-        ...(testsRes.tests || [])
-      ]
-        .map((item) => getDateOnly(item.timestamp || item.date))
-        .filter(date => !isNaN(date));
+      const progressRes = await getAllProgress();
+const allDates = [
+  ...(entriesRes.entries || []),
+  ...(testsRes.tests || []),
+  ...(progressRes || [])
+]
+  .map((item) => getDateOnly(item.timestamp || item.date)) // `timestamp` pt jurnale și teste, `date` pt progres
+  .filter(date => !isNaN(date));
+
 
       console.log("📅 Toate datele brute (cu ore resetate):", allDates.map(d => formatDateLocal(d)));
 
