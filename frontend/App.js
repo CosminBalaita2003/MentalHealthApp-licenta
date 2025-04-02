@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -21,6 +21,7 @@ import JournalScreen from "./screens/JournalScreen";
 import NewEntryScreen from "./screens/NewEntryScreen";
 import AstroChartScreen from "./screens/AstroChartScreen";
 import EditEntryScreen from "./screens/EditEntryScreen";
+import ProgressScreen from "./screens/ProgressScreen";
 export const AuthContext = createContext();
 
 const Stack = createStackNavigator();
@@ -28,6 +29,9 @@ const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
   return (
+    <>
+<StatusBar barStyle="dark-content" />
+
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -65,6 +69,7 @@ function TabNavigator() {
       <Tab.Screen name="Test" component={TestScreen} />
       
     </Tab.Navigator>
+    </>
   );
 }
 
@@ -113,6 +118,8 @@ export default function App() {
               <Stack.Screen name="EditEntryScreen" component={EditEntryScreen} />
               <Stack.Screen name="AstroChartScreen" component={AstroChartScreen} />
               <Stack.Screen name="ExerciseListScreen" component={ExerciseListScreen} />
+              <Stack.Screen name="ProgressScreen" component={ProgressScreen} />
+
               
             </>
           )}

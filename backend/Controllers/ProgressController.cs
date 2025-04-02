@@ -20,8 +20,12 @@ namespace MentalHealthApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Progress>>> GetProgresses()
         {
-            return await _context.Progresses.ToListAsync();
+            return await _context.Progresses
+                .Include(p => p.Exercise)
+                    .ThenInclude(e => e.Category)
+                .ToListAsync();
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Progress>> GetProgress(int id)

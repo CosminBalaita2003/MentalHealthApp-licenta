@@ -6,7 +6,7 @@ import { AuthContext } from '../App';
 import userService from '../services/userService';
 import styles from '../styles/profileStyles';
 import StreakIndicator from '../components/StreakIndicator';
-import ExerciseProgressSummary from "../components/ExerciseProgressSummary";
+import ExerciseProgressSummary from "../components/ProgressSummary";
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -84,7 +84,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
         <StreakIndicator />
-        <ExerciseProgressSummary />
+       
 
 
         <TouchableOpacity
@@ -94,6 +94,14 @@ export default function ProfileScreen({ navigation }) {
           <Ionicons name="planet-outline" size={22} color="#5A4E4D" />
           <Text style={styles.cardText}>View Astro Chart</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+  style={styles.card}
+  onPress={() => navigation.getParent()?.navigate("ProgressScreen")}
+>
+  <Ionicons name="bar-chart-outline" size={22} color="#5A4E4D" />
+  <Text style={styles.cardText}>View your Progress</Text>
+</TouchableOpacity>
+
       </ScrollView>
     </View>
   );

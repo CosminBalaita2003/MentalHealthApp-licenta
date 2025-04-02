@@ -40,6 +40,15 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     }
   };
 
+  // const startExercise = () => {
+  //   if (!steps.length) return;
+  //   setIsRunning(true);
+  //   onRunningChange?.(true);
+  //   setStepIndex(0);
+  //   setCurrentStep(steps[0]);
+  //   progressAnim.setValue(0);
+  //   exerciseStartTime.current = Date.now();
+  // };
   const startExercise = () => {
     if (!steps.length) return;
     setIsRunning(true);
@@ -48,8 +57,20 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     setCurrentStep(steps[0]);
     progressAnim.setValue(0);
     exerciseStartTime.current = Date.now();
+  
+    const totalDuration = exercise.duration || 60;
+    Animated.timing(progressAnim, {
+      toValue: 1,
+      duration: totalDuration * 1000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start(({ finished }) => {
+      if (finished) {
+        stopExercise(true);
+      }
+    });
   };
-
+  
   const stopExercise = async (completed = false) => {
     setIsRunning(false);
     onRunningChange?.(false);
@@ -57,7 +78,9 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     setCurrentStep(null);
     setRemainingTime(0);
     scaleAnim.setValue(1);
-    progressAnim.setValue(0);
+    progressAnim.stopAnimation();
+progressAnim.setValue(0);
+
 
     if (completed && onClose) {
       try {
@@ -104,27 +127,10 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       setStepIndex(nextIndex);
     }, duration * 1000);
 
-    const progressUpdater = setInterval(() => {
-      const totalDuration = exercise.duration || 60;
-      const elapsed = Math.floor((Date.now() - exerciseStartTime.current) / 1000);
-      const progress = Math.min(elapsed / totalDuration, 1);
-
-      Animated.timing(progressAnim, {
-        toValue: progress,
-        duration: 1000,
-        useNativeDriver: false,
-        easing: Easing.inOut(Easing.ease),
-      }).start();
-
-      if (progress >= 1) {
-        stopExercise(true);
-      }
-    }, 1000);
 
     return () => {
       clearTimeout(stepTimeout);
       clearInterval(countdownInterval);
-      clearInterval(progressUpdater);
     };
   }, [isRunning, stepIndex]);
 

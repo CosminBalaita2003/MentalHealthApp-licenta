@@ -60,5 +60,12 @@ export default StyleSheet.create({
     padding: 8,
     borderRadius: 12,
   },
+  description: {
+    color: "#ccc",
+    fontSize: 14,
+    marginTop: 10,
+    marginBottom: 20,
+    lineHeight: 20,
+  },
   
 });

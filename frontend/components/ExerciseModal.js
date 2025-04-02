@@ -4,11 +4,15 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/exerciseScreenStyles";
 import theme from "../styles/theme";
 import BreathingExercise from "./BreathingExercise";
+import MeditationExercise from "./MeditationExercise";
+
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ExerciseModal = ({ visible, onClose, exercise }) => {
   const isBreathing = exercise?.category?.name === "Breathing";
+const isMeditation = exercise?.category?.name === "Meditation & Mindfulness";
+
   const steps = isBreathing && exercise.stepsJson ? JSON.parse(exercise.stepsJson) : [];
   const navigation = useNavigation();
   const [isRunning, setIsRunning] = useState(false);
@@ -85,6 +89,14 @@ const ExerciseModal = ({ visible, onClose, exercise }) => {
             user={user} // ✅ trimitem user din AsyncStorage
           />
         )}
+        {isMeditation && user && (
+  <MeditationExercise
+    exercise={exercise}
+    onClose={handleClose}
+    onRunningChange={setIsRunning}
+  />
+)}
+
       </View>
     </Modal>
   );
