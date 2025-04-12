@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getAllProgress } from "../services/progressService";
+import { getUserProgress } from "../services/progressService";
 import { fetchUserEntries } from "../services/journalService";
 import testService from "../services/testService";
 import exerciseService from "../services/exerciseService";
@@ -30,7 +30,7 @@ const ProgressSummary = () => {
     const loadData = async () => {
       try {
         const [progressList, exercises] = await Promise.all([
-          getAllProgress(),
+          getUserProgress(),
           exerciseService.getAllExercises(),
         ]);
 

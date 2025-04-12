@@ -49,3 +49,22 @@ export const getAllProgress = async () => {
     }
   };
 
+  export const getUserProgress = async (userId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) throw new Error("No auth token found!");
+  
+      const response = await axios.get(`${API_URL}/api/Progress/UserProgress`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error("❌ Failed to fetch user's progress:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+

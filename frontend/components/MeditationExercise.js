@@ -13,6 +13,8 @@ const MeditationExercise = ({ exercise, onClose, onRunningChange }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [currentZone, setCurrentZone] = useState(null);
   const [isPreparing, setIsPreparing] = useState(false);
+  const [preparingZoneIndex, setPreparingZoneIndex] = useState(0);
+
 
   const progressAnim = useRef(new Animated.Value(0)).current;
   const exerciseStartTime = useRef(null);
@@ -93,8 +95,19 @@ const MeditationExercise = ({ exercise, onClose, onRunningChange }) => {
       }
     }, (exercise.duration / zones.length) * 1000);
   
-    return () => {clearTimeout(stepTimeout);stopTTS();}; // curățăm timeout-ul și oprim TTS la demontare
+    return () => {clearTimeout(stepTimeout);
+      // stopTTS();
+  }; // curățăm timeout-ul și oprim TTS la demontare
   }, [isRunning, isPreparing, stepIndex]); // 👈 am adăugat isPreparing aici
+  useEffect(() => {
+    if (!isPreparing || !zones.length) return;
+  
+    const interval = setInterval(() => {
+      setPreparingZoneIndex((prevIndex) => (prevIndex + 1) % zones.length);
+    }, 500); // poți ajusta viteza aici
+  
+    return () => clearInterval(interval);
+  }, [isPreparing, zones.length]);
   
   const renderZone = (zone) => {
     const isActive = zone === currentZone;

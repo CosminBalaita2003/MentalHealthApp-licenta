@@ -5,7 +5,7 @@ import testService from '../services/testService';
 import userService from '../services/userService';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { getAllProgress } from '../services/progressService';
+import { getUserProgress} from '../services/progressService';
 
 
 const StreakIndicator = () => {
@@ -34,7 +34,7 @@ const StreakIndicator = () => {
       const entriesRes = await fetchUserEntries(userId);
       const testsRes = await testService.getUserTests(userId);
 
-      const progressRes = await getAllProgress();
+      const progressRes = await getUserProgress();
 const allDates = [
   ...(entriesRes.entries || []),
   ...(testsRes.tests || []),

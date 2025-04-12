@@ -3,6 +3,7 @@ using MentalHealthApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TimeZoneConverter;
 
 namespace MentalHealthApp.Controllers
@@ -24,6 +25,16 @@ namespace MentalHealthApp.Controllers
                 .Include(p => p.Exercise)
                     .ThenInclude(e => e.Category)
                 .ToListAsync();
+        }
+        [HttpGet("UserProgress")]
+        public async Task<ActionResult<IEnumerable<Progress>>> GetUserProgress()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _context.Progresses
+               .Where(e => e.UserId == userId)
+               .Include(p => p.Exercise)
+                    .ThenInclude(e => e.Category)   
+               .ToListAsync();
         }
 
 
