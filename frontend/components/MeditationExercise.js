@@ -74,7 +74,7 @@ const MeditationExercise = ({ exercise, onClose, onRunningChange }) => {
         console.error("❌ Could not save progress:", e);
       }
   
-      await speakTextAndWait("Great job! You’ve completed your session. Remember, even a few minutes of mindfulness can improve your day.");
+      await speakTextAndWait("Great job! You've completed your session. Remember, even a few minutes of mindfulness can improve your day.");
 
       onClose(true); 
     }

@@ -14,7 +14,6 @@ const iconMap = {
   "Progressive Muscle Relaxation": "body-outline",
   "Emotional Regulation Exercises": "happy-outline",
   "Visualization Techniques": "eye-outline",
-  "Confidence-Boosting Exercises": "star-outline",
   "Stress Management Techniques": "pulse-outline",
   "Unknown": "help-circle-outline"
 };

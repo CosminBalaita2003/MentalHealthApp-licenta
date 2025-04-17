@@ -17,7 +17,6 @@ const categoryDescriptions = {
 
   "Visualization Techniques": "Visualization techniques involve the mental simulation of scenarios that elicit calming or empowering responses. Neuroimaging research shows activation of motor and emotional brain regions during visualization, indicating that imagined experiences can influence real-world psychological and physiological states. This method is commonly used to reduce anticipatory anxiety and improve focus and mood regulation.",
 
-  "Confidence-Boosting Exercises": "Confidence-boosting techniques are behavioral and cognitive interventions aimed at increasing self-worth and perceived competence. These include strength reflection, affirmations, and mastery experiences. Such interventions reframe self-perception and have shown efficacy in improving resilience, assertiveness, and motivation, particularly in therapeutic and coaching contexts.",
 
   "Stress Management Techniques": "Stress management encompasses structured approaches to cope with emotional and physiological responses to challenges. These methods often integrate physical activity, relaxation training, and cognitive restructuring. Evidence supports their effectiveness in reducing cortisol levels, enhancing coping mechanisms, and preventing the escalation of chronic stress into long-term mental health issues."
 };

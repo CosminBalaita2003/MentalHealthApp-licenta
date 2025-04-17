@@ -5,6 +5,10 @@ import styles from "../styles/exerciseScreenStyles";
 import theme from "../styles/theme";
 import BreathingExercise from "./BreathingExercise";
 import MeditationExercise from "./MeditationExercise";
+import PMRExercise from "./PMRExercise";
+import VisualizationExercise from "./VisualizationExercise";
+import EmotionalRegulationExercise from "./EmotionalRegulationExercise";
+import StressManagementExercise from "./StressManagementExercise";
 
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,6 +16,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ExerciseModal = ({ visible, onClose, exercise }) => {
   const isBreathing = exercise?.category?.name === "Breathing";
 const isMeditation = exercise?.category?.name === "Meditation & Mindfulness";
+const isPMR = exercise?.category?.name === "Progressive Muscle Relaxation";
+const isVisualization = exercise?.category?.name === "Visualization Techniques";
+const isEmotionalRegulation = exercise?.category?.name === "Emotional Regulation Exercises";
+const isStressManagement = exercise?.category?.name === "Stress Management Techniques";
 
   const steps = isBreathing && exercise.stepsJson ? JSON.parse(exercise.stepsJson) : [];
   const navigation = useNavigation();
@@ -96,6 +104,40 @@ const isMeditation = exercise?.category?.name === "Meditation & Mindfulness";
     onRunningChange={setIsRunning}
   />
 )}
+        {isPMR && user && (
+          <PMRExercise
+            exercise={exercise}
+            onClose={handleClose}
+            onRunningChange={setIsRunning}
+            user={user} // ✅ trimitem user din AsyncStorage
+          />
+        )}
+        {isVisualization && user && (
+          <VisualizationExercise
+            exercise={exercise}
+            onClose={handleClose}
+            onRunningChange={setIsRunning}
+            user={user} // ✅ trimitem user din AsyncStorage
+          />
+        )}
+
+        {isEmotionalRegulation && user && (
+          <EmotionalRegulationExercise
+            exercise={exercise}
+            onClose={handleClose}
+            onRunningChange={setIsRunning}
+            user={user} // ✅ trimitem user din AsyncStorage
+          />
+        )}
+        {isStressManagement && user && (
+          <StressManagementExercise
+            exercise={exercise}
+            onClose={handleClose}
+            onRunningChange={setIsRunning}
+            user={user} // ✅ trimitem user din AsyncStorage
+          />
+        )}
+
 
       </View>
     </Modal>
