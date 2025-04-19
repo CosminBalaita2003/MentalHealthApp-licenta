@@ -1,9 +1,16 @@
 from flask import Flask, request, send_file
+from flask_cors import CORS
 from gtts import gTTS
 import os
 import uuid
+import base64
+import cv2
+import numpy as np
+from deepface import DeepFace
 
 app = Flask(__name__)
+CORS(app)
+
 OUTPUT_DIR = "tts_output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -28,6 +35,23 @@ def text_to_speech():
 def get_audio(filename):
     filepath = os.path.join(OUTPUT_DIR, filename)
     return send_file(filepath, mimetype="audio/mpeg")
+
+@app.route("/api/expression", methods=["POST"])
+def analyze_expression():
+    data = request.get_json()
+    image_base64 = data.get("image")
+
+    try:
+        img_data = base64.b64decode(image_base64)
+        nparr = np.frombuffer(img_data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        result = DeepFace.analyze(img, actions=["emotion"], enforce_detection=False)
+        emotion = result[0]["dominant_emotion"]
+
+        return {"emotion": emotion, "message": f"You seem {emotion}."}
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005)
