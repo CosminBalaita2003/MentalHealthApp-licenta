@@ -2,67 +2,75 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchEmotionInsightVectors } from "../services/insightService";
 import { getUserTestSummaries } from "../services/testService";
 import { getChatCompletion } from "../services/openaiService";
+import { getUserProgress } from "../services/progressService";
 import exerciseService from "../services/exerciseService";
 
-const STORAGE_KEY = "personalized_tips_cache";
 export const getPersonalizedDailyTips = async () => {
   const today = new Date().toISOString().split("T")[0];
-  // if (!force) {
-  //   const cached = await AsyncStorage.getItem(STORAGE_KEY);
-  //   if (cached) {
-  //     const { tips, date } = JSON.parse(cached);
-  //     if (date === today && tips?.length) return tips;
-  //   }
-  // }
-  await AsyncStorage.removeItem(STORAGE_KEY);
-  // 1. Fetch emotion & test data
-  const [emotionData, testSummaryData, allExercises] = await Promise.all([
-    fetchEmotionInsightVectors(),
-    getUserTestSummaries(),
-    exerciseService.getAllExercises(),
-  ]);
 
-  if (!emotionData || !testSummaryData.success) {
-    return ["Take a deep breath. You're doing your best - and that's enough."];
+  // 👇 Eliminat caching, dar se poate readăuga aici dacă vrei.
+  await AsyncStorage.removeItem("personalized_tips_cache");
+
+  try {
+    const [emotionData, testSummaryData, allExercises, userString] = await Promise.all([
+      fetchEmotionInsightVectors(),
+      getUserTestSummaries(),
+      exerciseService.getAllExercises(),
+      AsyncStorage.getItem("user"),
+    ]);
+
+    if (!emotionData || !testSummaryData.success || !userString) {
+      throw new Error("Missing data");
+    }
+
+    const user = JSON.parse(userString);
+    const userProgress = await getUserProgress(user.id);
+
+    const { declaredByUser, detectedFromJournal, detectedFromBreathing } = emotionData;
+    const summaries = testSummaryData.summaries;
+
+    const testContext = Object.values(summaries)
+      .map((data) => {
+        return `Recently, you’ve shown signs of ${data.latestInterpretation.toLowerCase()} and a general trend of ${data.averageInterpretation.toLowerCase()}.`;
+      })
+      .join(" ");
+
+    const categories = [
+  ...new Set(allExercises.map((ex) => ex.category?.name).filter(Boolean)),
+];
+
+
+    const totalExercises = userProgress?.filter(p => p.exerciseId).length || 0;
+    const progressContext = `You’ve completed ${totalExercises} exercises so far, showing consistency in self-care.`
+
+    const prompt = `
+You're a compassionate mental health companion. Write a short, warm message (max 5 sentences, 2 short paragraphs) to someone who recently added a journal entry, completed a self-assessment, and finished a mindfulness exercise.
+
+The first paragraph should acknowledge their effort and emotional state based on recent activity. Do not directly name their feelings, but show attunement. Avoid judgment.
+
+The second paragraph should offer gentle encouragement and, if fitting, suggest 1–2 practice categories like a therapist in a casual talk — not as a list.
+
+Avoid structured formatting. Use a friendly tone. Refer to the user as "you".
+
+Self-perception: ${declaredByUser.join(", ") || "none"}
+Journal insights: ${detectedFromJournal.join(", ") || "none"}
+Facial expressions: ${detectedFromBreathing.join(", ") || "none"}
+Mental health trends: ${testContext}
+Activity summary: ${progressContext}
+Available practice categories: ${categories.join(", ")}
+    `.trim();
+
+    console.log(prompt);
+    const aiResponse = await getChatCompletion([
+      { role: "user", content: prompt }
+    ]);
+
+    const cleanMessage = aiResponse.trim().replace(/^[•\-\—\d\s]*\s*/, '');
+
+    console.log("🧠 AI Daily Tip:", cleanMessage);
+    return [cleanMessage];
+  } catch (error) {
+    console.error("❌ Failed to generate tips:", error.message);
+    return ["Take a deep breath. You're doing your best – and that’s more than enough."];
   }
-
-  const { declaredByUser, detectedFromJournal, detectedFromBreathing } = emotionData;
-  const summaries = testSummaryData.summaries;
-
-  const testContext = Object.values(summaries)
-    .map((data) => {
-      return `Recently, you’ve shown signs of ${data.latestInterpretation.toLowerCase()} and have had a general trend of ${data.averageInterpretation.toLowerCase()}.`;
-    })
-    .join(" ");
-
-  const categories = [
-    ...new Set(allExercises.map((ex) => ex.category).filter(Boolean)),
-  ];
-
-  const prompt = `
-  You're a compassionate mental health companion. Write a short, warm message (two short paragraphs, no more than 5 total sentences) to someone who recently expressed inner thoughts in a journal and went through breathing-based reflection.
-  
-  The first paragraph should acknowledge their effort and inner state in a gentle way - without labeling their emotions directly. Just reflect what someone like them might be going through.
-  
-  The second paragraph should offer kind, human guidance or encouragement. If it feels appropriate, you may softly suggest 1–2 relevant practices from the categories below, but do not present them as a list. Integrate them naturally into the message, like a therapist would during a casual, safe conversation.
-  
-  Avoid using any bullets, lists, or structured formatting. Keep the tone warm, clear, and human. Write directly to the user, using "you".
-  
-  Self-perception: ${declaredByUser.join(", ") || "none"}
-  Journal insights: ${detectedFromJournal.join(", ") || "none"}
-  Facial patterns during breathing: ${detectedFromBreathing.join(", ") || "none"}
-  Well-being trends: ${testContext}
-  Available practice categories: ${categories.join(", ")}
-  `;
-  
-
-  const aiResponse = await getChatCompletion([
-    { role: "user", content: prompt.trim() },
-  ]);
-
-  const message = aiResponse.trim();
-  console.log("AI Response:", message);
-  const cleanMessage = message.replace(/^[•\-\d\s]*\s*/, '');
-
-  return [cleanMessage];
 };

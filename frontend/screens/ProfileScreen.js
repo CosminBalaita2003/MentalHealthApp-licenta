@@ -11,6 +11,7 @@ import BreathingContainer from '../components/BreathingContainer';
 import { getPersonalizedDailyTips } from '../utils/getDailyTips';
 import { fetchEmotionInsightVectors } from "../services/insightService"; // ajustează calea dacă e nevoie
 import { getUserTestSummaries } from "../services/testService";
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -22,30 +23,44 @@ export default function ProfileScreen({ navigation }) {
   const [testSummary, setTestSummary] = useState(null);
 
   useEffect(() => {
-    const loadEmotionVectors = async () => {
-      const result = await fetchEmotionInsightVectors();
-      setEmotionInsight(result);
+    const loadEverything = async () => {
+      try {
+        setLoading(true);
+  
+        const [emotion, testSummary, tipsList] = await Promise.all([
+          fetchEmotionInsightVectors(),
+          getUserTestSummaries(),
+          getPersonalizedDailyTips(), // acest apel include deja toate celelalte
+        ]);
+  
+        if (testSummary.success) {
+          setEmotionInsight(emotion);
+          setTestSummary(testSummary.summaries);
+          setTips(tipsList);
+        } else {
+          setTips(["Take a deep breath. You're doing your best – and that’s more than enough."]);
+        }
+      } catch (e) {
+        console.error("❌ Failed to load tips or summaries:", e);
+        setTips(["Something went wrong. You're still doing great."]);
+      } finally {
+        setLoading(false);
+      }
     };
   
-    loadEmotionVectors();
+    loadEverything();
   }, []);
-
-useEffect(() => {
-  const loadSummaries = async () => {
-    const res = await getUserTestSummaries();
-    if (res.success) setTestSummary(res.summaries);
-  };
-  loadSummaries();
-}, []);
-useEffect(() => {
-  const fetchTips = async () => {
-    const tipsList = await getPersonalizedDailyTips(); // 👈 NU getDailyTips()
-    setTips(tipsList);
-  };
-
-  fetchTips();
-}, []);
-
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      const refreshTips = async () => {
+        const newTips = await getPersonalizedDailyTips();
+        setTips(newTips);
+      };
+  
+      refreshTips();
+    }, [])
+  );
   
   useEffect(() => {
 

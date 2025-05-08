@@ -1,5 +1,8 @@
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { OPENAI_API_KEY } from '@env';
+import { API_URL } from "@env";
+import { TTS_API_URL } from "@env";
 
 const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -26,3 +29,5 @@ export const getChatCompletion = async (messages) => {
     throw error;
   }
 };
+
+

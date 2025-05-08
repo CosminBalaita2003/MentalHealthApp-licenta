@@ -7,7 +7,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { speakTextAndWait, stopTTS } from "../utils/useTTS";
 import FloatingParticles from "../components/FloatingParticles";
 
-
 const VisualizationExercise = ({ exercise, onClose, onRunningChange }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);

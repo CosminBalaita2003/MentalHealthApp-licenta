@@ -42,7 +42,8 @@
     "react-native-webview": "^13.13.4",
     "react-responsive-carousel": "^3.2.23",
     "tz-lookup": "^6.1.25",
-    "expo-camera": "~16.0.18"
+    "expo-camera": "~16.0.18",
+    "expo-face-detector": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

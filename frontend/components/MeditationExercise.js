@@ -7,7 +7,6 @@ import { saveProgress } from "../services/progressService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { speakText, speakTextAndWait, stopTTS } from "../utils/useTTS";
 
-
 const MeditationExercise = ({ exercise, onClose, onRunningChange }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);

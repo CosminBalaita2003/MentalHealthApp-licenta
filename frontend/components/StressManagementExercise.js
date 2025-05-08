@@ -12,7 +12,6 @@ import styles from "../styles/exerciseScreenStyles";
 import theme from "../styles/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveProgress } from "../services/progressService";
-
 const StressManagementExercise = ({ exercise, onClose, onRunningChange }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);

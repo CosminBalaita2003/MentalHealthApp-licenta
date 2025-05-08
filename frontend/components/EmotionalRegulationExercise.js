@@ -5,7 +5,6 @@ import theme from "../styles/theme";
 import { saveProgress } from "../services/progressService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { speakTextAndWait, stopTTS } from "../utils/useTTS";
-
 const EmotionalRegulationExercise = ({ exercise, onClose, onRunningChange }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);

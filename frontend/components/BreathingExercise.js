@@ -9,20 +9,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { analyzeExpressionFromBase64 } from "../utils/useExpressionAI";
 import { saveDetectedEmotion } from "../services/emotionService";
 
+
 const getSuggestionForEmotion = (emotion) => {
   switch (emotion) {
-    case "happy":
     case "neutral":
+      return "Focus on your breath and let go of distractions.";
+    case "happy":
       return "You’re doing great, keep it up!";
+    case "neutral":
+      return "Focus on your breath and let go of distractions.";
     case "sad":
       return "Take a deep breath and focus on the present.";
     case "angry":
       return "Try relaxing your muscles. You’ve got this.";
-    case "fear":
+    case "fearful":
       return "You’re safe. Let your breath calm you.";
-    case "surprise":
+    case "surprised":
       return "Take it slow. Let the surprise pass.";
-    case "disgust":
+    case "disgusted":
       return "Release the tension. You're in control.";
     case "...analyzing":
       return "You can do it!";
@@ -69,34 +73,33 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
   };
 
   const captureAndAnalyze = async () => {
-    if (!allowCamera) return;
-    if (isAnalyzingRef.current) return;
+    if (!allowCamera || isAnalyzingRef.current) return;
     isAnalyzingRef.current = true;
-
+  
     try {
       if (cameraRef.current?.takePictureAsync) {
         const photo = await cameraRef.current.takePictureAsync({
           base64: true,
           quality: 0.2,
         });
-
-        const now = Date.now();
-        const shouldUpdate = now - lastEmotionUpdateRef.current >= 1500;
-
+  
         await analyzeExpressionFromBase64(photo.base64, async (data) => {
-          if (shouldUpdate && data.emotion) {
+          if (data.emotion) {
             const emotionName = data.emotion.toLowerCase();
-            prevEmotionRef.current = emotionName;
-            lastEmotionUpdateRef.current = now;
-
-            // Count emotion
-            const counts = emotionCountsRef.current;
-            counts[emotionName] = (counts[emotionName] || 0) + 1;
-            emotionCountsRef.current = { ...counts };
-
-            updateDominantEmotion();
+        
+            // 👉 Doar dacă e o emoție nouă, o setăm
+            if (emotionName !== prevEmotionRef.current) {
+              prevEmotionRef.current = emotionName;
+        
+              const counts = emotionCountsRef.current;
+              counts[emotionName] = (counts[emotionName] || 0) + 1;
+              emotionCountsRef.current = { ...counts };
+        
+              updateDominantEmotion();
+            }
           }
         });
+        
       }
     } catch (err) {
       console.error("❌ Failed to capture/analyze:", err);
@@ -104,6 +107,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       isAnalyzingRef.current = false;
     }
   };
+  
   const animateScale = (step) => {
     let toValue = 1;
     const stepLower = step.toLowerCase();
@@ -215,13 +219,13 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     };
   }, [isRunning, stepIndex]);
 
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      captureAndAnalyze();
-    }, 1500); // mai des
-    return () => clearInterval(interval);
-  }, [isRunning]);
+  // useEffect(() => {
+  //   if (!isRunning) return;
+  //   const interval = setInterval(() => {
+  //     captureAndAnalyze();
+  //   }, 1500); // mai des
+  //   return () => clearInterval(interval);
+  // }, [isRunning]);
 
   if (allowCamera === null) {
     return (

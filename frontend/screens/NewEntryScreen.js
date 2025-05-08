@@ -20,6 +20,8 @@ import JournalStyles from "../styles/journalStyles";
 import theme from "../styles/theme";
 import EmotionSelector from "../components/EmotionSelector";
 import JournalTextBox from "../components/JournalTextBox";
+
+
 import { saveDetectedEmotion } from "../services/emotionService";
 const NewEntryScreen = () => {
   const [content, setContent] = useState("");
@@ -168,7 +170,11 @@ const NewEntryScreen = () => {
       }
   
       Alert.alert("Success", response.message || "Entry saved!");
+
+      // ✅ Regenerăm mesajul personalizat
+
       navigation.goBack();
+
     } catch (error) {
       console.error("Error adding journal entry:", error);
       Alert.alert("Error", "Something went wrong while saving.");
