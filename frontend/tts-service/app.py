@@ -10,6 +10,15 @@ from deepface import DeepFace
 
 app = Flask(__name__)
 CORS(app)
+from transformers import pipeline
+
+emotion_classifier_text = pipeline(
+    "text-classification",
+    model="./models/emotion-model",
+    tokenizer="./models/emotion-model",
+    return_all_scores=True
+)
+
 
 OUTPUT_DIR = "tts_output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -52,6 +61,27 @@ def analyze_expression():
         return {"emotion": emotion, "message": f"You seem {emotion}."}
     except Exception as e:
         return {"error": str(e)}, 500
+    
+@app.route("/api/text-emotion", methods=["POST"])
+def analyze_text_emotion():
+    data = request.get_json()
+    text = data.get("text", "")
+
+    if not text:
+        return {"error": "No text provided"}, 400
+
+    try:
+        results = emotion_classifier_text(text)[0]
+        dominant = max(results, key=lambda r: r["score"])
+
+        return {
+            "dominantEmotion": dominant["label"],
+            "scores": {r["label"]: round(r["score"], 3) for r in results},
+            "message": f"You seem to feel {dominant['label']}."
+        }
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005)

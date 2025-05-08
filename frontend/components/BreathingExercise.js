@@ -7,27 +7,27 @@ import theme from "../styles/theme";
 import { saveProgress } from "../services/progressService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { analyzeExpressionFromBase64 } from "../utils/useExpressionAI";
+import { saveDetectedEmotion } from "../services/emotionService";
 
-// ... restul importurilor
 const getSuggestionForEmotion = (emotion) => {
   switch (emotion) {
     case "happy":
     case "neutral":
-      return "You’re doing great, keep it up! (happy)";
+      return "You’re doing great, keep it up!";
     case "sad":
-      return "Take a deep breath and focus on the present. (sad)";
+      return "Take a deep breath and focus on the present.";
     case "angry":
-      return "Try relaxing your muscles. You’ve got this. (angry)";
+      return "Try relaxing your muscles. You’ve got this.";
     case "fear":
-      return "You’re safe. Let your breath calm you. (fear)";
+      return "You’re safe. Let your breath calm you.";
     case "surprise":
-      return "Take it slow. Let the surprise pass. (surprise)";
+      return "Take it slow. Let the surprise pass.";
     case "disgust":
-      return "Release the tension. You're in control. (disgust)";
+      return "Release the tension. You're in control.";
     case "...analyzing":
-      return "You can do it! (analyzing)";
+      return "You can do it!";
     default:
-      return "Keep breathing and stay present. (unknown)";
+      return "Keep breathing and stay present.";
   }
 };
 
@@ -37,7 +37,10 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
   const [currentStep, setCurrentStep] = useState(null);
   const [remainingTime, setRemainingTime] = useState(0);
   const [hasPermission, setHasPermission] = useState(null);
-  const [emotion, setEmotion] = useState(null);
+  const [allowCamera, setAllowCamera] = useState(null);
+
+  const emotionCountsRef = useRef({});
+  const [dominantEmotion, setDominantEmotion] = useState(null);
 
   const cameraRef = useRef(null);
   const isFocused = useIsFocused();
@@ -59,28 +62,14 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     })();
   }, []);
 
-  const animateScale = (step) => {
-    let toValue = 1;
-    const stepLower = step.toLowerCase();
-
-    if (stepLower.startsWith("inhale")) toValue = 1.5;
-    else if (stepLower.startsWith("exhale")) toValue = 0.7;
-    else if (stepLower.startsWith("hold")) toValue = lastScale.current;
-
-    const durationMatch = step.match(/(\d+)/);
-    const duration = durationMatch ? parseInt(durationMatch[1]) * 1000 : 4000;
-
-    lastScale.current = toValue;
-
-    Animated.timing(scaleAnim, {
-      toValue,
-      duration,
-      easing: Easing.inOut(Easing.ease),
-      useNativeDriver: true,
-    }).start();
+  const updateDominantEmotion = () => {
+    const counts = emotionCountsRef.current;
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    setDominantEmotion(sorted[0]?.[0] ?? null);
   };
 
   const captureAndAnalyze = async () => {
+    if (!allowCamera) return;
     if (isAnalyzingRef.current) return;
     isAnalyzingRef.current = true;
 
@@ -92,22 +81,22 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
         });
 
         const now = Date.now();
-        const shouldUpdate = now - lastEmotionUpdateRef.current >= 5000;
+        const shouldUpdate = now - lastEmotionUpdateRef.current >= 1500;
 
-        if (!emotion) setEmotion("...analyzing");
-
-        await analyzeExpressionFromBase64(photo.base64, (data) => {
-          if (shouldUpdate && data.emotion && data.emotion !== prevEmotionRef.current) {
-            setEmotion(data.emotion);
-            prevEmotionRef.current = data.emotion;
+        await analyzeExpressionFromBase64(photo.base64, async (data) => {
+          if (shouldUpdate && data.emotion) {
+            const emotionName = data.emotion.toLowerCase();
+            prevEmotionRef.current = emotionName;
             lastEmotionUpdateRef.current = now;
-            console.log("✅ Emotion updated:", data.emotion);
-          } else {
-            console.log("ℹ️ Emotion skipped or unchanged");
+
+            // Count emotion
+            const counts = emotionCountsRef.current;
+            counts[emotionName] = (counts[emotionName] || 0) + 1;
+            emotionCountsRef.current = { ...counts };
+
+            updateDominantEmotion();
           }
         });
-      } else {
-        console.log("❌ cameraRef.current.takePictureAsync is undefined");
       }
     } catch (err) {
       console.error("❌ Failed to capture/analyze:", err);
@@ -115,7 +104,25 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       isAnalyzingRef.current = false;
     }
   };
-
+  const animateScale = (step) => {
+    let toValue = 1;
+    const stepLower = step.toLowerCase();
+    if (stepLower.startsWith("inhale")) toValue = 1.5;
+    else if (stepLower.startsWith("exhale")) toValue = 0.7;
+    else if (stepLower.startsWith("hold")) toValue = lastScale.current;
+  
+    const durationMatch = step.match(/(\d+)/);
+    const duration = durationMatch ? parseInt(durationMatch[1]) * 1000 : 4000;
+    lastScale.current = toValue;
+  
+    Animated.timing(scaleAnim, {
+      toValue,
+      duration,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  };
+  
   const startExercise = () => {
     if (!steps.length) return;
     setIsRunning(true);
@@ -124,6 +131,8 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     setCurrentStep(steps[0]);
     progressAnim.setValue(0);
     exerciseStartTime.current = Date.now();
+    emotionCountsRef.current = {};
+    setDominantEmotion(null);
 
     const totalDuration = exercise.duration || 60;
     Animated.timing(progressAnim, {
@@ -132,9 +141,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       easing: Easing.linear,
       useNativeDriver: false,
     }).start(({ finished }) => {
-      if (finished) {
-        stopExercise(true);
-      }
+      if (finished) stopExercise(true);
     });
   };
 
@@ -148,6 +155,19 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     progressAnim.stopAnimation();
     progressAnim.setValue(0);
 
+    // ✅ Save top 3 detected emotions
+    const sorted = Object.entries(emotionCountsRef.current)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    for (const [emotionName] of sorted) {
+      await saveDetectedEmotion({
+        emotionName,
+        sentence: null,
+        source: "breathing"
+      });
+    }
+
     if (completed && onClose) {
       try {
         const userString = await AsyncStorage.getItem("user");
@@ -158,7 +178,6 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       } catch (e) {
         console.error("Could not save progress:", e);
       }
-
       onClose(true);
     }
   };
@@ -169,7 +188,6 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     const step = steps[stepIndex];
     setCurrentStep(step);
     animateScale(step);
-
     captureAndAnalyze();
 
     const durationMatch = step.match(/(\d+)/);
@@ -196,6 +214,38 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       clearTimeout(stepTimeout);
     };
   }, [isRunning, stepIndex]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+    const interval = setInterval(() => {
+      captureAndAnalyze();
+    }, 1500); // mai des
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  if (allowCamera === null) {
+    return (
+      <View style={{ alignItems: "center", justifyContent: "center", flex: 1, padding: 20 }}>
+        <Text style={[styles.text, { fontSize: 18, textAlign: "center", marginBottom: 20 }]}>
+          Would you like to enable the camera for facial emotion feedback during this exercise?
+        </Text>
+        <View style={{ flexDirection: "row", gap: 20 }}>
+          <TouchableOpacity
+            onPress={() => setAllowCamera(true)}
+            style={{ padding: 12, backgroundColor: theme.colors.semiaccent, borderRadius: 8 }}
+          >
+            <Text style={styles.cardText}>Yes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setAllowCamera(false)}
+            style={{ padding: 12, backgroundColor: theme.colors.text, borderRadius: 8 }}
+          >
+            <Text style={styles.cardText}>No</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={{ marginTop: 70, alignItems: "center", justifyContent: "center" }}>
@@ -224,7 +274,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
             left: 0,
           }}
         >
-          {hasPermission && isFocused && (
+          {allowCamera && hasPermission && isFocused ? (
             <CameraView
               ref={cameraRef}
               style={{
@@ -235,6 +285,17 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
                 left: "-10%",
               }}
               facing="front"
+            />
+          ) : (
+            <Animated.View
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: theme.colors.text,
+                opacity: 0.2,
+                borderRadius: 100,
+                transform: [{ scale: scaleAnim }],
+              }}
             />
           )}
         </View>
@@ -248,9 +309,9 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
           <Text style={[styles.text, { fontSize: 22, fontWeight: "bold", color: theme.colors.text }]}>
             {remainingTime}s
           </Text>
-          {emotion && (
+          {allowCamera && (
             <Text style={[styles.text, { fontSize: 14, color: theme.colors.semiaccent, marginTop: 4, textAlign: "center" }]}>
-              {getSuggestionForEmotion(emotion)}
+              {getSuggestionForEmotion(dominantEmotion || "...analyzing")}
             </Text>
           )}
         </View>

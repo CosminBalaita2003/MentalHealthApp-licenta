@@ -19,10 +19,10 @@ const ExercisesScreen = () => {
     const fetchData = async () => {
       try {
         const allExercises = await exerciseService.getAllExercises();
-        console.log("Fetched exercises:", allExercises);
+        // console.log("Fetched exercises:", allExercises);
 
         const grouped = groupByCategory(allExercises);
-        console.log("Grouped categories:", grouped);
+        // console.log("Grouped categories:", grouped);
 
         setCategories(grouped);
       } catch (error) {

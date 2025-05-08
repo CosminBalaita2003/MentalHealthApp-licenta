@@ -29,7 +29,7 @@ export default StyleSheet.create({
     width: "100%",
   },
   cardText: {
-    marginLeft: 10,
+    marginLeft: 0,
     fontSize: 16,
     color: "black",
     fontWeight: "500",

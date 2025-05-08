@@ -22,6 +22,10 @@ namespace MentalHealthApp.Data
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<JournalEntry> JournalEntries { get; set; }
 
+        public DbSet<NatalChart> NatalCharts { get; set; } 
+
+        public DbSet<DetectedEmotion> DetectedEmotions { get; set; } // Adăugat pentru a salva emoțiile detectate
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -63,7 +67,21 @@ namespace MentalHealthApp.Data
                 .WithMany(u => u.JournalEntries)
                 .HasForeignKey(j => j.UserId)
                 .OnDelete(DeleteBehavior.Cascade); // Șterge jurnalele dacă userul e șters
+
+            builder.Entity<NatalChart>()
+    .HasIndex(n => n.UserId)
+    .IsUnique();
+
+            builder.Entity<DetectedEmotion>()
+                .HasOne(de => de.User)
+                .WithMany()
+                .HasForeignKey(de => de.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Șterge emoțiile detectate dacă userul e șters
+
+
+
         }
+
     }
     }
 

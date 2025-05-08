@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "@env";
 import { fetchUserData } from "./authService";
-
+import { TTS_API_URL } from "@env";
 
 
 /**
@@ -217,3 +217,22 @@ export const updateJournalEntry = async (entry, user) => {
     throw error;
   }
 };
+
+
+export const analyzeTextEmotion = async (text) => {
+  try {
+    const response = await axios.post(`${TTS_API_URL}/api/text-emotion`, {
+      text: text,
+    });
+
+    return {
+      success: true,
+      dominantEmotion: response.data.dominantEmotion,
+      scores: response.data.scores,
+    };
+  } catch (error) {
+    console.error("Error analyzing emotion:", error.response?.data || error.message);
+    return { success: false };
+  }
+};
+

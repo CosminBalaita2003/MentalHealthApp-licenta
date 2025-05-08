@@ -7,14 +7,49 @@ import userService from '../services/userService';
 import styles from '../styles/profileStyles';
 import StreakIndicator from '../components/StreakIndicator';
 import ExerciseProgressSummary from "../components/ProgressSummary";
+import BreathingContainer from '../components/BreathingContainer';
+import { getPersonalizedDailyTips } from '../utils/getDailyTips';
+import { fetchEmotionInsightVectors } from "../services/insightService"; // ajustează calea dacă e nevoie
+import { getUserTestSummaries } from "../services/testService";
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { setIsAuthenticated } = useContext(AuthContext);
+  const [tips, setTips] = useState([]);
+  const [emotionInsight, setEmotionInsight] = useState(null);
+  const [testSummary, setTestSummary] = useState(null);
 
   useEffect(() => {
+    const loadEmotionVectors = async () => {
+      const result = await fetchEmotionInsightVectors();
+      setEmotionInsight(result);
+    };
+  
+    loadEmotionVectors();
+  }, []);
+
+useEffect(() => {
+  const loadSummaries = async () => {
+    const res = await getUserTestSummaries();
+    if (res.success) setTestSummary(res.summaries);
+  };
+  loadSummaries();
+}, []);
+useEffect(() => {
+  const fetchTips = async () => {
+    const tipsList = await getPersonalizedDailyTips(); // 👈 NU getDailyTips()
+    setTips(tipsList);
+  };
+
+  fetchTips();
+}, []);
+
+  
+  useEffect(() => {
+
+    
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
@@ -43,6 +78,7 @@ export default function ProfileScreen({ navigation }) {
     };
 
     fetchUserProfile();
+
   }, []);
 
   const handleLogout = async () => {
@@ -68,6 +104,7 @@ export default function ProfileScreen({ navigation }) {
       </View>
     );
   }
+  
 
   return (
     <View style={{ flex: 1, backgroundColor: "#16132D" }}>
@@ -101,8 +138,18 @@ export default function ProfileScreen({ navigation }) {
   <Ionicons name="bar-chart-outline" size={22} color="#5A4E4D" />
   <Text style={styles.cardText}>View your Progress</Text>
 </TouchableOpacity>
+<BreathingContainer>
+  <Text style={styles.tipsTitle}>Daily Tips</Text>
+  {tips.map((tip, index) => (
+    <Text key={index} style={styles.tipText}>{tip}</Text>
+  ))}
+</BreathingContainer>
+
+
+
 
       </ScrollView>
     </View>
+
   );
 }

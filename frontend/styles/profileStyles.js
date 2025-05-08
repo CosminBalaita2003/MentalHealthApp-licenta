@@ -65,4 +65,31 @@ export default StyleSheet.create({
     fontSize: 16,
     color: '#5A4E4D',
   },
+  tipsContainer: {
+    backgroundColor: '#1E1A38',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    marginTop: 40,
+    
+    shadowColor: '#9f7aea',
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  tipsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#E8BCB9',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  tipText: {
+    fontSize: 14,
+    color: '#ddd',
+    marginBottom: 6,
+    lineHeight: 20,
+  },
+  
 });

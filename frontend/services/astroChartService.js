@@ -106,7 +106,8 @@ export const fetchNatalWheelChart = async (profile) => {
       payload,
       {
         headers: {
-          'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+          // 'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+          'x-api-key': 'SqD8LbGWle8MjQzMRAB5w6sWhJepbC44cRzDcXke',
           'Content-Type': 'application/json',
         }
       }
@@ -141,7 +142,8 @@ export const fetchPlanets = async (profile) => {
       payload,
       {
         headers: {
-          'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+          // 'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+          'x-api-key': 'SqD8LbGWle8MjQzMRAB5w6sWhJepbC44cRzDcXke',
           'Content-Type': 'application/json',
         }
       }
@@ -177,7 +179,8 @@ export const fetchHouses = async (profile) => {
       payload,
       {
         headers: {
-          'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+         'x-api-key': 'rdB80hPQKM7BHCm1RfwDr6kZbNQgnxbp9HVuzZqc',
+        //  'x-api-key': 'SqD8LbGWle8MjQzMRAB5w6sWhJepbC44cRzDcXke',
           'Content-Type': 'application/json',
         }
       }
@@ -187,5 +190,48 @@ export const fetchHouses = async (profile) => {
   } catch (error) {
     console.error(" Error fetching houses:", error.response?.data || error.message);
     return null;
+  }
+};
+export const saveNatalChart = async (svgContent, planets, houses) => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    const userString = await AsyncStorage.getItem("user");
+
+    if (!token || !userString) {
+      console.warn("No token or user found.");
+      return;
+    }
+
+    const user = JSON.parse(userString);
+
+    const simplifiedPlanets = planets.map(p => ({
+      planet: p.planet?.en,
+      zodiacSign: p.zodiac_sign?.name?.en,
+    }));
+
+    const simplifiedHouses = houses.map(h => ({
+      house: h.House,
+      zodiacSign: h.zodiac_sign?.name?.en,
+    }));
+
+    const response = await axios.post(
+      `${API_URL}/api/NatalChart`,
+      {
+        chartSvg: svgContent,
+        planetsJson: JSON.stringify(simplifiedPlanets),
+        housesJson: JSON.stringify(simplifiedHouses),
+        userId: user.id // acum merge corect ✅
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("✅ Natal chart saved:", response.status);
+  } catch (error) {
+    console.error("❌ Error saving natal chart:", error.response?.data || error.message);
   }
 };

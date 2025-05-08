@@ -21,6 +21,7 @@
     "@shopify/react-native-skia": "1.5.0",
     "axios": "^1.8.4",
     "expo": "~52.0.37",
+    "expo-av": "~15.0.2",
     "expo-status-bar": "~2.0.1",
     "moment-timezone": "^0.5.48",
     "react": "18.3.1",
@@ -41,7 +42,7 @@
     "react-native-webview": "^13.13.4",
     "react-responsive-carousel": "^3.2.23",
     "tz-lookup": "^6.1.25",
-    "expo-av": "~15.0.2"
+    "expo-camera": "~16.0.18"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

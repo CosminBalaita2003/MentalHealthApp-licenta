@@ -22,6 +22,43 @@ namespace backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DetectedEmotion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EmotionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("JournalEntryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Sentence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JournalEntryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DetectedEmotions");
+                });
+
             modelBuilder.Entity("MentalHealthApp.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -443,6 +480,41 @@ namespace backend.Migrations
                     b.ToTable("JournalEntries");
                 });
 
+            modelBuilder.Entity("backend.Models.NatalChart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChartSvg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HousesJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlanetsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("NatalCharts");
+                });
+
             modelBuilder.Entity("backend.Models.TestResult", b =>
                 {
                     b.Property<int>("Id")
@@ -480,6 +552,23 @@ namespace backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TestResults");
+                });
+
+            modelBuilder.Entity("DetectedEmotion", b =>
+                {
+                    b.HasOne("backend.Models.JournalEntry", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalEntryId");
+
+                    b.HasOne("MentalHealthApp.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MentalHealthApp.Models.ApplicationUser", b =>
@@ -589,6 +678,15 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Emotion");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.NatalChart", b =>
+                {
+                    b.HasOne("MentalHealthApp.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });

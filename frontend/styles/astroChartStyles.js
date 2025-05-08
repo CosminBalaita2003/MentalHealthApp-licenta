@@ -37,10 +37,11 @@ title: {
     marginTop: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: theme.colors.text,
     fontWeight: 'bold',
-    marginBottom: 0,
+    marginBottom: 10,
+    
   },
   explanation: {
     color: theme.colors.text,
@@ -61,6 +62,7 @@ title: {
   },
   sectionIcon: {
     marginRight: 6,
+    marginBottom: 10,
   },
   
 });

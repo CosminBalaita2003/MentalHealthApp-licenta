@@ -85,3 +85,4 @@ C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Data\cit
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\backend.staticwebassets.runtime.json
 C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\TimeZoneConverter.dll
+C:\Users\cosmi\Desktop\MentalHealthApp-licenta\backend\bin\Debug\net7.0\Newtonsoft.Json.dll

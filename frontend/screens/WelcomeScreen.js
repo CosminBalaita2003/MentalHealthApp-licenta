@@ -6,7 +6,7 @@ import theme from '../styles/theme';
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>MindEase</Text>
+      <Text style={styles.title}>MindWell</Text>
       <Text style={styles.subtitle}>Welcome! Let’s take care of your mental wellbeing.</Text>
 
       <TouchableOpacity

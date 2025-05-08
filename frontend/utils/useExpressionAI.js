@@ -15,7 +15,7 @@ export const analyzeExpressionFromBase64 = async (base64Image, callback = null) 
     if (data.message) {
       console.log("🧠 Detected:", data.message);
       
-      // am scos speakText(data.message);
+
 
       if (callback) callback(data);
     } else if (data.error) {
