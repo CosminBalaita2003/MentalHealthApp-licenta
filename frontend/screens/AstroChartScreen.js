@@ -41,78 +41,88 @@ export default function AstroChartScreen({ route, navigation }) {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const getSavedChart = async () => {
+const getSavedChart = async () => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) return null;
+
+    const response = await axios.get(`${API_URL}/api/NatalChart`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    return response.data;
+  } catch (err) {
+    if (err.response?.status === 404) {
+      return null; // nu mai loga nimic pt 404
+    }
+    console.error("❌ Error fetching chart:", err.response?.data || err.message);
+    return null;
+  }
+};
+
+useEffect(() => {
+  const loadChartData = async () => {
+    setLoading(true);
+
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) return null;
+      const cached = await getSavedChart();
 
-      const response = await axios.get(`${API_URL}/api/NatalChart`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const hasChart = cached?.planetsJson && cached?.housesJson && cached?.chartSvg;
 
-      return response.data;
-    } catch (err) {
-      console.error("❌ Error fetching chart:", err.response?.data || err.message);
-      return null;
+      if (!hasChart) {
+        // 🪐 NU avem chart => îl generăm și-l salvăm
+        const chartResult = await fetchNatalWheelChart(user);
+        const chartUrl = chartResult?.output;
+        if (!chartUrl) {
+          Alert.alert("Eroare", "Nu s-a putut obține link-ul către chart.");
+          return;
+        }
+
+        const svgRes = await axios.get(chartUrl);
+        await sleep(500);
+
+        const planetsResult = await fetchPlanets(user);
+        const planetsData = planetsResult?.output || [];
+
+        await sleep(500);
+
+        const housesResult = await fetchHouses(user);
+        const housesData = housesResult?.output?.Houses || [];
+
+        await saveNatalChart(svgRes.data, planetsData, housesData);
+
+        // Reîncarcă totul din backend
+        return loadChartData();
+      }
+
+      // ✅ Chart existent: extragem și setăm datele
+      const planetsData = JSON.parse(cached.planetsJson);
+      const housesData = JSON.parse(cached.housesJson);
+      setSvgContent(cached.chartSvg);
+      setPlanets(planetsData);
+      setHouses(housesData);
+
+      const planetExpl = planetsData.map(p =>
+        planetData[p.planet]?.[p.zodiacSign] || 'No explanation available.'
+      );
+      setPlanetDescriptions(planetExpl);
+
+      const houseExpl = housesData.map(h =>
+        houseData[`House ${h.house}`]?.[h.zodiacSign] || 'No explanation available.'
+      );
+      setHouseDescriptions(houseExpl);
+
+    } catch (error) {
+      console.error("❌ General error:", error.response?.data || error.message);
+      Alert.alert("Eroare", "Nu s-au putut încărca datele astrologice.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const loadChartData = async () => {
-      try {
-        const cached = await getSavedChart();
+  loadChartData();
+}, []);
 
-        let planetsData = [], housesData = [];
-
-        if (cached) {
-          planetsData = JSON.parse(cached.planetsJson);
-          housesData = JSON.parse(cached.housesJson);
-          setSvgContent(cached.chartSvg);
-        } else {
-          const chartResult = await fetchNatalWheelChart(user);
-          const chartUrl = chartResult?.output;
-          if (!chartUrl) {
-            Alert.alert("Eroare", "Nu s-a putut obține link-ul către chart.");
-            return;
-          }
-
-          const svgRes = await axios.get(chartUrl);
-          setSvgContent(svgRes.data);
-          await sleep(1000);
-
-          const planetsResult = await fetchPlanets(user);
-          planetsData = planetsResult?.output || [];
-
-          await sleep(1000);
-          const housesResult = await fetchHouses(user);
-          housesData = housesResult?.output?.Houses || [];
-
-          await saveNatalChart(svgRes.data, planetsData, housesData);
-        }
-
-        setPlanets(planetsData);
-        setHouses(housesData);
-
-        const planetExpl = planetsData.map(p =>
-          planetData[p.planet]?.[p.zodiacSign] || 'No explanation available.'
-        );
-        setPlanetDescriptions(planetExpl);
-
-        const houseExpl = housesData.map(h =>
-          houseData[`House ${h.house}`]?.[h.zodiacSign] || 'No explanation available.'
-        );
-        setHouseDescriptions(houseExpl);
-
-      } catch (error) {
-        console.error("❌ General error:", error.response?.data || error.message);
-        Alert.alert("Eroare", "Nu s-au putut încărca datele astrologice.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadChartData();
-  }, []);
 
   const onWebViewMessage = (event) => {
     const base64 = event.nativeEvent.data;

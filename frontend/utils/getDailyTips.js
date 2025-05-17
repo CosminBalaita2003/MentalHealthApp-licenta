@@ -1,95 +1,115 @@
+// utils/getPersonalizedDailyTips.js
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchEmotionInsightVectors } from "../services/insightService";
 import { getUserTestSummaries } from "../services/testService";
-import { getChatCompletion } from "../services/openaiService";
-import { getUserProgress } from "../services/progressService";
 import exerciseService from "../services/exerciseService";
+import { getUserProgress } from "../services/progressService";
+import { getChatCompletion } from "../services/openaiService";
+
+const CACHE_KEY = "personalized_tips_cache";
+
 export const getPersonalizedDailyTips = async () => {
-  const today = new Date().toISOString().split("T")[0];
-
-  await AsyncStorage.removeItem("personalized_tips_cache");
-
   try {
-    const [emotionDataRaw, testSummaryDataRaw, allExercisesRaw, userStringRaw] = await Promise.allSettled([
+    // 1. Încarcă cache-ul
+    const cacheRaw = await AsyncStorage.getItem(CACHE_KEY);
+    const cache = cacheRaw ? JSON.parse(cacheRaw) : null;
+
+    // 2. Fetch date actuale
+    const [
+      emotionDataRaw,
+      testSummaryDataRaw,
+      allExercisesRaw,
+      userStringRaw
+    ] = await Promise.allSettled([
       fetchEmotionInsightVectors(),
       getUserTestSummaries(),
       exerciseService.getAllExercises(),
-      AsyncStorage.getItem("user"),
+      AsyncStorage.getItem("user")
     ]);
 
-    const emotionData = emotionDataRaw.status === "fulfilled" ? emotionDataRaw.value : null;
-    const testSummaryData = testSummaryDataRaw.status === "fulfilled" ? testSummaryDataRaw.value : { success: false };
+    const emotionData = emotionDataRaw.status === "fulfilled" ? emotionDataRaw.value : {};
+    const testSummaryData = testSummaryDataRaw.status === "fulfilled" && testSummaryDataRaw.value.success
+      ? testSummaryDataRaw.value.summaries
+      : {};
     const allExercises = allExercisesRaw.status === "fulfilled" ? allExercisesRaw.value : [];
-    const userString = userStringRaw.status === "fulfilled" ? userStringRaw.value : null;
-    const user = userString ? JSON.parse(userString) : null;
-
-    const userProgress = user?.id
-      ? await getUserProgress(user.id).catch(() => null)
+    const user = userStringRaw.status === "fulfilled" && userStringRaw.value
+      ? JSON.parse(userStringRaw.value)
       : null;
 
-    const { declaredByUser = [], detectedFromJournal = [], detectedFromBreathing = [] } = emotionData || {};
-    const summaries = testSummaryData.success ? testSummaryData.summaries : {};
+    // 3. Deriveşte lista de emoţii unice
+    const declared   = emotionData.declaredByUser    || [];
+    const journaled  = emotionData.detectedFromJournal|| [];
+    const breathed   = emotionData.detectedFromBreathing || [];
+    const emotions   = Array.from(new Set([...declared, ...journaled, ...breathed]));
 
-    const categories = Array.isArray(allExercises)
-      ? [...new Set(allExercises.map((ex) => ex.category?.name).filter(Boolean))]
+    // 4. Deriveşte lista de exerciţii finalizate (doar id-uri)
+    const progress = user
+      ? await getUserProgress(user.id).catch(() => [])
       : [];
+    const exercises = Array.from(new Set(progress.map(p => p.exerciseId)));
 
-    const totalExercises = userProgress?.filter(p => p.exerciseId).length || 0;
+    // 5. Deriveşte lista testelor făcute (cheile din summaries)
+    const tests = Object.keys(testSummaryData);
 
-    const testContext = Object.values(summaries)
-      .map((data) => {
-        return `Recently, you’ve shown signs of ${data.latestInterpretation?.toLowerCase()} and a general trend of ${data.averageInterpretation?.toLowerCase()}.`;
-      })
-      .join(" ");
+    // 6. Compară cu cache
+    const sortedEq = (a, b) =>
+      Array.isArray(a) &&
+      Array.isArray(b) &&
+      JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
 
-    const progressContext = totalExercises > 0
-      ? `You’ve completed ${totalExercises} exercises so far, showing consistency in self-care.`
-      : null;
-
-    // 🧠 Pregătim datele pentru prompt
-    const promptSections = {
-      selfPerception: declaredByUser.length > 0 ? declaredByUser.join(", ") : null,
-      journalInsights: detectedFromJournal.length > 0 ? detectedFromJournal.join(", ") : null,
-      breathingEmotions: detectedFromBreathing.length > 0 ? detectedFromBreathing.join(", ") : null,
-      testContext: testContext || null,
-      progressContext,
-      categories: categories.length > 0 ? categories.join(", ") : null,
-    };
-
-    const meaningful = Object.values(promptSections).some(Boolean); // măcar un element existent
-
-    if (!meaningful) {
-      return ["Take a deep breath. You're doing your best – and that’s more than enough."];
+    if (
+      cache &&
+      sortedEq(cache.emotions, emotions) &&
+      sortedEq(cache.exercises, exercises) &&
+      sortedEq(cache.tests, tests)
+    ) {
+      // nimic nou → returnează sfaturile din cache
+      return cache.tips;
     }
 
+    // 7. Construieşte contextul pentru prompt
+    const totalExercises = exercises.length;
+    const progressContext = totalExercises
+      ? `You’ve completed ${totalExercises} exercises so far, showing consistency.`
+      : null;
+
+    const testContext = tests.length
+      ? `You’ve taken ${tests.join(", ")} tests recently.`
+      : null;
+
+    const categories = [...new Set(
+      allExercises.map(ex => ex.category?.name).filter(Boolean)
+    )];
+
+    // 8. Dacă nu e nimic de spus
+    const meaningful = emotions.length || testContext || progressContext || categories.length;
+    if (!meaningful) {
+      return ["Take a deep breath. You’re doing your best – and that’s more than enough."];
+    }
+
+    // 9. Formează promptul şi apelează AI-ul
     const prompt = `
-You're a compassionate mental health companion. Write a short, warm message (max 5 sentences, 2 short paragraphs) to someone who recently added a journal entry, completed a self-assessment, or finished a mindfulness exercise.
-
-The first paragraph should acknowledge their effort and emotional state based on recent activity. Do not directly name their feelings, but show attunement. Avoid judgment.
-
-The second paragraph should offer gentle encouragement and, if fitting, suggest 1–2 practice categories like a therapist in a casual talk — not as a list.
-
-Avoid structured formatting. Use a friendly tone. Refer to the user as "you".
-
-Self-perception: ${promptSections.selfPerception || "none"}
-Journal insights: ${promptSections.journalInsights || "none"}
-Facial expressions: ${promptSections.breathingEmotions || "none"}
-Mental health trends: ${promptSections.testContext || "none"}
-Activity summary: ${promptSections.progressContext || "none"}
-Available practice categories: ${promptSections.categories || "none"}
+You’re a compassionate mental health companion. Write a short, warm message (max 5 sentences) acknowledging:
+• recent emotions: ${emotions.join(", ") || "none"}  
+• recent progress: ${progressContext || "none"}  
+• recent tests: ${testContext || "none"}.  
+Then offer gentle encouragement and suggest 1–2 practice categories like ${categories.slice(0,2).join(" or ")}.
+Without mentioning specific counts or naming emotions/tests directly.
     `.trim();
-    console.log("Prompt for AI:", prompt);
-    const aiResponse = await getChatCompletion([{ role: "user", content: prompt }]);
 
-if (!aiResponse || aiResponse.trim().length === 0) {
-  throw new Error("AI response was empty");
-}
+    const aiResp = await getChatCompletion([{ role: "user", content: prompt }]);
+    const clean = aiResp?.trim().replace(/^[•\-\—\d\s]*/,"") ||
+      "Take a deep breath. You’re doing your best – and that’s enough.";
 
-const cleanMessage = aiResponse.trim().replace(/^[•\-\—\d\s]*\s*/, '');
-return [cleanMessage];
+    // 10. Salvează noua stare + mesaj în cache
+    const newCache = { emotions, exercises, tests, tips: [clean] };
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(newCache));
+
+    return [clean];
 
   } catch (error) {
-    console.error("❌ Failed to generate tips:", error.message);
-    return ["Take a deep breath. You're doing your best – and that’s more than enough."];
+    console.error("❌ Failed to generate tips:", error);
+    return ["Take a deep breath. You’re doing your best – and that’s enough."];
   }
 };
