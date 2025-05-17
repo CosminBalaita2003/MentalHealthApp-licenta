@@ -11,7 +11,7 @@ export const getChatCompletion = async (messages) => {
     const response = await axios.post(
       OPENAI_URL,
       {
-        model: "gpt-4.1-mini-2025-04-14",
+        model: "gpt-4.1-mini", // sau "gpt-4"
         messages,
         temperature: 0.85,
       },
@@ -22,12 +22,17 @@ export const getChatCompletion = async (messages) => {
         },
       }
     );
-    console.log('🤖 OpenAI response:');
-    return response.data.choices[0].message.content;
+
+    const content = response.data?.choices?.[0]?.message?.content;
+    console.log("🤖 OpenAI raw content:", content);
+
+    if (!content || content.trim().length === 0) {
+      throw new Error("OpenAI returned empty response");
+    }
+
+    return content.trim();
   } catch (error) {
     console.error('❌ OpenAI error:', error.response?.data || error.message);
     throw error;
   }
 };
-
-

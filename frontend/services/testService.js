@@ -78,7 +78,7 @@ export const getUserTestSummaries = async () => {
 
     return { success: true, summaries };
   } catch (err) {
-    console.error("❌ Error fetching test summaries:", err.response?.data || err.message);
+    console.log("❌ Error fetching test summaries:", err.response?.data || err.message);
     return { success: false, summaries: {} };
   }
 };

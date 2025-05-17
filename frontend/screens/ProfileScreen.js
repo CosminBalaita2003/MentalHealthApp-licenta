@@ -30,18 +30,21 @@ export default function ProfileScreen({ navigation }) {
         const [emotion, testSummary, tipsList] = await Promise.all([
           fetchEmotionInsightVectors(),
           getUserTestSummaries(),
-          getPersonalizedDailyTips(), // acest apel include deja toate celelalte
+          getPersonalizedDailyTips(), 
         ]);
   
-        if (testSummary.success) {
-          setEmotionInsight(emotion);
-          setTestSummary(testSummary.summaries);
+        console.log("Tips List:", tipsList);
+        console.log("Emotion Insight:", emotion);
+        setEmotionInsight(emotion);
+        setTestSummary(testSummary?.summaries || {});
+        if (Array.isArray(tipsList) && tipsList.length > 0) {
           setTips(tipsList);
         } else {
           setTips(["Take a deep breath. You're doing your best – and that’s more than enough."]);
         }
+        
       } catch (e) {
-        console.error("❌ Failed to load tips or summaries:", e);
+        console.log("❌ Failed to load tips or summaries:", e);
         setTips(["Something went wrong. You're still doing great."]);
       } finally {
         setLoading(false);
@@ -51,16 +54,16 @@ export default function ProfileScreen({ navigation }) {
     loadEverything();
   }, []);
   
-  useFocusEffect(
-    React.useCallback(() => {
-      const refreshTips = async () => {
-        const newTips = await getPersonalizedDailyTips();
-        setTips(newTips);
-      };
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const refreshTips = async () => {
+  //       const newTips = await getPersonalizedDailyTips();
+  //       setTips(newTips);
+  //     };
   
-      refreshTips();
-    }, [])
-  );
+  //     refreshTips();
+  //   }, [])
+  // );
   
   useEffect(() => {
 

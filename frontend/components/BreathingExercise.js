@@ -102,7 +102,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
         
       }
     } catch (err) {
-      console.error("❌ Failed to capture/analyze:", err);
+      console.log("❌ Failed to capture/analyze:", err);
     } finally {
       isAnalyzingRef.current = false;
     }
@@ -180,7 +180,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
           await saveProgress(exercise.id, user);
         }
       } catch (e) {
-        console.error("Could not save progress:", e);
+        console.log("Could not save progress:", e);
       }
       onClose(true);
     }

@@ -47,7 +47,7 @@ const TestStatistics = ({ onBack }) => {
         const response = await testService.getUserTests(userId);
         if (response.success) setTests(response.tests);
       } catch (err) {
-        console.error("Error fetching tests:", err);
+        console.log("Error fetching tests:", err);
         
 
       } finally {
