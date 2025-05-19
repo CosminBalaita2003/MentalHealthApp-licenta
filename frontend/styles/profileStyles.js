@@ -91,5 +91,25 @@ export default StyleSheet.create({
     marginBottom: 6,
     lineHeight: 20,
   },
-  
+   // pentru UserProfileScreen
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+  },
+  value: {
+    fontSize: 16,
+    color: theme.colors.text,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
 });
