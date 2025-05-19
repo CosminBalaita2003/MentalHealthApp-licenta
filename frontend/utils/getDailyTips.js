@@ -36,6 +36,7 @@ export const getPersonalizedDailyTips = async () => {
     const user = userStringRaw.status === "fulfilled" && userStringRaw.value
       ? JSON.parse(userStringRaw.value)
       : null;
+    const bio = user?.bio || "";
 
     // 3. Deriveşte lista de emoţii unice
     const declared   = emotionData.declaredByUser    || [];
@@ -51,7 +52,7 @@ export const getPersonalizedDailyTips = async () => {
 
     // 5. Deriveşte lista testelor făcute (cheile din summaries)
     const tests = Object.keys(testSummaryData);
-
+    
     // 6. Compară cu cache
     const sortedEq = (a, b) =>
       Array.isArray(a) &&
@@ -89,14 +90,17 @@ export const getPersonalizedDailyTips = async () => {
     }
 
     // 9. Formează promptul şi apelează AI-ul
-    const prompt = `
+const prompt = `
 You’re a compassionate mental health companion. Write a short, warm message (max 5 sentences) acknowledging:
+• user background: ${bio || "not specified"}
 • recent emotions: ${emotions.join(", ") || "none"}  
 • recent progress: ${progressContext || "none"}  
-• recent tests: ${testContext || "none"}.  
+• recent tests: ${testContext || "none"}  
 Then offer gentle encouragement and suggest 1–2 practice categories like ${categories.slice(0,2).join(" or ")}.
-Without mentioning specific counts or naming emotions/tests directly.
-    `.trim();
+Avoid listing bullet points in your response.
+Do not mention specific numbers, test names, or emotion names.
+`.trim();
+
 
     const aiResp = await getChatCompletion([{ role: "user", content: prompt }]);
     const clean = aiResp?.trim().replace(/^[•\-\—\d\s]*/,"") ||

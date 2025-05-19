@@ -309,18 +309,7 @@ const EditProfileScreen = () => {
                 />
               </View>
 
-              {/* Bio */}
-              <Text style={editStyles.text}>Bio</Text>
-              <View style={editStyles.inputContainer}>
-                <TextInput
-                  style={[editStyles.input, { height: 100 }]}
-                  placeholder="Bio"
-                  placeholderTextColor={theme.colors.text}
-                  value={profile.bio}
-                  onChangeText={(text) => setProfile({ ...profile, bio: text })}
-                  multiline
-                />
-              </View>
+             
 
               <TouchableOpacity style={editStyles.button} onPress={handleSave}>
                 <Text style={editStyles.buttonText}>Save Profile</Text>

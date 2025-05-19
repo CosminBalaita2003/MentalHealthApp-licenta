@@ -9,8 +9,11 @@ import { useNavigation } from '@react-navigation/native';
 import userService from '../services/userService';
 import styles from '../styles/authStyles';
 import theme from '../styles/theme';
+import { analyzeTextEmotion } from "../services/journalService";
+
 
 const RegisterScreen = () => {
+  const [isRegistering, setIsRegistering] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -32,6 +35,18 @@ const RegisterScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [cities, setCities] = useState([]);
   const [showCityList, setShowCityList] = useState(false);
+const [quizAnswers, setQuizAnswers] = useState({
+  hobbies: '',
+  personality: '',
+  weekend: '',
+  quote: '',
+  motivation: '',
+  improvement: '',
+});
+const [showError, setShowError] = useState(false);
+const [checkingMeaning, setCheckingMeaning] = useState(false);
+
+
 
   const navigation = useNavigation();
 
@@ -45,6 +60,20 @@ const RegisterScreen = () => {
     if (!hasValue) return '#999'; // gri
     return isValid ? 'lightgreen' : 'red';
   };
+  const validateAnswer = async (text) => {
+  const trimmed = text.trim();
+  const isRegexValid = trimmed.length >= 5 && /[a-zA-Z]/.test(trimmed);
+  if (!isRegexValid) return false;
+
+  try {
+    const result = await analyzeTextEmotion(trimmed);
+    return result.success && !!result.dominantEmotion;
+  } catch (e) {
+    console.error("AI validation failed:", e);
+    return false;
+  }
+};
+
 
   const handleNext = () => {
     if (formData.fullName && emailValid && passLength && passSpecial && passUpper)  {
@@ -54,42 +83,51 @@ const RegisterScreen = () => {
     }
   };
 
-  const handleRegister = async () => {
-    const today = new Date();
-    if (formData.dateOfBirth > today) {
-      Alert.alert("Invalid Date", "Birth date cannot be in the future.");
-      return;
+const handleRegister = async (dataOverride) => {
+  const data = dataOverride || formData;
+  const today = new Date();
+
+  if (data.dateOfBirth > today) {
+    Alert.alert("Invalid Date", "Birth date cannot be in the future.");
+    return;
+  }
+
+  if (!data.cityId || !data.gender || !data.pronouns || !data.bio) {
+    Alert.alert("Error", "All fields are required.");
+    return;
+  }
+
+  const formattedTime = knowsBirthTime
+    ? data.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : null;
+
+  setIsRegistering(true); // ⏳ start
+
+  try {
+    const response = await userService.register({
+      ...data,
+      dateOfBirth: data.dateOfBirth.toISOString(),
+      timeOfBirth: formattedTime,
+    });
+
+    setIsRegistering(false); // ✅ done
+
+    if (response.success) {
+      Alert.alert("Success", "User registered successfully!", [
+        { text: "OK", onPress: () => navigation.replace("WelcomeScreen") },
+      ]);
+    } else {
+      const errorMsg = response.errors?.[0] || response.message || "Registration failed.";
+      Alert.alert("Registration Error", errorMsg);
     }
+  } catch (error) {
+    setIsRegistering(false); // ❌ fail
+    console.error("Register error:", error);
+    Alert.alert("Error", "An unexpected error occurred.");
+  }
+};
 
-    if (!formData.cityId || !formData.gender || !formData.pronouns || !formData.bio) {
-      Alert.alert("Error", "All fields are required.");
-      return;
-    }
 
-    const formattedTime = knowsBirthTime
-      ? formData.timeOfBirth.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-      : null;
-
-    try {
-      const response = await userService.register({
-        ...formData,
-        dateOfBirth: formData.dateOfBirth.toISOString(),
-        timeOfBirth: formattedTime,
-      });
-
-      if (response.success) {
-        Alert.alert("Success", "User registered successfully!", [
-          { text: "OK", onPress: () => navigation.replace("WelcomeScreen") },
-        ]);
-      } else {
-        const errorMsg = response.errors?.[0] || response.message || "Registration failed.";
-        Alert.alert("Registration Error", errorMsg);
-      }
-    } catch (error) {
-      console.error("Register error:", error);
-      Alert.alert("Error", "An unexpected error occurred.");
-    }
-  };
   const searchCities = async (text) => {
     setSearchTerm(text);
 
@@ -137,8 +175,14 @@ const RegisterScreen = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.title}>Register</Text>
+          {isRegistering && (
+  <Text style={{ color: "lightblue", marginBottom: 10, textAlign: "center" }}>
+    Registering...
+  </Text>
+)}
 
-          {step === 1 ? (
+
+          {step === 1 && (
             <>
               <Text style={styles.label}>Full Name</Text>
               <TextInput
@@ -204,18 +248,19 @@ const RegisterScreen = () => {
                 <Text style={styles.buttonText}>Next</Text>
               </TouchableOpacity>
             </>
-          ) : (
-            <>
-              {/* Date of Birth */}
-              <Text style={styles.text}>Date of Birth</Text>
-              <TouchableOpacity style={styles.time} onPress={() => setShowDatePicker(true)}>
-                <Text style={{olor:theme.colors.background}}>{formData.dateOfBirth.toDateString()}</Text>
-              </TouchableOpacity>
-              {showDatePicker && (
+          )}
+              {step === 2 && (
                 <>
-                  <DateTimePicker
-                    value={formData.dateOfBirth}
-                    mode="date"
+                  {/* Date of Birth */}
+                  <Text style={styles.text}>Date of Birth</Text>
+                  <TouchableOpacity style={styles.time} onPress={() => setShowDatePicker(true)}>
+                    <Text style={{ color: theme.colors.background }}>{formData.dateOfBirth.toDateString()}</Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <>
+                      <DateTimePicker
+                        value={formData.dateOfBirth}
+                        mode="date"
                     display="spinner"
                     textColor="white"
                     onChange={(event, selectedDate) => {
@@ -352,21 +397,129 @@ const RegisterScreen = () => {
                 onChangeText={(text) => setFormData({ ...formData, gender: text })}
               />
 
-              {/* Bio */}
-              <Text style={styles.label}>Bio</Text>
-              <TextInput
-                style={[styles.input, { height: 100 }]}
-                placeholder="Bio"
-                value={formData.bio}
-                onChangeText={(text) => setFormData({ ...formData, bio: text })}
-                multiline
-              />
+           <TouchableOpacity
+  style={styles.button}
+  onPress={() => {
+    if (!formData.cityId || !formData.gender || !formData.pronouns) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
+    setStep(3);
+  }}
+>
+  <Text style={styles.buttonText}>Next</Text>
+</TouchableOpacity>
 
-              <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Register</Text>
-              </TouchableOpacity>
             </>
           )}
+             {step === 3 && (
+        <>
+          {/* === Step 3: Quiz === */}
+          <Text style={styles.label}>What are your hobbies?</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., reading, hiking, painting"
+            value={quizAnswers.hobbies}
+            onChangeText={(text) => setQuizAnswers({ ...quizAnswers, hobbies: text })}
+          />
+
+          <Text style={styles.label}>How would you describe yourself?</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., introverted, creative, logical"
+            value={quizAnswers.personality}
+            onChangeText={(text) => setQuizAnswers({ ...quizAnswers, personality: text })}
+          />
+
+          <Text style={styles.label}>What does your ideal weekend look like?</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., hiking, cozy indoors, party with friends"
+            value={quizAnswers.weekend}
+            onChangeText={(text) => setQuizAnswers({ ...quizAnswers, weekend: text })}
+          />
+
+          <Text style={styles.label}>Favorite quote or motto?</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., 'Stay hungry, stay foolish.'"
+            value={quizAnswers.quote}
+            onChangeText={(text) => setQuizAnswers({ ...quizAnswers, quote: text })}
+          />
+          <Text style={styles.label}>What motivates you in life?</Text>
+<TextInput
+  style={styles.input}
+  placeholder="e.g., helping others, achieving goals"
+  value={quizAnswers.motivation}
+  onChangeText={(text) => setQuizAnswers({ ...quizAnswers, motivation: text })}
+/>
+
+<Text style={styles.label}>What’s one thing you'd like to improve about yourself?</Text>
+<TextInput
+  style={styles.input}
+  placeholder="e.g., confidence, patience, focus"
+  value={quizAnswers.improvement}
+  onChangeText={(text) => setQuizAnswers({ ...quizAnswers, improvement: text })}
+/>
+
+{showError && (
+  <Text style={{ color: "red", marginVertical: 10, textAlign: "center" }}>
+    Please write meaningful answers in all fields.
+  </Text>
+)}
+
+<TouchableOpacity
+  style={[styles.button, { opacity: checkingMeaning ? 0.6 : 1 }]}
+  disabled={checkingMeaning}
+  onPress={async () => {
+    const { hobbies, personality, weekend, quote, motivation, improvement } = quizAnswers;
+
+    const allFields = [hobbies, personality, weekend, quote, motivation, improvement];
+
+    if (allFields.some((answer) => answer.trim().length < 5 || !/[a-zA-Z]/.test(answer))) {
+      setShowError(true);
+      return;
+    }
+
+    setCheckingMeaning(true);
+    try {
+      for (const text of allFields) {
+        const isValid = await validateAnswer(text);
+        if (!isValid) {
+          setShowError(true);
+          setCheckingMeaning(false);
+          return;
+        }
+      }
+
+      setShowError(false);
+      const compiledBio = `
+Hobbies: ${hobbies}
+Personality: ${personality}
+Ideal Weekend: ${weekend}
+Favorite Quote: ${quote}
+Motivation: ${motivation}
+Self-Improvement Goal: ${improvement}`.trim();
+
+      setFormData((prev) => {
+        const updated = { ...prev, bio: compiledBio };
+        setTimeout(() => handleRegister(updated), 0);
+        return updated;
+      });
+    } catch (e) {
+      console.error("Validation error:", e);
+      setShowError(true);
+    } finally {
+      setCheckingMeaning(false);
+    }
+  }}
+>
+  <Text style={styles.buttonText}>Register</Text>
+</TouchableOpacity>
+
+        </>
+      )}
+
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
