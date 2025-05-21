@@ -32,8 +32,8 @@ const userService = {
   
       return { success: true, token, user };
     } catch (error) {
-      console.error(" Login error:", error.response?.data || error.message);
-      return { success: false, message: "Eroare la autentificare" };
+      console.log(" Login error:", error.response?.data || error.message);
+      return { success: false, message: "Invalid email or password" };
     }
   }
   ,
@@ -45,7 +45,7 @@ const userService = {
       const token = await AsyncStorage.getItem("token"); //  Fix Here
       if (!token) {
         console.warn(" No token found!");
-        return { success: false, message: "Utilizator neautentificat" };
+        return { success: false, message: "User not authenticated" };
       }
 
       console.log(" Fetching user with token:", token);
@@ -58,8 +58,8 @@ const userService = {
 
       return { success: true, user: response.data };
     } catch (error) {
-      console.error(" GetUser error:", error.response?.data || error.message);
-      return { success: false, message: "Eroare la obținerea utilizatorului" };
+      console.log(" GetUser error:", error.response?.data || error.message);
+      return { success: false, message: "Error fetching user" };
     }
   },
 
@@ -70,7 +70,7 @@ const userService = {
     try {
       const token = await AsyncStorage.getItem("token"); //  Fix Here
       if (!token) {
-        return { success: false, message: "Utilizator neautentificat" };
+        return { success: false, message: "User not authenticated" };
       }
 
       console.log(" Sending edit request with token:", token);
@@ -98,13 +98,13 @@ const userService = {
 
       return { success: true, message: response.data?.Message || "Datele au fost actualizate" };
     } catch (error) {
-      console.error(" EditUser error:", error.response?.data || error.message);
+      console.log(" EditUser error:", error.response?.data || error.message);
 
       if (error.response) {
         console.log(" Full error response:", JSON.stringify(error.response.data, null, 2));
       }
 
-      return { success: false, message: "Eroare la actualizarea datelor" };
+      return { success: false, message: "Error updating user data" };
     }
   },
 
@@ -116,7 +116,7 @@ const userService = {
       await AsyncStorage.removeItem("token"); //  Fix Here
       console.log(" Token removed");
     } catch (error) {
-      console.error(" Logout error:", error.message);
+      console.log(" Logout error:", error.message);
     }
   },
 
@@ -137,11 +137,17 @@ const userService = {
       console.log(" Registration response:", response.data);
       return { success: true, message: response.data?.Message || "User registered successfully!" };
     } catch (error) {
-      console.error(" Register error:", error.response?.data || error.message);
+      console.log(" Register error:", error.response?.data || error.message);
       return { success: false, message: error.response?.data?.Message || "Eroare la înregistrare" };
     }
   },
 
-};
 
+checkEmailExists: async (email) => {
+  const res = await fetch(`${API_URL}/api/User/check-email?email=${encodeURIComponent(email)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const { exists } = await res.json();
+  return exists;
+}
+};
 export default userService;

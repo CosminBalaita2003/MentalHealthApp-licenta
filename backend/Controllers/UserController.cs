@@ -196,6 +196,22 @@ namespace MentalHealthApp.Controllers
 
             return Ok(new { Message = "User updated successfully" });
         }
+
+        [HttpGet("check-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckEmail([FromQuery] string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest(new { message = "Email is required" });
+
+            // Verifici direct prin UserManager
+            var user = await _userManager.FindByEmailAsync(email);
+            bool exists = user != null;
+
+            return Ok(new { exists });
+        }
+
+
     }
 
     public class RegisterRequest

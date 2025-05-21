@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView,
-  ScrollView, TouchableWithoutFeedback, Keyboard, Platform
+  ScrollView, TouchableWithoutFeedback, Keyboard, Platform,  Modal, ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import userService from '../services/userService';
@@ -16,12 +16,20 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { setIsAuthenticated } = useContext(AuthContext);
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+
+   const showError = msg => {
+    setErrorMessage(msg);
+    setErrorVisible(true);
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Te rog introdu un email și o parolă.");
-      return;
+ showError("Please fill in all fields");
+       return;
     }
 
     const response = await userService.login(email, password);
@@ -31,16 +39,20 @@ const LoginScreen = () => {
         const user = userResponse.user;
         await AsyncStorage.setItem('user', JSON.stringify(user));
         await AsyncStorage.setItem('userId', user.id);
-        setIsAuthenticated(true);
+       
+        setLoadingModalVisible(true);
+
         setTimeout(() => {
           console.log(" Navigating to Main...");
+          setLoadingModalVisible(false);
+           setIsAuthenticated(true);
           // navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
-        }, 500);
+        }, 2000);
       } else {
-        alert("Eroare: " + userResponse.message);
+       showError("Eroare: " + userResponse.message);
       }
     } else {
-      alert("Eroare: " + response.message);
+      showError("Eroare: " + response.message);
     }
   };
 
@@ -93,6 +105,31 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
         </ScrollView>
+         {/* Modal-ul de eroare */}
+        <Modal visible={errorVisible} transparent animationType="fade">
+          <View style={styles.errorOverlay}>
+            <View style={styles.errorContent}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+              <TouchableOpacity
+                style={styles.errorButton}
+                onPress={()=>setErrorVisible(false)}
+              >
+                <Text style={styles.errorButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+         <Modal visible={loadingModalVisible} transparent animationType="fade">
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingContent}>
+              <ActivityIndicator size="large" color={theme.colors.semiaccent} />
+              <Text style={styles.loadingText}>Logging in...</Text>
+            </View>
+          </View>
+        </Modal>
+
+
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

@@ -1,14 +1,15 @@
 import "@fontsource/delius";
 export default {
   colors: {
-    background: '#1D1A39',
+    // background: '#1D1A39',
+    background: '#10002b',
     card: '#451952',
-    accent: '#662549',
-    semiaccent: "#AE445A",
+    accent: '#5a189a', 
+    semiaccent: "#9d4edd",
     text: '#faf0ee',
-    neutral: '#4ECDC4',
-    backgroundDark: "#16132D",
-    backgroundLight: "#39397d",
+    neutral: '#c77dff',
+    backgroundDark: "#240046",
+    backgroundLight: "#3c096c",
     black: "#000",
   },
   font: {

@@ -15,6 +15,19 @@ export default StyleSheet.create({
     color: theme.colors.text,
     marginBottom: 20,
   },
+   logo: {
+    width: 250,
+    height: 250,
+
+    marginBottom: 20,
+    overflow: 'hidden'
+  },
+   logoContainer: {
+    width: 250,
+    height: 250,
+    overflow: 'hidden',      // important!
+    marginBottom: 20,
+  },
   subtitle: {
     fontSize: 16,
     color: theme.colors.text,

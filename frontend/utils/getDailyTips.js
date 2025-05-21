@@ -98,7 +98,7 @@ You’re a compassionate mental health companion. Write a short, warm message (m
 • recent tests: ${testContext || "none"}  
 Then offer gentle encouragement and suggest 1–2 practice categories like ${categories.slice(0,2).join(" or ")}.
 Avoid listing bullet points in your response.
-Do not mention specific numbers, test names, or emotion names.
+Do not mention specific numbers, test names, or emotion names. you can use the background info in order to create a more personalized message, but don't repeat it and don't mention it in the message.
 `.trim();
 
 

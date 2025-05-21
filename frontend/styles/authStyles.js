@@ -6,6 +6,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: 20,
+    
   },
   scrollContainer: {
     paddingBottom: 50,
@@ -20,7 +21,8 @@ export default StyleSheet.create({
   label: {
     fontSize: 16,
     color: theme.colors.text,
-    marginTop: 12,
+    marginTop: 5,
+    marginBottom: 6,
   },
   input: {
     backgroundColor: '#2B2A4C',
@@ -67,29 +69,40 @@ export default StyleSheet.create({
     backgroundColor: theme.colors.text,
   },
   time: {
-    backgroundColor: '#FAECEB',
+    backgroundColor: '#2B2A4C',
+    color: '#fff',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 12,
+    
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(22, 19, 45, 0.9)',
-    justifyContent: 'center',
+    backgroundColor: theme.colors.backgroundDark,
+    justifyContent: 'flex-start',
     padding: 20,
+    marginTop: '30%',
+    alignContent: 'center',
   },
   modalContent: {
     backgroundColor: theme.colors.backgroundLight,
     borderRadius: 16,
     padding: 20,
   },
-  modalInput: {
-    backgroundColor: '#FAECEB',
-    borderRadius: 10,
-    padding: 12,
+  modalInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.text,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     marginBottom: 10,
-    color: theme.colors.black,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   flatListContainer: {
     maxHeight: 200,
@@ -98,12 +111,100 @@ export default StyleSheet.create({
   cityListItem: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderBottomColor: '#E0E0E0',
-    borderBottomWidth: 1,
+    // borderBottomColor: '#E0E0E0',
+    // borderBottomWidth: 1,
+    borderColor: theme.colors.semiaccent,
+    backgroundColor: theme.colors.accent,
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 5,
+      height: 2,
+    },
+    borderWidth: 1,
+    borderRadius: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+
+
   },
   cityListItemText: {
     fontSize: 16,
     color: '#fff',
   },
+  loadingOverlay: {
+  ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.64)',
+    justifyContent: 'center',
+    alignItems: 'center',
+},
+loadingContent:{
+ width: '80%',
+    backgroundColor: theme.colors.backgroundLight,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    position: 'relative',
+},
+loadingText: {
+  fontSize: 16,
+    textAlign: 'center',
+    color: theme.colors.text,
+    letterSpacing: 1,
+    rowSpacing: 1,
+    marginTop: 20,
+    marginBottom: 5,
   
+},
+ errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.64)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContent: {
+    width: '80%',
+    backgroundColor: theme.colors.backgroundLight,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  errorClose: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 4,
+  },
+  errorCloseText: {
+    fontSize: 18,
+    color: '#999',
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: theme.colors.text,
+    letterSpacing: 1,
+    rowSpacing: 1,
+    marginBottom: 20,
+  },
+  errorButton: {
+    backgroundColor: theme.colors.semiaccent,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+    width: '100%',
+  
+
+  },
+  errorButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    width: '100%',
+    textAlign: 'center',
+  },
+
 });
