@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from gtts import gTTS
 import os
@@ -8,10 +8,12 @@ import cv2
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
+import sys
+import subprocess
 
 from PIL import Image
 from io import BytesIO
-
+from ml_recommender import recommend_for_user  
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +28,21 @@ emotion_classifier_text = pipeline(
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "facial-emotion", "model.h5")
+def run_script(script_name):
+    """
+    Rulează script-ul Python din BASE_DIR și ridică CalledProcessError dacă există eroare.
+    """
+    python_bin = sys.executable
+    script_path = os.path.join(BASE_DIR, script_name)
+    result = subprocess.run(
+        [python_bin, script_path],
+        cwd=BASE_DIR,
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    print(f"=== {script_name} output ===\n{result.stdout}")
+    return result 
 
 emotion_model = Sequential()
 emotion_model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48, 48, 1)))
@@ -143,6 +160,60 @@ def analyze_text_emotion():
         }
     except Exception as e:
         return {"error": str(e)}, 500
+
+
+
+@app.route("/api/update-and-train", methods=["POST"])
+def update_and_train():
+    """
+    1) Rulează sync_progress.py pentru a aduce ultimul progres din baza de date
+    2) Rulează train_recommender.py pentru a re-antrena modelul pe CSV-ul actualizat
+    """
+    try:
+        # 1) sincronizare CSV
+        run_script("sync_progress.py")
+
+        # 2) training modele
+        run_script("train_model.py")
+
+        return jsonify({"status": "ok", "message": "Data synced and model retrained"}), 200
+
+    except subprocess.CalledProcessError as e:
+        # dacă oricare script a eșuat
+        print(f"❌ Error running script: {e.stderr}")
+        return jsonify({
+            "error": f"Script failed: {e.cmd[-1]}",
+            "details": e.stderr
+        }), 500
+
+
+
+@app.route("/api/recommend/<user_id>", methods=["GET"])
+def get_recommendation(user_id):
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    # citim parametrul k, default 10
+    k = request.args.get("k", default=10, type=int)
+
+    try:
+        # recs e o listă de (id, score) de lungime k
+        recs = recommend_for_user(user_id, k=k)
+        if not recs:
+            return jsonify({"error": "No recommendations available"}), 404
+
+        # extragem doar ID-urile și le forțăm la int
+        exercise_ids = [int(r[0]) if isinstance(r, (list, tuple)) else int(r)
+                        for r in recs]
+
+        return jsonify({ "exerciseIds": exercise_ids })
+    except KeyError as ke:
+        return jsonify({"error": str(ke)}), 404
+    except Exception as e:
+        print("⚠️ Error in get_recommendation:", e)
+        return jsonify({"error": str(e)}), 500
+    
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005)

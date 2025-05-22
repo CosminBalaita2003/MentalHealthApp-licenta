@@ -11,25 +11,25 @@ export default function BreathingContainer({ children, style }) {
         Animated.parallel([
           Animated.sequence([
             Animated.timing(scale, {
-              toValue: 1.03,
-              duration: 2000,
+              toValue: 1.015,
+              duration: 3000,
               useNativeDriver: false,
             }),
             Animated.timing(scale, {
               toValue: 1,
-              duration: 2000,
+              duration: 3000,
               useNativeDriver: false,
             }),
           ]),
           Animated.sequence([
             Animated.timing(shadow, {
-              toValue: 0.4,
-              duration: 2000,
+              toValue: 0.3,
+              duration: 3000,
               useNativeDriver: false, 
             }),
             Animated.timing(shadow, {
               toValue: 0.2,
-              duration: 2000,
+              duration: 3000,
               useNativeDriver: false,
             }),
           ]),

@@ -9,11 +9,14 @@ import PMRExercise from "./PMRExercise";
 import VisualizationExercise from "./VisualizationExercise";
 import EmotionalRegulationExercise from "./EmotionalRegulationExercise";
 import StressManagementExercise from "./StressManagementExercise";
-
+import { stopTTS } from "../utils/useTTS";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ExerciseModal = ({ visible, onClose, exercise }) => {
+const ExerciseModal = ({ visible, onClose, exercise, fromRecommend = false }) => {
+   if (!visible || !exercise) {
+    return null;
+  }
   const isBreathing = exercise?.category?.name === "Breathing";
 const isMeditation = exercise?.category?.name === "Meditation & Mindfulness";
 const isPMR = exercise?.category?.name === "Progressive Muscle Relaxation";
@@ -46,11 +49,14 @@ const isStressManagement = exercise?.category?.name === "Stress Management Techn
   }, [visible]);
 
   const handleClose = (completed = false) => {
+    stopTTS();
     if (completed) {
       Alert.alert(
         "Great job!",
         "You have completed the exercise.",
-        [{ text: "OK", onPress: () => navigation.pop(2) }],
+        [{ text: "OK", onPress: () => 
+          //navigation.pop(2)
+           fromRecommend ? onClose() : navigation.pop(2)}],
         { cancelable: false }
       );
     } else if (isRunning) {

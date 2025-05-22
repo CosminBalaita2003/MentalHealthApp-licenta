@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import GlobalStyles from "./styles/globalStyles";
+import { enableScreens } from 'react-native-screens';
+enableScreens(false);  
 import { fetchUserData } from "./services/authService"; //  Import serviciul de autentificare
 // Import screens
 import LoginScreen from "./screens/LoginScreen";
@@ -22,6 +24,18 @@ import NewEntryScreen from "./screens/NewEntryScreen";
 import AstroChartScreen from "./screens/AstroChartScreen";
 import EditEntryScreen from "./screens/EditEntryScreen";
 import ProgressScreen from "./screens/ProgressScreen";
+
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs([
+  'Expected static flag was missing'  // hides that exact warning
+]);
+LogBox.ignoreLogs([
+  'useInsertionEffect must not schedule updates'
+]);
+LogBox.ignoreLogs([
+  'useInsertionEffect must not schedule updates'
+]);
+
 export const AuthContext = createContext();
 
 const Stack = createStackNavigator();

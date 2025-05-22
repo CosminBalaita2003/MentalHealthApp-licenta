@@ -8,13 +8,22 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import exerciseService from "../services/exerciseService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import styles from "../styles/exerciseScreenStyles";
+import recommendationService from "../services/recommendationService";
+import ExerciseModal from "../components/ExerciseModal";
+import axios from "axios";
+import { TTS_API_URL } from "@env";
 
 const ExercisesScreen = () => {
   const [categories, setCategories] = useState({});
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
+  const [recLoading, setRecLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [recommendedExercise, setRecommendedExercise] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,7 +56,48 @@ const ExercisesScreen = () => {
     });
     return map;
   };
+ const handleRecommend = async () => {
+    setRecLoading(true);
+    try {
+      // 1️⃣ Obține token-ul și user-ul
+      const token = await AsyncStorage.getItem("token");
+      if (!token) throw new Error("Nu sunt logat!");
+      const userStr = await AsyncStorage.getItem("user");
+      const user = JSON.parse(userStr);
 
+      // 2️⃣ Sincronizează și retraining pe backend
+      await axios.post(
+        `${TTS_API_URL}/api/update-and-train`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // 3️⃣ Cerea top-10 recomandări
+      const recoRes = await axios.get(
+        `${TTS_API_URL}/api/recommend/${user.id}?k=10`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const ids = recoRes.data.exerciseIds;
+      if (!ids?.length) {
+        Alert.alert("Nicio recomandare", "Nu s-au găsit exerciții pentru tine.");
+        return;
+      }
+
+      // 4️⃣ Alege aleator un ID și adu datele lui
+      const chosenId = ids[Math.floor(Math.random() * ids.length)];
+      const ex = await exerciseService.getExerciseById(chosenId);
+
+      // 5️⃣ Deschide modalul
+      setRecommendedExercise(ex);
+      setModalVisible(true);
+
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Eroare", err.response?.data?.error || err.message);
+    } finally {
+      setRecLoading(false);
+    }
+  };
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -66,6 +116,20 @@ const ExercisesScreen = () => {
         <Text style={styles.text}>No exercises available.</Text>
       )}
 
+       <TouchableOpacity
+          style={[styles.card, { backgroundColor: "#4ECDC4", marginBottom: 20 }]}
+          onPress={handleRecommend}
+          disabled={recLoading}
+        >
+          {recLoading ? (
+            <ActivityIndicator color="#16132D" />
+          ) : (
+            <Text style={[styles.cardText, { color: "#16132D" }]}>
+              Recomandă-mi un exercițiu
+            </Text>
+          )}
+        </TouchableOpacity>
+
       {Object.entries(categories).map(([id, cat]) => (
         <TouchableOpacity
           key={id}
@@ -82,6 +146,13 @@ const ExercisesScreen = () => {
         </TouchableOpacity>
       ))}
     </ScrollView>
+    {/* Modalul cu exercițiul recomandat */}
+      <ExerciseModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        exercise={recommendedExercise}
+        fromRecommend={true}
+      />
     </View>
   );
 };

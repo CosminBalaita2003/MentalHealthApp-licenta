@@ -120,7 +120,7 @@ export default function ProfileScreen({ navigation }) {
 
         <StreakIndicator />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}
         >
@@ -134,7 +134,26 @@ export default function ProfileScreen({ navigation }) {
         >
           <Ionicons name="bar-chart-outline" size={22} color="#5A4E4D" />
           <Text style={styles.cardText}>View your Progress</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+ <View style={styles.buttonRow}>
+  <TouchableOpacity
+    style={styles.squareCard}
+    onPress={() => navigation.getParent()?.navigate('AstroChartScreen', { user })}
+  >
+    <Ionicons name="planet-outline" size={28} color="#5A4E4D" />
+    <Text style={styles.squareCardText}>Astro Chart</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.squareCard}
+    onPress={() => navigation.getParent()?.navigate("ProgressScreen")}
+  >
+    <Ionicons name="bar-chart-outline" size={28} color="#5A4E4D" />
+    <Text style={styles.squareCardText}>Progress</Text>
+  </TouchableOpacity>
+</View>
+
 
         <BreathingContainer>
           <Text style={styles.tipsTitle}>Daily Tips</Text>

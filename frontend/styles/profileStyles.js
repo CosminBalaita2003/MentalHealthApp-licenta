@@ -15,16 +15,18 @@ export default StyleSheet.create({
     backgroundColor: '#FFF7F1',
   },
   header: {
-    flexDirection: 'row',
+   flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    width: '100%',
+    marginTop: 50,
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     color:theme.colors.text,
-    marginTop: 50,
+    
   },
   actions: {
     flexDirection: 'row',
@@ -32,24 +34,39 @@ export default StyleSheet.create({
   },
   iconButton: {
     
-    borderRadius: 12,
-    padding: 8,
-    marginTop:50,
-  },
-  card: {
-    flexDirection: 'row',
+    backgroundColor: theme.colors.accent,
+    borderRadius: 20,
+    borderColor: theme.colors.semiaccent,
+    borderWidth: 2,
+    padding: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAECEB',
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 20,
   },
-  cardText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#5A4E4D',
-    fontWeight: '500',
-  },
+  buttonRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginTop: 20,
+  gap: 25,
+},
+
+squareCard: {
+  flex: 1,
+  aspectRatio: 1.4, 
+  backgroundColor: '#FAECEB',
+  borderRadius: 16,
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingVertical: 10,
+},
+
+squareCardText: {
+  marginTop: 8,
+  fontSize: 14,
+  color: '#5A4E4D',
+  fontWeight: '500',
+},
+
   button: {
     backgroundColor: '#E8BCB9',
     padding: 12,
@@ -78,7 +95,7 @@ export default StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  tipsTitle: {
+ tipsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#E8BCB9',
