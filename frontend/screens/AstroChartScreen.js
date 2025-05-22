@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, Image, Alert, TouchableOpacity, ScrollView , Modal } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { fetchNatalWheelChart, fetchPlanets, fetchHouses, saveNatalChart } from '../services/astroChartService';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,22 +12,44 @@ import SwipeableDeck from '../components/SwipeableDeck';
 const planetData = require('../data/planet_explanations.json');
 const houseData = require('../data/house_explanations.json');
 
-const InfoCard = ({ title, description }) => (
-  <View style={{
-    backgroundColor: '#16132D',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: '#9f7aea',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 3,
-  }}>
-    <Text style={{ fontWeight: 'bold', color: '#fff', marginBottom: 4 }}>{title}</Text>
-    <Text style={{ color: '#ddd' }}>{description}</Text>
-  </View>
-);
+
+const InfoCard = ({ title, description }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const firstParagraph = description.split('\n\n')[0] || description.split('\n')[0] || description;
+
+  return (
+    <>
+      <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.9}>
+        <View style={astroStyles.tarotCard}>
+          <Text style={astroStyles.cardTitle}>{title}</Text>
+          <Text style={astroStyles.cardDescription}>{firstParagraph}</Text>
+          <Text style={astroStyles.showMore}>Press to see more</Text>
+        </View>
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={astroStyles.modalOverlay}>
+          <View style={astroStyles.modalContent}>
+            <Text style={astroStyles.cardTitle}>{title}</Text>
+            <ScrollView style={astroStyles.modalScrollView} showsVerticalScrollIndicator={false}>
+  <Text style={astroStyles.cardDescription}>{description}</Text>
+</ScrollView>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={astroStyles.modalCloseButton}>
+              <Text style={astroStyles.modalCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+};
 
 export default function AstroChartScreen({ route, navigation }) {
   const { user } = route.params;
@@ -172,7 +194,7 @@ useEffect(() => {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-          <Text style={[astroStyles.text, { textAlign: 'center', fontStyle: 'italic', marginHorizontal: 20 }]}>
+          {/* <Text style={[astroStyles.text, { textAlign: 'center', fontStyle: 'italic', marginHorizontal: 20 }]}>
             The stars kept moving since your birth. This is how the sky looked like that day.
           </Text>
 
@@ -187,7 +209,30 @@ useEffect(() => {
               onMessage={onWebViewMessage}
               style={{ height: 1, width: 1, opacity: 0 }}
             />
-          )}
+          )} */}
+
+          <View style={astroStyles.tarotCard}>
+  {pngBase64 && (
+    <View style={astroStyles.imageShadowContainer}>
+      <Image source={{ uri: pngBase64 }} style={astroStyles.chartImage} resizeMode="contain" />
+    </View>
+  )}
+
+  {svgContent && !pngBase64 && (
+    <WebView
+      originWhitelist={['*']}
+      source={{ html: htmlContent }}
+      onMessage={onWebViewMessage}
+      style={{ height: 1, width: 1, opacity: 0 }}
+    />
+  )}
+
+  <Text style={astroStyles.tarotText}>
+    The stars kept moving since your birth. This is how the sky looked like that day.
+  </Text>
+</View>
+
+
 
           <View style={astroStyles.sectionContainer}>
             <View style={astroStyles.sectionHeader}>

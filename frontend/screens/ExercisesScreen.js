@@ -14,6 +14,8 @@ import styles from "../styles/exerciseScreenStyles";
 import recommendationService from "../services/recommendationService";
 import ExerciseModal from "../components/ExerciseModal";
 import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
+
 import { TTS_API_URL } from "@env";
 
 const ExercisesScreen = () => {
@@ -24,6 +26,16 @@ const ExercisesScreen = () => {
   const [recLoading, setRecLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [recommendedExercise, setRecommendedExercise] = useState(null);
+  const iconMap = {
+  "Breathing": "leaf-outline",
+  "Meditation & Mindfulness": "flower-outline",
+  "Progressive Muscle Relaxation": "body-outline",
+  "Emotional Regulation Exercises": "happy-outline",
+  "Visualization Techniques": "eye-outline",
+  "Stress Management Techniques": "pulse-outline",
+  "Unknown": "help-circle-outline"
+};
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -116,35 +128,59 @@ const ExercisesScreen = () => {
         <Text style={styles.text}>No exercises available.</Text>
       )}
 
-       <TouchableOpacity
-          style={[styles.card, { backgroundColor: "#4ECDC4", marginBottom: 20 }]}
-          onPress={handleRecommend}
-          disabled={recLoading}
-        >
-          {recLoading ? (
-            <ActivityIndicator color="#16132D" />
-          ) : (
-            <Text style={[styles.cardText, { color: "#16132D" }]}>
-              Recomandă-mi un exercițiu
-            </Text>
-          )}
-        </TouchableOpacity>
+       
 
-      {Object.entries(categories).map(([id, cat]) => (
-        <TouchableOpacity
-          key={id}
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate("ExerciseListScreen", {
-              categoryId: parseInt(id),
-              exercises: cat.exercises,
-              categoryName: cat.name,
-            })
-          }
-        >
-          <Text style={styles.cardText}>{cat.name}</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.grid}>
+  {Object.entries(categories).map(([id, cat]) => (
+    <TouchableOpacity
+      key={id}
+      style={styles.exerciseCard}
+      onPress={() =>
+        navigation.navigate("ExerciseListScreen", {
+          categoryId: parseInt(id),
+          exercises: cat.exercises,
+          categoryName: cat.name,
+        })
+      }
+    >
+      
+<Ionicons
+  name={iconMap[cat.name] || iconMap["Unknown"]}
+  size={32}
+  color="#5A4E4D"
+  style={styles.cardIcon}
+/>
+
+
+
+      <Text style={styles.cardLabel}>{cat.name}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
+<View style={styles.centeredContainer}>
+<TouchableOpacity
+  style={styles.recommendButton}
+  onPress={handleRecommend}
+  disabled={recLoading}
+>
+  {recLoading ? (
+    <ActivityIndicator color="#16132D" size="large" />
+  ) : (
+    <>
+      <Ionicons
+        name="lock-open-outline"
+        size={28}
+        color="#5A4E4D"
+        style={{ marginBottom: 8 }}
+      />
+      <Text style={styles.recommendText}>Need a suggestion?</Text>
+    </>
+  )}
+</TouchableOpacity>
+
+</View>
+
     </ScrollView>
     {/* Modalul cu exercițiul recomandat */}
       <ExerciseModal

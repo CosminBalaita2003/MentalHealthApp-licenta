@@ -34,9 +34,9 @@ export default StyleSheet.create({
   },
   iconButton: {
     
-    backgroundColor: theme.colors.accent,
+    backgroundColor:theme.colors.background,
     borderRadius: 20,
-    borderColor: theme.colors.semiaccent,
+    borderColor: theme.colors.background,
     borderWidth: 2,
     padding: 10,
     justifyContent: 'center',
@@ -129,4 +129,7 @@ squareCardText: {
     color: 'red',
     textAlign: 'center',
   },
+
+  
+
 });
