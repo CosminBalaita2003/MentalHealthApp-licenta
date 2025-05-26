@@ -141,6 +141,13 @@ def analyze_expression():
     except Exception as e:
         return {"error": str(e)}, 500
     
+translator = pipeline(
+    "translation", 
+    model="Helsinki-NLP/opus-mt-mul-en",   # multi-language → English
+    device=0  # or omit for CPU
+)
+
+
 @app.route("/api/text-emotion", methods=["POST"])
 def analyze_text_emotion():
     data = request.get_json()
@@ -150,7 +157,8 @@ def analyze_text_emotion():
         return {"error": "No text provided"}, 400
 
     try:
-        results = emotion_classifier_text(text)[0]
+        en_text = translator(text, max_length=512)[0]["translation_text"]
+        results = emotion_classifier_text(en_text)[0]
         dominant = max(results, key=lambda r: r["score"])
 
         return {

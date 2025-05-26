@@ -33,9 +33,10 @@ export default StyleSheet.create({
     fontSize: 16,
     color: "black",
     fontWeight: "500",
+    
   },
   button: {
-    backgroundColor: "#E8BCB9",
+    backgroundColor: "#FAECEB",
     padding: 12,
     borderRadius: 12,
     marginTop: 30,
@@ -43,7 +44,7 @@ export default StyleSheet.create({
   buttonText: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#fff",
+    color: "#5A4E4D",
   },
   text: {
     fontSize: 16,
@@ -133,7 +134,83 @@ recommendText: {
   fontSize: 14,
   textAlign: "center",
 },
+modalOverlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.7)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+  zIndex: 1000,
+},
+modalContent: {
+  backgroundColor: '#1E1A38',
+  borderRadius: 16,
+  padding: 20,
+  maxHeight: '80%',
+  width: '100%',
+  borderWidth: 2,
+  borderColor: '#E8BCB9',
+  shadowColor: '#9f7aea',
+  shadowOpacity: 0.5,
+  shadowOffset: { width: 0, height: 4 },
+  shadowRadius: 12,
+  elevation: 10,
+},
+modalCloseButton: {
+  marginTop: 20,
+  backgroundColor: '#E8BCB9',
+  borderRadius: 8,
+  paddingVertical: 8,
+  paddingHorizontal: 16,
+  alignSelf: 'flex-end',
+},
+modalCloseText: {
+  color: '#FFFFFF',
+  fontWeight: 'bold',
+  textAlign: 'center',
+},
+cardTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#E8BCB9',
+  marginBottom: 10,
+},
+cardDescription: {
+  fontSize: 16,
+  color: '#E8BCB9',
+  marginBottom: 10,
+  letterSpacing: 0.5,
+},
+cardGrid: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  marginTop: 5,
+  gap : 10, 
+},
 
+cardBreathing: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#FAECEB",
+  padding: 16,
+  borderRadius: 16,
+  marginTop: 0,
+  width: "48%",          // două card-uri pe rând, cu spațiu între ele
+  justifyContent: "center",
+  
+},
+
+cardTextBreathing: {
+  marginLeft: 0,
+  fontSize: 16,
+  color: "black",
+  fontWeight: "500",
+},
 
   
 });

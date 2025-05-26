@@ -5,7 +5,9 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+    KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -102,7 +104,11 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#16132D" }}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+
         <View style={styles.header}>
           <Text style={styles.title}>Welcome, {user.fullName.split(" ")[0]}!</Text>
           <View style={styles.actions}>
@@ -167,7 +173,7 @@ export default function ProfileScreen({ navigation }) {
             ))
           )}
         </BreathingContainer>
-      </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

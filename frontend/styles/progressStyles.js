@@ -111,6 +111,7 @@ modalOverlay: {
   justifyContent: 'center',
   alignItems: 'center',
   padding: 20,
+  
 },
 
 modalContent: {

@@ -5,24 +5,45 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo-black.png",
-    "userInterfaceStyle": "light",
+     "userInterfaceStyle": "automatic",
+      "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#1E1A38",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#1E1A38"
+    },
+    "ios": {
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
+      }
+    },
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
+    
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#ffffff",
+          "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#1E1A38",
+      "translucent": true
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#1E1A38"
     }
+  }},
+  "web": {
+    "favicon": "./assets/favicon.png"
   }
+}
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator , Platform,
+    KeyboardAvoidingView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import userService from "../services/userService";
 import testService from "../services/testService";
@@ -72,34 +73,37 @@ const TestScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#16132D" }}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Mental Health Tests</Text>
+ <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >        
+      <Text style={styles.title}>Mental Health Tests</Text>
         <View style={styles.divider}>
 
          {tests.length > 0 && (
   <TouchableOpacity style={styles.card} onPress={() => setActiveSection("statistics")}>
-    <Ionicons name="bar-chart-outline" size={20} color="#fff" />
+    <Ionicons name="bar-chart-outline" size={20} color="#000" marginRight={10}/>
     <Text style={styles.cardText}>Show Statistics</Text>
   </TouchableOpacity>
 )}
 
 
           <TouchableOpacity style={styles.card} onPress={() => setActiveSection("GAD7Test")}>
-            <Ionicons name="pulse-outline" size={20} color="#fff" />
+            <Ionicons name="pulse-outline" size={20} color="#000" marginRight={10}/>
             <Text style={styles.cardText}>Start Anxiety Test (GAD-7)</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card} onPress={() => setActiveSection("PSS10Test")}>
-            <Ionicons name="flash-outline" size={20} color="#fff" />
+            <Ionicons name="flash-outline" size={20} color="#000" marginRight={10}/>
             <Text style={styles.cardText}>Start Stress Test (PSS-10)</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => setActiveSection("PHQ9Test")}>
-  <Ionicons name="cloud-outline" size={20} color="#fff" />
+  <Ionicons name="cloud-outline" size={20} color="#000" marginRight={10} />
   <Text style={styles.cardText}>Start Depression Test (PHQ-9)</Text>
 </TouchableOpacity>
 
         </View>
-      </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };

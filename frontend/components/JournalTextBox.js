@@ -13,6 +13,10 @@ const JournalTextBox = ({ value, onChangeText }) => {
         value={value}
         onChangeText={onChangeText}
         returnKeyType="done"
+        autoComplete="off"
+        autoCorrect={false}
+        textAlignVertical="top"  //  Textul începe de sus
+        
       />
     </View>
   );

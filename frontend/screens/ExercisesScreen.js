@@ -5,6 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+    KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import exerciseService from "../services/exerciseService";
@@ -121,7 +123,10 @@ const ExercisesScreen = () => {
   return (
         <View style={{ flex: 1, backgroundColor: "#16132D" }}>
     
-    <ScrollView contentContainerStyle={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
       <Text style={styles.title}>Exercise Categories</Text>
 
       {Object.keys(categories).length === 0 && (
@@ -181,7 +186,7 @@ const ExercisesScreen = () => {
 
 </View>
 
-    </ScrollView>
+    </KeyboardAvoidingView>
     {/* Modalul cu exercițiul recomandat */}
       <ExerciseModal
         visible={modalVisible}

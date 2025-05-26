@@ -228,29 +228,45 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
   // }, [isRunning]);
 
   if (allowCamera === null) {
-    return (
-      <View style={{ alignItems: "center", justifyContent: "center", flex: 1, padding: 20 }}>
-        <Text style={[styles.text, { fontSize: 18, textAlign: "center", marginBottom: 20 }]}>
-          Would you like to enable the camera for facial emotion feedback during this exercise?
-        </Text>
-        <View style={{ flexDirection: "row", gap: 20 }}>
-          <TouchableOpacity
-            onPress={() => setAllowCamera(true)}
-            style={{ padding: 12, backgroundColor: theme.colors.semiaccent, borderRadius: 8 }}
-          >
-            <Text style={styles.cardText}>Yes</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setAllowCamera(false)}
-            style={{ padding: 12, backgroundColor: theme.colors.text, borderRadius: 8 }}
-          >
-            <Text style={styles.cardText}>No</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "flex-start",  // urcă conținutul în sus
+        padding: 20,
+        paddingTop: 60,                 // spațiu de deasupra
+      }}
+    >
+      <Text
+        style={[
+          styles.text,
+          { fontSize: 18, textAlign: "center", marginBottom: 20 },
+        ]}
+      >
+        Would you like to enable the camera for facial emotion feedback during
+        this exercise?
+      </Text>
+   {/* Grid de card-uri */}
+<View style={styles.cardGrid}>
+  <TouchableOpacity
+    onPress={() => setAllowCamera(true)}
+    style={styles.cardBreathing}
+  >
+    <Text style={styles.cardTextBreathing}>Yes</Text>
+  </TouchableOpacity>
 
+  <TouchableOpacity
+    onPress={() => setAllowCamera(false)}
+    style={styles.cardBreathing}
+  >
+    <Text style={styles.cardText}>No</Text>
+  </TouchableOpacity>
+</View>
+
+    </View>
+  );
+}
   return (
     <View style={{ marginTop: 70, alignItems: "center", justifyContent: "center" }}>
       <View style={{ position: "relative", width: 160, height: 200, marginBottom: 20 }}>

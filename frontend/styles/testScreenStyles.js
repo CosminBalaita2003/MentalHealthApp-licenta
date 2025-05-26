@@ -29,16 +29,16 @@ export default StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.backgroundLight,
+    backgroundColor: "#FAECEB",
     padding: 16,
     borderRadius: 16,
-    
-    marginBottom: 16,
+    marginTop: 20,
+    width: "100%",
   },
   cardText: {
-    marginLeft: 10,
+    marginLeft: 0,
     fontSize: 16,
-    color: theme.colors.text,
+    color: "black",
     fontWeight: "500",
   },
 });

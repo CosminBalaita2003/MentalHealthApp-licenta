@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity ,   KeyboardAvoidingView,
+  Platform,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../styles/exerciseScreenStyles";
@@ -30,7 +31,10 @@ const ExerciseListScreen = ({ route }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView contentContainerStyle={styles.container}>
+       <KeyboardAvoidingView
+              style={styles.container}
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+            >
         <View style={styles.header}>
           <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
@@ -53,7 +57,7 @@ const ExerciseListScreen = ({ route }) => {
             <Text style={styles.cardText}>{exercise.name}</Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </KeyboardAvoidingView>
 
       {selectedExercise && (
         <ExerciseModal

@@ -129,7 +129,7 @@ const ProgressSummary = () => {
 
       <Modal
   visible={!!activeModalCategory}
-  animationType="slide"
+  animationType="fade"
   transparent={true}
   onRequestClose={() => setActiveModalCategory(null)}
 >

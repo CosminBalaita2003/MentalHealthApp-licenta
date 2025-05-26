@@ -101,7 +101,7 @@ const LoginScreen = () => {
           {/* Navigation */}
           <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
             <Text style={[styles.text, { textAlign: 'center', marginTop: 20 }]}>
-              Nu ai cont? Creează unul
+              Don't have an account? Register
             </Text>
           </TouchableOpacity>
         </ScrollView>

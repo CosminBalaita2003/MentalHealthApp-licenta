@@ -49,7 +49,7 @@ const JournalScreen = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ro-RO", {
+    return date.toLocaleDateString("en-RO", {
       timeZone: "Europe/Bucharest",
       weekday: "short",
       month: "short",
@@ -81,17 +81,19 @@ const JournalScreen = () => {
         <Text style={journalStyles.buttonText}>+ Add Entry</Text>
       </TouchableOpacity>
 
-      {loading ? (
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      ) : entries.length === 0 ? (
-        <Text style={{ textAlign: "center", color: "gray", marginTop: 20 }}>
-          No journal entries found.
-        </Text>
-      ) : (
+     {loading ? (
+  <ActivityIndicator size="large" color={theme.colors.primary} />
+) : entries.length === 0 ? (
+  <View style={journalStyles.emptyContainer}>
+    <Text style={journalStyles.emptyTitle}>No journal entries found.</Text>
+    <Text style={journalStyles.emptySubtitle}>Welcome to your safe haven. Here, you can pour out your heart. Share your joys, your worries, or anything in between, without a hint of judgment. This is your moment to be completely yourself.</Text>
+  </View>
+) : (
         <FlatList
           data={entries}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={journalStyles.listContainer}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={journalStyles.journalCard}
@@ -120,60 +122,42 @@ const JournalScreen = () => {
 
       {/* 🔥 Modal nativ scrollabil */}
       <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
+  visible={modalVisible}
+  animationType="fade"
+  transparent={true}
+  onRequestClose={() => setModalVisible(false)}
+>
+  <View style={journalStyles.ModalJournalOverlay}>
+    <View style={journalStyles.ModalJournalContent}>
+      <TouchableOpacity
+        onPress={handleEdit}
+        style={journalStyles.ModalJournalEditButton}
       >
-        <View style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.2)",
-          justifyContent: "flex-end"
-        }}>
-          <View style={{
-            backgroundColor: theme.colors.backgroundLight,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            padding: 20,
-            height: "80%",
+        <Ionicons name="pencil" size={22} color={theme.colors.text} />
+      </TouchableOpacity>
 
+      <ScrollView showsHorizontalScrollIndicator={false}>
+        <Text style={journalStyles.ModalJournalTitle}>
+          {selectedEntry?.emotion?.name ?? "Emotion"}
+        </Text>
+        <Text style={journalStyles.ModalJournalDate}>
+          {formatDate(selectedEntry?.date)}
+        </Text>
+        <Text style={journalStyles.ModalJournalDescription}>
+          {selectedEntry?.content}
+        </Text>
+      </ScrollView>
 
-          }}>
-            <TouchableOpacity
-              onPress={handleEdit}
-              style={{ position: "absolute", top: 10, right: 10 }}
-            >
-              <Ionicons name="pencil" size={22} color={theme.colors.text} />
-            </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setModalVisible(false)}
+        style={journalStyles.ModalJournalCloseButton}
+      >
+        <Text style={journalStyles.ModalJournalCloseText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
-            <ScrollView>
-              <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, color: theme.colors.text }}>
-                {selectedEntry?.emotion?.name ?? "Emotion"}
-              </Text>
-              <Text style={{ color: "gray", marginBottom: 10 }}>
-                {formatDate(selectedEntry?.date)}
-              </Text>
-              <Text style={{ fontSize: 16, lineHeight: 22, color: theme.colors.text }}>
-                {selectedEntry?.content}
-              </Text>
-            </ScrollView>
-
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={{
-                marginTop: 15,
-                alignSelf: "center",
-                backgroundColor: theme.colors.primary,
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                borderRadius: 10
-              }}
-            >
-              <Text style={{ color: "white" }}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
 import { View, Text, ActivityIndicator, StatusBar } from "react-native";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -44,7 +45,7 @@ const Tab = createBottomTabNavigator();
 function TabNavigator() {
   return (
     <>
-<StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
 
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -107,7 +108,7 @@ export default function App() {
     return (
       setLoading(false),
       <View style={GlobalStyles.container}>
-        <ActivityIndicator size="large" color="#4ECDC4" />
+        <ActivityIndicator size="large" color="#E8BCB9 " />
       </View>
     );
   }

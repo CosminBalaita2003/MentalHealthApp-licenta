@@ -60,7 +60,7 @@ const TestStatistics = ({ onBack }) => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#4ECDC4" />
+        <ActivityIndicator size="large" color="#E8BCB9" />
       </View>
     );
   }

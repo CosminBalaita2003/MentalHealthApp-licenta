@@ -6,7 +6,9 @@ import {
   Alert,
   ActivityIndicator,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+   Modal,
+  StyleSheet,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import userService from "../services/userService";
@@ -22,7 +24,8 @@ const EditEntryScreen = () => {
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-
+  const [saving, setSaving] = useState(false);
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
   const entry = route.params?.entry;
@@ -68,7 +71,7 @@ const EditEntryScreen = () => {
       Alert.alert("Error", "User data is missing.");
       return;
     }
-
+ setSaving(true);
     try {
       // 🔧 Reconstruim city manual din cityId și cityName
       const updatedEntry = {
@@ -84,14 +87,21 @@ const EditEntryScreen = () => {
 
       console.log("Update Success:", response);
 
-      Alert.alert("Success", "Entry updated successfully.");
-      navigation.goBack();
+        setConfirmationVisible(true);
+
+     
     } catch (error) {
       console.error("Error updating journal entry:", error.response?.data || error.message);
       Alert.alert("Error", error.response?.data?.message || "Could not update the entry.");
     }
+    finally {
+      setSaving(false);
+    }
   };
-
+ const handleConfirm = () => {
+    setConfirmationVisible(false);
+    navigation.goBack();
+  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={JournalStyles.container}>
@@ -112,6 +122,41 @@ const EditEntryScreen = () => {
             </TouchableOpacity>
           </View>
         )}
+          {/* Loading overlay */}
+        <Modal visible={saving} transparent>
+          <View style={JournalStyles.ModalJournalLoadingOverlay}>
+            <View style={JournalStyles.ModalJournalLoadingContent}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text style={JournalStyles.ModalJournalLoadingText}>
+                Saving your entry…
+              </Text>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Confirmation modal */}
+        <Modal
+          visible={confirmationVisible}
+          transparent
+          animationType="fade"
+        >
+          <View style={JournalStyles.ModalJournalConfirmationOverlay}>
+            <View style={JournalStyles.ModalJournalConfirmationContent}>
+              <Text style={JournalStyles.ModalJournalConfirmationTitle}>
+                Entry updated successfully!
+              </Text>
+              <TouchableOpacity
+                style={JournalStyles.ModalJournalConfirmationButton}
+                onPress={handleConfirm}
+              >
+                <Text style={JournalStyles.ModalJournalConfirmationButtonText}>
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
       </View>
     </TouchableWithoutFeedback>
   );

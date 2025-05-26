@@ -3,11 +3,13 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import userService from "../services/userService";
@@ -20,174 +22,114 @@ import JournalStyles from "../styles/journalStyles";
 import theme from "../styles/theme";
 import EmotionSelector from "../components/EmotionSelector";
 import JournalTextBox from "../components/JournalTextBox";
-
-
 import { saveDetectedEmotion } from "../services/emotionService";
-const NewEntryScreen = () => {
-  const [content, setContent] = useState("");
-  const [emotionId, setEmotionId] = useState(null);
-  const [emotions, setEmotions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [detectedEmotions, setDetectedEmotions] = useState([]);
-  const [analyzing, setAnalyzing] = useState(false);
+
+const emotionMessages = {
+  anger:        "Anger is valid. Let it out in a healthy way! Don't bottle it up. ",
+  disgust:      "Disgust is a natural response. Acknowledge it! It's okay to feel this way. ",
+  fear:        "Believe in yourself. You’ve got this! You are stronger than you think. ",
+  joy:        "Joy is a wonderful feeling. Embrace it!  Celebrate the little things. ",
+  neutral:     "Neutral is okay sometimes it’s good to just be. Don't feel pressured to feel something. ",
+  sadness:          "It’s okay to feel sad. Be gentle with yourself. It's okay to take a break. ",
+  surprise:            "Surprise can be exciting. What’s next?  Embrace the unexpected! ",
+  
+};
+
+export default function NewEntryScreen() {
+  const [content, setContent]           = useState("");
+  const [emotionId, setEmotionId]       = useState(null);
+  const [emotions, setEmotions]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [user, setUser]                 = useState(null);
+  const [analyzing, setAnalyzing]       = useState(false);
+
+  // States for the new flow:
+  const [saving, setSaving]             = useState(false);
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [dominantEmotion, setDominantEmotion]         = useState(null);
 
   const navigation = useNavigation();
 
+  // Load user + emotions on mount
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-
-      const userResponse = await userService.getUser();
-      if (userResponse.success) {
-        setUser(userResponse.user);
-      } else {
-        Alert.alert("Error", "Failed to load user data.");
+      const ures = await userService.getUser();
+      if (ures.success) setUser(ures.user);
+      else {
+        Alert.alert("Error", "Failed to load user.");
         setLoading(false);
         return;
       }
-
-      const emotionsResponse = await fetchEmotions();
-      if (emotionsResponse.success) {
-        setEmotions(emotionsResponse.emotions);
-      } else {
-        Alert.alert("Error", emotionsResponse.message || "Failed to load emotions.");
-      }
-
+      const eres = await fetchEmotions();
+      if (eres.success) setEmotions(eres.emotions);
+      else Alert.alert("Error", "Failed to load emotions.");
       setLoading(false);
     };
-
     loadData();
   }, []);
 
-  const splitByParagraphs = (text) => {
-    return text
-      .split(/\n+/) // separă pe paragrafe
-      .flatMap(paragraph =>
-        paragraph
-          .split(/(?<=[.?!])\s+/) // apoi în fraze
-          .map(p => p.trim())
-          .filter(Boolean)
+  // Utility to split text
+  const splitByPara = (text) =>
+    text
+      .split(/\n+/)
+      .flatMap(p =>
+        p.split(/(?<=[.?!])\s+/).map(s => s.trim()).filter(Boolean)
       );
-  };
-  
 
-  const analyzeTextLive = async (text) => {
-    if (!text.trim()) {
-      setDetectedEmotions([]);
-      return;
-    }
-
-    setAnalyzing(true);
-
-    const sentences = splitByParagraphs(text);
-    const emotionCounts = {};
-
-    for (const sentence of sentences) {
-      const result = await analyzeTextEmotion(sentence);
-      if (result.success) {
-        const emotion = result.dominantEmotion.toLowerCase();
-        if (emotion in emotionCounts) {
-          emotionCounts[emotion]++;
-        } else {
-          emotionCounts[emotion] = 1;
-        }
-      }
-    }
-
-    const sorted = Object.entries(emotionCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3); // Top 3 emoții
-
-    setDetectedEmotions(sorted);
-    setAnalyzing(false);
-    for (const [emotionName, count] of sorted) {
-      await saveDetectedEmotion({
-        emotionName,
-        sentence: null,      // nu mai salvăm propoziția în top
-        source: "journal"    // doar informativ
-      });
-    }
-  };
-
+  // Submit handler: 1) send to backend, 2) compute dominant emotion, 3) show confirmation
   const handleSubmit = async () => {
     if (!content.trim() || !emotionId) {
-      Alert.alert("Error", "Please write your journal entry and select how you feel.");
-      return;
+      return Alert.alert("Error", "Write something and pick how you feel.");
     }
-  
     if (!user) {
-      Alert.alert("Error", "User data is missing.");
-      return;
+      return Alert.alert("Error", "User missing.");
     }
-  
+
+    setSaving(true);
     try {
-      setLoading(true);
-  
-      const sentences = splitByParagraphs(content);
-      const emotionCounts = {};
-  
-      console.log("📓 Full Journal Text:\n", content);
-      console.log("✂️ Split Sentences:", sentences);
-  
-      for (const sentence of sentences) {
-        const result = await analyzeTextEmotion(sentence);
-        if (result.success) {
-          const emotion = result.dominantEmotion.toLowerCase();
-          console.log(`📍 "${sentence}" → 🤖 ${emotion}`);
-          console.log(`   Scores:`, result.scores);
-  
-          if (emotion in emotionCounts) {
-            emotionCounts[emotion]++;
-          } else {
-            emotionCounts[emotion] = 1;
-          }
-        } else {
-          console.log(`❌ Failed to analyze sentence: "${sentence}"`);
+      // 1) Save the journal entry
+      const response = await addJournalEntry(content, emotionId, user);
+      if (!response.id) throw new Error("No entry ID returned");
+
+      // 2) Analyze text to find dominant emotion
+      const sentences = splitByPara(content);
+      const counts = {};
+      for (const s of sentences) {
+        const res = await analyzeTextEmotion(s);
+        if (res.success) {
+          const em = res.dominantEmotion.toLowerCase();
+          counts[em] = (counts[em]||0) + 1;
         }
       }
-  
-      const sortedEmotions = Object.entries(emotionCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-  
-      // 💾 1. Salvează jurnalul înainte
-      const response = await addJournalEntry(content, emotionId, user);
-      const journalEntryId = response?.id;
-  
-      if (!journalEntryId) {
-        throw new Error("Failed to retrieve journal entry ID");
-      }
-  
-      // 🧠 2. Trimite emoțiile legate de jurnal
-      for (const [emotionName] of sortedEmotions) {
-        await saveDetectedEmotion({
-          emotionName,
-          sentence: null,
-          source: "journal",
-          journalEntryId, // ✅ atașează jurnalul
-        });
-      }
-  
-      Alert.alert("Success", response.message || "Entry saved!");
+      // pick the top one
+      const dominant = Object.entries(counts)
+        .sort((a,b)=>b[1]-a[1])[0]?.[0] ?? null;
+      setDominantEmotion(dominant);
 
-      // ✅ Regenerăm mesajul personalizat
-
-      navigation.goBack();
-
-    } catch (error) {
-      console.error("Error adding journal entry:", error);
-      Alert.alert("Error", "Something went wrong while saving.");
+      // 3) show the confirmation modal
+      setConfirmationVisible(true);
+    } catch (e) {
+      console.error(e);
+      Alert.alert("Error", "Could not save entry.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
-  
+
+  // Final save confirmation
+  const handleFinalSave = () => {
+    setConfirmationVisible(false);
+    navigation.goBack();
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView contentContainerStyle={JournalStyles.container} keyboardShouldPersistTaps="handled">
-        <Text style={JournalStyles.title}>New Journal Entry</Text>
+      <KeyboardAvoidingView
+        style={JournalStyles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Text style={JournalStyles.title}>How Are You Feeling Today?</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -195,13 +137,8 @@ const NewEntryScreen = () => {
           <View style={{ flex: 1, width: "100%" }}>
             <JournalTextBox
               value={content}
-              onChangeText={(text) => {
-                setContent(text);
-                analyzeTextLive(text);
-              }}
+              onChangeText={setContent}
             />
-
-           
 
             <EmotionSelector
               emotions={emotions}
@@ -217,9 +154,117 @@ const NewEntryScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+
+        {/* Saving overlay */}
+        <Modal visible={saving} transparent>
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingContent}>
+              <ActivityIndicator
+                size="large"
+                color={theme.colors.semiaccent}
+              />
+              <Text style={styles.loadingText}>Saving your entry…</Text>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Confirmation modal */}
+        <Modal visible={confirmationVisible} transparent animationType="fade">
+          <View style={styles.errorOverlay}>
+            <View style={styles.errorContent}>
+              <Text style={styles.modalTitle}>
+                You seem to feel{" "}
+                <Text style={{ fontWeight: "bold" }}>
+                  {dominantEmotion}
+                </Text>
+              </Text>
+              <Text style={styles.modalDescription}>
+                {emotionMessages[dominantEmotion] ?? ""}
+              </Text>
+              <TouchableOpacity
+                style={styles.errorButton}
+                onPress={handleFinalSave}
+              >
+                <Text style={styles.errorButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
-};
+}
 
-export default NewEntryScreen;
+const styles = StyleSheet.create({
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.64)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingContent: {
+    width: "80%",
+    backgroundColor: "#1E1A38",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    position: "relative",
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: theme.colors.text,
+    letterSpacing: 1,
+    marginTop: 20,
+    marginBottom: 5,
+  },
+
+  // we reuse the errorOverlay & errorContent styles for the confirmation
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.64)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 30,
+  },
+  errorContent: {
+   backgroundColor: "#1E1A38",
+    borderRadius: 16,
+    padding: 20,
+    maxHeight: "80%",
+    width: "100%",
+    borderWidth: 2,
+    borderColor: "#E8BCB9",
+    shadowColor: "#9f7aea",
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#E8BCB9",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  modalDescription: {
+   fontSize: 16,
+    color: "#E8BCB9",
+    marginBottom: 10,
+    letterSpacing: 0.5,
+  },
+  errorButton: {
+    marginTop: 20,
+    backgroundColor: "#E8BCB9",
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: "flex-center",
+  },
+  errorButtonText: {
+     color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});
