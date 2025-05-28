@@ -7,7 +7,8 @@ import {
   Dimensions,
   ActivityIndicator,
   Modal,
-  StyleSheet,
+      KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -62,6 +63,7 @@ const interpretResults = (testType, score) => {
     return "Severe Depression";
   }
 };
+
 
 // explicații detaliate și recomandări pentru fiecare categorie
 const testDetails = {
@@ -215,8 +217,8 @@ const TestStatistics = ({ onBack }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#16132D" }}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <View style={{ flex: 1, backgroundColor: "#16132D", marginTop: Platform.OS === "ios" ? 0 : 20 , marginBottom: 20 }}>
+      <ScrollView contentContainerStyle={styles.container } showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.iconButton}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -245,15 +247,15 @@ const TestStatistics = ({ onBack }) => {
                 <LineChart
                   data={{ datasets: [{ data: scores }] }}
                   width={screenWidth * 0.8}
-                  height={200}
+                  height={150}
                   yAxisSuffix=" pts"
                   chartConfig={{
                     backgroundGradientFrom: theme.colors.background,
                     backgroundGradientTo: theme.colors.background,
-                    color: (opacity = 1) => `rgba(255, 244, 247, ${opacity})`,
-                    strokeWidth: 5,
+                    color: (opacity = 1) => `rgba(232, 188, 185, ${opacity})`,
+                    strokeWidth: 3,
                     decimalPlaces: 0,
-                    propsForDots: { r: "5", strokeWidth: "2", stroke: "#fff" },
+                    propsForDots: { r: "3", strokeWidth: "1", stroke: "#fff" },
                   }}
                   style={{ borderRadius: 12 }}
                   formatYLabel={(val) => `${parseInt(val)}`}

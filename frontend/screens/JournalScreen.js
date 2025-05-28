@@ -136,7 +136,7 @@ const JournalScreen = () => {
         <Ionicons name="pencil" size={22} color={theme.colors.text} />
       </TouchableOpacity>
 
-      <ScrollView showsHorizontalScrollIndicator={false}>
+      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
         <Text style={journalStyles.ModalJournalTitle}>
           {selectedEntry?.emotion?.name ?? "Emotion"}
         </Text>

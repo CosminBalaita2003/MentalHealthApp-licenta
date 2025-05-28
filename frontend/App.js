@@ -25,6 +25,7 @@ import NewEntryScreen from "./screens/NewEntryScreen";
 import AstroChartScreen from "./screens/AstroChartScreen";
 import EditEntryScreen from "./screens/EditEntryScreen";
 import ProgressScreen from "./screens/ProgressScreen";
+import TestStatistics from "./components/TestStatistics";
 
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs([
@@ -134,7 +135,7 @@ export default function App() {
               <Stack.Screen name="AstroChartScreen" component={AstroChartScreen} />
               <Stack.Screen name="ExerciseListScreen" component={ExerciseListScreen} />
               <Stack.Screen name="ProgressScreen" component={ProgressScreen} />
-
+              
               
             </>
           )}
