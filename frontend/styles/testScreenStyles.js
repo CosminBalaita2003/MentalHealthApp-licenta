@@ -41,4 +41,5 @@ export default StyleSheet.create({
     color: "black",
     fontWeight: "500",
   },
+  
 });
