@@ -98,7 +98,7 @@ const StressTest = ({ user, onClose }) => {
           <TouchableOpacity onPress={onClose} style={styles.iconButton}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.title}>GAD-7 Anxiety Test</Text>
+          <Text style={styles.title}>PSS-10 Stress Test</Text>
         </View>
   
         {/* Progress Indicator */}

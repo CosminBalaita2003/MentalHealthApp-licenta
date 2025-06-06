@@ -98,6 +98,7 @@ export default function NewEntryScreen() {
       for (const s of sentences) {
         const res = await analyzeTextEmotion(s);
         if (res.success) {
+          console.log(`Analyzed sentence: "${s}" -> ${res.dominantEmotion}`);
           const em = res.dominantEmotion.toLowerCase();
           counts[em] = (counts[em]||0) + 1;
         }

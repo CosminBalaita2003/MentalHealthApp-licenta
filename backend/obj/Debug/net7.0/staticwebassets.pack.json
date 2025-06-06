@@ -5,40 +5,80 @@
       "PackagePath": "staticwebassets\\images\\Anger.png"
     },
     {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anger.svg",
+      "PackagePath": "staticwebassets\\images\\Anger.svg"
+    },
+    {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anxiety.png",
       "PackagePath": "staticwebassets\\images\\Anxiety.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anxiety.svg",
+      "PackagePath": "staticwebassets\\images\\Anxiety.svg"
     },
     {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Frustration.png",
       "PackagePath": "staticwebassets\\images\\Frustration.png"
     },
     {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Frustration.svg",
+      "PackagePath": "staticwebassets\\images\\Frustration.svg"
+    },
+    {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Gratitude.png",
       "PackagePath": "staticwebassets\\images\\Gratitude.png"
     },
     {
-      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.PNG",
-      "PackagePath": "staticwebassets\\images\\Guilt.PNG"
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Gratitude.svg",
+      "PackagePath": "staticwebassets\\images\\Gratitude.svg"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.png",
+      "PackagePath": "staticwebassets\\images\\Guilt.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.svg",
+      "PackagePath": "staticwebassets\\images\\Guilt.svg"
     },
     {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Happiness.png",
       "PackagePath": "staticwebassets\\images\\Happiness.png"
     },
     {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Happiness.svg",
+      "PackagePath": "staticwebassets\\images\\Happiness.svg"
+    },
+    {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Motivation.png",
       "PackagePath": "staticwebassets\\images\\Motivation.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Motivation.svg",
+      "PackagePath": "staticwebassets\\images\\Motivation.svg"
     },
     {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Relaxation.png",
       "PackagePath": "staticwebassets\\images\\Relaxation.png"
     },
     {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Relaxation.svg",
+      "PackagePath": "staticwebassets\\images\\Relaxation.svg"
+    },
+    {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Sadness.png",
       "PackagePath": "staticwebassets\\images\\Sadness.png"
     },
     {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Sadness.svg",
+      "PackagePath": "staticwebassets\\images\\Sadness.svg"
+    },
+    {
       "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Self-Confidence.png",
       "PackagePath": "staticwebassets\\images\\Self-Confidence.png"
+    },
+    {
+      "Id": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Self-Confidence.svg",
+      "PackagePath": "staticwebassets\\images\\Self-Confidence.svg"
     },
     {
       "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.backend.Microsoft.AspNetCore.StaticWebAssets.props",

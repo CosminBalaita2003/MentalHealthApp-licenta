@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, View, Text, TouchableOpacity, Alert } from "react-native";
+import { Modal, View, Text, TouchableOpacity, Alert, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/exerciseScreenStyles";
 import theme from "../styles/theme";
@@ -84,7 +84,10 @@ const ExerciseModal = ({ visible, onClose, exercise, fromRecommend = false }) =>
           <View style={{ marginTop: 0 }}>
             <TouchableOpacity
               style={[styles.button, { height: 50, justifyContent: "center", alignItems: "center", width: "100%" }]}
-              onPress={() => setInfoVisible(true)}
+               onPress={() => {
+        Keyboard.dismiss();
+        setInfoVisible(true);
+      }}
             >
               <Text style={styles.buttonText}>Do you want to know what you have to do?</Text>
             </TouchableOpacity>

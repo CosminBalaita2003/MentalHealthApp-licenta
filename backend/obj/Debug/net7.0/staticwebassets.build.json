@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "HdBsc8RY1bk7Os6OzPwBw6STZFiauLvpaRmg+aySkF8=",
+  "Hash": "s9Me+MHyNE9KgZ+O4nsf43KM83XxBnoAO8fO2UfOovg=",
   "Source": "backend",
   "BasePath": "_content/backend",
   "Mode": "Default",
@@ -34,6 +34,23 @@
       "OriginalItemSpec": "wwwroot\\images\\Anger.png"
     },
     {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anger.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Anger.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Anger.svg"
+    },
+    {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anxiety.png",
       "SourceId": "backend",
       "SourceType": "Discovered",
@@ -49,6 +66,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\Anxiety.png"
+    },
+    {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Anxiety.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Anxiety.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Anxiety.svg"
     },
     {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Frustration.png",
@@ -68,6 +102,23 @@
       "OriginalItemSpec": "wwwroot\\images\\Frustration.png"
     },
     {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Frustration.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Frustration.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Frustration.svg"
+    },
+    {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Gratitude.png",
       "SourceId": "backend",
       "SourceType": "Discovered",
@@ -85,12 +136,12 @@
       "OriginalItemSpec": "wwwroot\\images\\Gratitude.png"
     },
     {
-      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.PNG",
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Gratitude.svg",
       "SourceId": "backend",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
       "BasePath": "_content/backend",
-      "RelativePath": "images/Guilt.PNG",
+      "RelativePath": "images/Gratitude.svg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -99,7 +150,41 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\Guilt.PNG"
+      "OriginalItemSpec": "wwwroot\\images\\Gratitude.svg"
+    },
+    {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.png",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Guilt.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Guilt.png"
+    },
+    {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Guilt.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Guilt.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Guilt.svg"
     },
     {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Happiness.png",
@@ -119,6 +204,23 @@
       "OriginalItemSpec": "wwwroot\\images\\Happiness.png"
     },
     {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Happiness.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Happiness.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Happiness.svg"
+    },
+    {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Motivation.png",
       "SourceId": "backend",
       "SourceType": "Discovered",
@@ -134,6 +236,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\Motivation.png"
+    },
+    {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Motivation.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Motivation.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Motivation.svg"
     },
     {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Relaxation.png",
@@ -153,6 +272,23 @@
       "OriginalItemSpec": "wwwroot\\images\\Relaxation.png"
     },
     {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Relaxation.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Relaxation.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Relaxation.svg"
+    },
+    {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Sadness.png",
       "SourceId": "backend",
       "SourceType": "Discovered",
@@ -170,6 +306,23 @@
       "OriginalItemSpec": "wwwroot\\images\\Sadness.png"
     },
     {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Sadness.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Sadness.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Sadness.svg"
+    },
+    {
       "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Self-Confidence.png",
       "SourceId": "backend",
       "SourceType": "Discovered",
@@ -185,6 +338,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\Self-Confidence.png"
+    },
+    {
+      "Identity": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\images\\Self-Confidence.svg",
+      "SourceId": "backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\wwwroot\\",
+      "BasePath": "_content/backend",
+      "RelativePath": "images/Self-Confidence.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\Self-Confidence.svg"
     }
   ]
 }
