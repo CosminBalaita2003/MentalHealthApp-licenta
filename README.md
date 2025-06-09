@@ -1,8 +1,8 @@
-# MentalHealthApp
+# MindWell
 
 ## Project Overview
 
-**MentalHealthApp** is a cross-platform mobile application designed to help users achieve emotional balance and improve their mental well-being. It provides a personalized approach to mental health through AI-driven insights and tailored exercises. Users begin with a brief **mental state assessment**, receive a customized profile, and engage with various exercises and tools aimed at stress reduction, mindfulness, and emotional resilience. The project integrates a mobile frontend, a cloud-ready backend API, and a machine learning microservice to deliver a comprehensive mental health companion.
+**MindWell** is a cross-platform mobile application designed to help users achieve emotional balance and improve their mental well-being. It provides a personalized approach to mental health through AI-driven insights and tailored exercises. Users begin with a brief **mental state assessment**, receive a customized profile, and engage with various exercises and tools aimed at stress reduction, mindfulness, and emotional resilience. The project integrates a mobile frontend, a cloud-ready backend API, and a machine learning microservice to deliver a comprehensive mental health companion.
 
 ## Features
 
@@ -99,6 +99,6 @@ While **MentalHealthApp** is fully functional, there are opportunities to enhanc
 
 * **User Data Privacy & Security:** As a future update, implement end-to-end encryption for sensitive data, give users options to control or delete their data, and possibly integrate biometric or two-factor authentication for extra security on personal journals.
 
-These improvements can further elevate **MentalHealthApp** from a solid prototype to a production-ready platform, providing even more value and trust for its users.
+These improvements can further elevate **MindWell** from a solid prototype to a production-ready platform, providing even more value and trust for its users.
 
 
