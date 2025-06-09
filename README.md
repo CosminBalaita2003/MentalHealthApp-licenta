@@ -28,7 +28,7 @@
 
 ## Setup Instructions
 
-Setting up the MentalHealthApp on a local development environment involves preparing the frontend (React Native app), the backend (ASP.NET API), and the AI microservice (Flask). Follow the steps below for each component:
+Setting up the MindWell on a local development environment involves preparing the frontend (React Native app), the backend (ASP.NET API), and the AI microservice (Flask). Follow the steps below for each component:
 
 ### Prerequisites
 
@@ -85,7 +85,7 @@ Each part of the project is separated for clarity: the mobile app, backend API, 
 
 ## Future Improvements
 
-While **MentalHealthApp** is fully functional, there are opportunities to enhance and expand the project in the future:
+While **MindWell** is fully functional, there are opportunities to enhance and expand the project in the future:
 
 * **Expanded Content:** Add more exercises and content types, such as yoga stretches, cognitive behavioral therapy (CBT) worksheets, or guided sleep stories. A broader content library would cater to a wider range of user preferences and mental health needs.
 
