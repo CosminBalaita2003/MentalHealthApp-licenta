@@ -51,7 +51,7 @@ namespace MentalHealthApp.Controllers
                 Gender = request.Gender,
                 Pronouns = request.Pronouns,
                 Bio = request.Bio,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);

@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
   Alert,
   StatusBar,
 } from "react-native";
@@ -30,10 +31,55 @@ const options = [
   { label: "Nearly every day", value: 3 },
 ];
 
+const recommendations = {
+  "Minimal Depression": `
+Your mood is generally positive with very few depressive symptoms.
+
+Recommendations:
+- Keep up activities you enjoy.
+- Stay socially active.
+- Continue self-care habits that support your mood.
+    `,
+    "Mild Depression": `
+You’re experiencing some depressive symptoms, like low mood or less interest in activities.
+
+Recommendations:
+- Engage in pleasant activities - even if you don’t feel like it at first.
+- Keep a gratitude journal (write 3 things you’re thankful for daily).
+- Discuss feelings with a friend or family member.
+    `,
+    "Moderate Depression": `
+Depressive symptoms are moderate and may impact your motivation and daily functioning.
+
+Recommendations:
+- Establish a regular sleep schedule.
+- Set small, achievable goals each day.
+- Consider short-term therapy or online counseling resources.
+    `,
+    "Moderately Severe Depression": `
+Your symptoms are significant: you may have trouble performing usual tasks.
+
+Recommendations:
+- Reach out for professional help (therapy, GP for evaluation).
+- Build a support system: share your feelings openly.
+- Explore behavioural activation - scheduling enjoyable tasks daily.
+    `,
+    "Severe Depression": `
+Your symptoms are intense and likely interfering substantially with your life.
+
+Recommendations:
+- Seek immediate professional support (therapist, psychiatrist).
+- If you have thoughts of self-harm, contact emergency services or a crisis line.
+- Don’t isolate - keep in touch with trusted friends or family.
+    `,
+  };
+
 const PHQ9Test = ({ user, onClose }) => {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [result, setResult] = useState({ score: 0, interpretation: "" });
 
   const handleSelect = (value) => {
     const updated = [...answers];
@@ -48,11 +94,11 @@ const PHQ9Test = ({ user, onClose }) => {
       const score = answers.reduce((sum, val) => sum + val, 0);
 
       let interpretation = "Unknown";
-      if (score <= 4) interpretation = "None-minimal";
-      else if (score <= 9) interpretation = "Mild";
-      else if (score <= 14) interpretation = "Moderate";
-      else if (score <= 19) interpretation = "Moderately Severe";
-      else interpretation = "Severe";
+      if (score <= 4) interpretation = "Minimal Depression";
+      else if (score <= 9) interpretation = "Mild Depression";
+      else if (score <= 14) interpretation = "Moderate Depression";
+      else if (score <= 19) interpretation = "Moderately Severe Depression";
+      else interpretation = "Severe Depression";
 
       const requestBody = {
         id: 0,
@@ -61,8 +107,7 @@ const PHQ9Test = ({ user, onClose }) => {
         testType: "PHQ-9",
         score,
         interpretation,
-        recommendations:
-          "Based on score: consider treatment plan with counseling, pharmacotherapy or referral if needed.",
+        recommendations: recommendations[interpretation] || "No recommendations available",
       };
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
@@ -74,14 +119,20 @@ const PHQ9Test = ({ user, onClose }) => {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) throw new Error("Failed to save test result");
-      Alert.alert("Test Submitted!", "Your results have been saved.");
-      onClose();
-    } catch (error) {
-      Alert.alert("Error", error.message);
+     if (!response.ok) throw new Error("Failed to save test result");
+
+      // Deschide modalul cu rezultat
+      setResult({ score, interpretation });
+      setModalVisible(true);
+    } catch (err) {
+      Alert.alert("Error", err.message);
     } finally {
       setLoading(false);
     }
+  };
+  const closeModal = () => {
+    setModalVisible(false);
+    onClose();
   };
 
   return (
@@ -167,6 +218,37 @@ const PHQ9Test = ({ user, onClose }) => {
           </TouchableOpacity>
         )}
       </View>
+
+        {/* Modal rezultat */}
+            <Modal
+              visible={modalVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={closeModal}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Test Result</Text>
+                  <Text style={styles.modalText}>
+                    Score: {result.score}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Interpretation: {result.interpretation}
+                  </Text>
+      
+                  <Text style={styles.modalDescription}>
+                    {recommendations[result.interpretation]}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={closeModal}
+                  >
+                    <Text style={styles.modalButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
     </View>
   );
 };

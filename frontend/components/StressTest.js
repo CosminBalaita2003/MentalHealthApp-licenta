@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  Alert,Modal,
   StatusBar,
 } from "react-native";import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,10 +32,37 @@ const options = [
   { label: "Very often", value: 4 },
 ];
 
+const recommendations = { "Low Stress": `
+Your perceived stress level is low. You probably have good strategies for managing daily pressures.
+
+Recommendations:
+- Continue current routines that support relaxation.
+- Keep balancing work/leisure time.
+- Maintain social connections for ongoing support.
+    `,
+    "Moderate Stress": `
+You often feel stressed and may find it hard to unwind at times.
+
+Recommendations:
+- Schedule short breaks during your day (5–10 minutes) to recharge.
+- Try journaling: write down top 3 stressors each evening.
+- Incorporate light exercise - walking, stretching - to clear your mind.
+    `,
+    "High Stress": `
+Your stress level is high and may be negatively affecting your mood or relationships.
+
+Recommendations:
+- Prioritize tasks: break projects into smaller steps.
+- Practice daily relaxation routines (e.g., yoga, deep breathing).
+- Consider talking with a coach or counselor to develop coping strategies.
+    `,
+};
 const StressTest = ({ user, onClose }) => {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [loading, setLoading] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+ const [modalVisible, setModalVisible] = useState(false);
+  const [result, setResult] = useState({ score: 0, interpretation: "" });
 
   const handleSelect = (value) => {
     const updatedAnswers = [...answers];
@@ -60,14 +87,16 @@ const StressTest = ({ user, onClose }) => {
         finalScore <= 13 ? "Low Stress" :
         finalScore <= 26 ? "Moderate Stress" : "High Stress";
 
+      const score = finalScore; // Final score for the test
+
       const requestBody = {
         id: 0,
         userId: user.id,
         testDate: new Date().toISOString(),
         testType: "PSS-10",
-        score: finalScore,
+        score: score,
         interpretation,
-        recommendations: "Try relaxation techniques, mindfulness, and managing your daily workload.",
+        recommendations: recommendations[interpretation],
       };
 
       const response = await fetch(`${process.env.API_URL}/api/tests`, {
@@ -80,15 +109,20 @@ const StressTest = ({ user, onClose }) => {
       });
 
       if (!response.ok) throw new Error("Failed to save test result");
-      Alert.alert("Test Submitted!", "Your results have been saved.");
-      onClose();
-    } catch (error) {
-      Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    
+          // Deschide modalul cu rezultat
+          setResult({ score, interpretation });
+          setModalVisible(true);
+        } catch (err) {
+          Alert.alert("Error", err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      const closeModal = () => {
+        setModalVisible(false);
+        onClose();
+      };
    return (
       <View style={{ flex: 1, backgroundColor: "#16132D", padding: 20 }}>
         <StatusBar barStyle="light-content" backgroundColor="#16132D" />
@@ -171,6 +205,37 @@ const StressTest = ({ user, onClose }) => {
             </TouchableOpacity>
           )}
         </View>
+        
+                {/* Modal rezultat */}
+                    <Modal
+                      visible={modalVisible}
+                      transparent
+                      animationType="fade"
+                      onRequestClose={closeModal}
+                    >
+                      <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                          <Text style={styles.modalTitle}>Test Result</Text>
+                          <Text style={styles.modalText}>
+                            Score: {result.score}
+                          </Text>
+                          <Text style={styles.modalText}>
+                            Interpretation: {result.interpretation}
+                          </Text>
+              
+                          <Text style={styles.modalDescription}>
+                            {recommendations[result.interpretation]}
+                          </Text>
+                          <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={closeModal}
+                          >
+                            <Text style={styles.modalButtonText}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </Modal>
+        
       </View>
     );
 };

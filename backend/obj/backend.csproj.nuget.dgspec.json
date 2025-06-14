@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\backend.csproj": {}
+    "/Users/cosminbalaita/Desktop/Me/faculty/MindWell/backend/backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\backend.csproj": {
+    "/Users/cosminbalaita/Desktop/Me/faculty/MindWell/backend/backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\backend.csproj",
+        "projectUniqueName": "/Users/cosminbalaita/Desktop/Me/faculty/MindWell/backend/backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\cosmi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cosmi\\Desktop\\MentalHealthApp-licenta\\backend\\obj\\",
+        "projectPath": "/Users/cosminbalaita/Desktop/Me/faculty/MindWell/backend/backend.csproj",
+        "packagesPath": "/Users/cosminbalaita/.nuget/packages/",
+        "outputPath": "/Users/cosminbalaita/Desktop/Me/faculty/MindWell/backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\cosmi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/cosminbalaita/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -34,7 +32,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net7.0": {
@@ -62,10 +66,6 @@
               "target": "Package",
               "version": "[7.0.12, )"
             },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[7.0.12, )"
-            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -75,6 +75,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[7.0.5, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -104,7 +108,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/RuntimeIdentifierGraph.json"
         }
       }
     }

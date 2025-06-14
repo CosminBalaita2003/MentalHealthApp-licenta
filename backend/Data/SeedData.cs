@@ -46,7 +46,7 @@ serviceProvider)
             context.Users.AddRange(
                 new ApplicationUser
                 {
-                    FullName="Admin Test",
+                    FullName = "Admin Test",
                     Id = "8e445865-a24d-4543-a6c6-9443d048cdb0",
                     // primary key 
                     UserName = "admin@test.com",
@@ -54,13 +54,19 @@ serviceProvider)
                     NormalizedEmail = "ADMIN@TEST.COM",
                     Email = "admin@test.com",
                     NormalizedUserName = "ADMIN@TEST.COM",
-                    PasswordHash = hasher.HashPassword(null,
-"Admin1!")
+                    PasswordHash = hasher.HashPassword(null, "Admin1!"),
+                    CreatedAt = DateTime.UtcNow,
+                    DateOfBirth = new DateTime(1995, 5, 10, 0, 0, 0, DateTimeKind.Utc),
+                    TimeOfBirth = new TimeSpan(9, 30, 0),
+                    Gender = "Male",
+                    Pronouns = "he/him",
+                    Bio = "-",
+                    CityId = 1 
                 },
                 
                     new ApplicationUser
                     {
-                        FullName="User Test",
+                        FullName = "User Test",
                         Id = "8e445865-a24d-4543-a6c6-9443d048cdb2",
                         // primary key 
                         UserName = "user@test.com",
@@ -68,8 +74,14 @@ serviceProvider)
                         NormalizedEmail = "USER@TEST.COM",
                         Email = "user@test.com",
                         NormalizedUserName = "USER@TEST.COM",
-                        PasswordHash = hasher.HashPassword(null,
-"User1!")
+                        PasswordHash = hasher.HashPassword(null, "User1!"),
+                        CreatedAt = DateTime.UtcNow,
+                        DateOfBirth = new DateTime(1995, 5, 10, 0, 0, 0, DateTimeKind.Utc),
+                        TimeOfBirth = new TimeSpan(9, 30, 0),
+                        Gender = "Male",
+                        Pronouns = "he/him",
+                        Bio = "-",
+                        CityId = 1
                     }
 );
 

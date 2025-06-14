@@ -12,7 +12,7 @@ namespace MentalHealthApp.Models
 
         public int Age => CalculateAge();
         public int CityId { get; set; }
-        public City City { get; set; }
+        public City? City { get; set; }
 
         public string Pronouns { get; set; }
         public string Gender { get; set; }

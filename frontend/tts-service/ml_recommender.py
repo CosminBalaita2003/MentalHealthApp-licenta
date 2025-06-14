@@ -25,24 +25,34 @@ user_index_map    = np.load(os.path.join(BASE_DIR, "models", "user_index_map.npy
 # —————————————————————————————
 def recommend_for_user(user_id, k=1):
     """
-    returnează o listă de (exercise_id, score) de dimensiune k
-    user_id: UUID-ul utilizatorului, ca string
-    k: numărul de recomandări
+    Returnează o listă de (exercise_id, score) de dimensiune k.
+    Dacă user_id nu este în index, returnează cele mai populare exerciții (fallback).
     """
     if user_id not in user_index_map:
-        raise KeyError(f"User '{user_id}' nu există în mapping-ul nostru.")
+        print(f"[INFO] User '{user_id}' nu are date în progres. Returnăm fallback.")
+        return recommend_popular_exercises(k)
 
-    # 1) găsește indexul în matrice
+    # 1) Găsește indexul în matrice
     uidx = user_index_map[user_id]
 
-    # 2) extrage vectorul şi rulează predict
+    # 2) Extrage vectorul şi rulează predict
     user_vector = user_item_matrix[uidx].reshape(1, -1)
     scores = model.predict(user_vector, verbose=0)[0]
 
-    # 3) masca pentru exerciții noi (unde nu e progres salvat)
+    # 3) Filtrează doar exercițiile nevizitate
     unseen = user_item_matrix[uidx] == 0
     candidates = [(item_ids[i], float(scores[i])) for i in np.where(unseen)[0]]
 
-    # 4) sortează după score descrescător şi returnează primele k
+    # 4) Sortează și returnează
     candidates.sort(key=lambda x: x[1], reverse=True)
     return candidates[:k]
+
+
+
+def recommend_popular_exercises(k):
+    """
+    Returnează primii k item_ids cei mai frecvenți în matrice.
+    """
+    popularity = np.sum(user_item_matrix, axis=0)
+    top_indices = np.argsort(-popularity)[:k]
+    return [(item_ids[i], float(popularity[i])) for i in top_indices]

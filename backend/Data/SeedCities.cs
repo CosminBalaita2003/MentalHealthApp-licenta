@@ -21,7 +21,7 @@ public static class SeedCities
                 return;
             }
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "cities500.json");
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "cities.json");
             if (!File.Exists(filePath))
             {
                 Console.WriteLine($"❌ Fișierul {filePath} nu a fost găsit!");

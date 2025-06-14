@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using MentalHealthApp.Data;
 using MentalHealthApp.Models;
 using Microsoft.Extensions.FileProviders;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -66,7 +67,8 @@ builder.Services.AddCors(options =>
 });
 // 🔹 Configurare DbContext pentru SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // 🔹 Configurează Identity pentru autentificare
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

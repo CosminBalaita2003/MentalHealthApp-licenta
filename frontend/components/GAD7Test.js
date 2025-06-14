@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  Modal,
   StatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,27 +28,63 @@ const options = [
   { label: "Nearly every day", value: 3 },
 ];
 
+const recommendations = {
+  "Minimal Anxiety": `
+You’re experiencing very few symptoms of anxiety. Your overall day-to-day life is unlikely to be significantly impacted.
+  
+Recommendations:
+- Maintain regular physical activity.
+- Practice brief breathing exercises when you notice tension.
+- Keep monitoring your feelings - early detection helps keep anxiety minimal.
+    `,
+    "Mild Anxiety": `
+You're noticing occasional anxiety symptoms - like feeling nervous or having trouble relaxing - several days a week.
+
+Recommendations:
+- Introduce a short mindfulness or meditation practice (5-10 minutes daily).
+- Limit caffeine and screen-time before bed.
+- Talk about your worries with someone you trust.
+    `,
+    "Moderate Anxiety": `
+Your anxiety symptoms are more frequent/intense and may interfere with work or social activities.
+
+Recommendations:
+- Consider weekly relaxation techniques (e.g., guided imagery, progressive muscle relaxation).
+- Set aside “worry time” - 15 minutes per day to process anxious thoughts.
+- If symptoms persist, consult a mental health professional.
+    `,
+    "Severe Anxiety": `
+You're experiencing daily, intense anxiety that likely disrupts your ability to focus or sleep.
+
+Recommendations:
+- Seek professional support (therapist, counselor) as soon as possible.
+- Explore structured therapies: CBT (Cognitive Behavioral Therapy) or mindfulness-based stress reduction.
+- Reach out to your support network; don't face severe anxiety alone.
+    `,
+  }
+
+
 const GAD7Test = ({ user, onClose }) => {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [result, setResult] = useState({ score: 0, interpretation: "" });
 
   const handleSelect = (value) => {
-    const updatedAnswers = [...answers];
-    updatedAnswers[currentQuestion] = value;
-    setAnswers(updatedAnswers);
+    const updated = [...answers];
+    updated[currentQuestion] = value;
+    setAnswers(updated);
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert("Error", "User is not authenticated!");
-        return;
-      }
-
-      const score = answers.reduce((sum, val) => sum + val, 0);
+      if (!token) throw new Error("User is not authenticated!");
+      
+      // Calculează scorul și interpretarea
+      const score = answers.reduce((sum, v) => sum + v, 0);
       const interpretation =
         score <= 4
           ? "Minimal Anxiety"
@@ -58,33 +94,39 @@ const GAD7Test = ({ user, onClose }) => {
           ? "Moderate Anxiety"
           : "Severe Anxiety";
 
-      const requestBody = {
+      // Salvează în backend
+      const body = {
         id: 0,
         userId: user.id,
         testDate: new Date().toISOString(),
         testType: "GAD-7",
         score,
         interpretation,
-        recommendations: "Try breathing exercises and relaxation techniques.",
+        recommendations: recommendations[interpretation],
       };
-
-      const response = await fetch(`${process.env.API_URL}/api/tests`, {
+      const res = await fetch(`${process.env.API_URL}/api/tests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(body),
       });
+      if (!res.ok) throw new Error("Failed to save test result");
 
-      if (!response.ok) throw new Error("Failed to save test result");
-      Alert.alert("Test Submitted!", "Your results have been saved.");
-      onClose();
-    } catch (error) {
-      Alert.alert("Error", error.message);
+      // Deschide modalul cu rezultat
+      setResult({ score, interpretation });
+      setModalVisible(true);
+    } catch (err) {
+      Alert.alert("Error", err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    onClose();
   };
 
   return (
@@ -99,7 +141,7 @@ const GAD7Test = ({ user, onClose }) => {
         <Text style={styles.title}>GAD-7 Anxiety Test</Text>
       </View>
 
-      {/* Progress Indicator */}
+      {/* Progress */}
       <Text style={styles.progressText}>
         Question {currentQuestion + 1} of {questions.length}
       </Text>
@@ -114,29 +156,31 @@ const GAD7Test = ({ user, onClose }) => {
         />
       </View>
 
-      {/* Question Area */}
+      {/* Question */}
       <View style={styles.questionWrapper}>
-        <Text style={styles.questionText}>{questions[currentQuestion]}</Text>
-        {options.map((option) => (
+        <Text style={styles.questionText}>
+          {questions[currentQuestion]}
+        </Text>
+        {options.map((opt) => (
           <TouchableOpacity
-            key={option.value}
+            key={opt.value}
             style={[
               styles.optionButton,
-              answers[currentQuestion] === option.value && styles.selectedOption,
+              answers[currentQuestion] === opt.value && styles.selectedOption,
             ]}
-            onPress={() => handleSelect(option.value)}
+            onPress={() => handleSelect(opt.value)}
           >
-            <Text style={styles.buttonText}>{option.label}</Text>
+            <Text style={styles.buttonText}>{opt.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Navigation buttons */}
+      {/* Navigation */}
       <View style={styles.navButtons}>
         {currentQuestion > 0 && (
           <TouchableOpacity
             style={[styles.navButton, { marginRight: 8 }]}
-            onPress={() => setCurrentQuestion(currentQuestion - 1)}
+            onPress={() => setCurrentQuestion((q) => q - 1)}
           >
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
@@ -147,8 +191,10 @@ const GAD7Test = ({ user, onClose }) => {
               styles.navButton,
               answers[currentQuestion] === null && styles.disabledButton,
             ]}
-            onPress={() => setCurrentQuestion(currentQuestion + 1)}
             disabled={answers[currentQuestion] === null}
+            onPress={() =>
+              setCurrentQuestion((q) => q + 1)
+            }
           >
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
@@ -156,10 +202,11 @@ const GAD7Test = ({ user, onClose }) => {
           <TouchableOpacity
             style={[
               styles.navButton,
-              answers[currentQuestion] === null && styles.disabledButton,
+              (answers[currentQuestion] === null || loading) &&
+                styles.disabledButton,
             ]}
+            disabled={answers[currentQuestion] === null || loading}
             onPress={handleSubmit}
-            disabled={loading || answers[currentQuestion] === null}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
@@ -169,6 +216,36 @@ const GAD7Test = ({ user, onClose }) => {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Modal rezultat */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Test Result</Text>
+            <Text style={styles.modalText}>
+              Score: {result.score}
+            </Text>
+            <Text style={styles.modalText}>
+              Interpretation: {result.interpretation}
+            </Text>
+
+            <Text style={styles.modalDescription}>
+              {recommendations[result.interpretation]}
+            </Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={closeModal}
+            >
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
