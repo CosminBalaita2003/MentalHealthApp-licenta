@@ -129,6 +129,52 @@ squareCardText: {
     color: 'red',
     textAlign: 'center',
   },
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 20,
+  width: '80%',
+  alignItems: 'center',
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  marginBottom: 10,
+},
+modalText: {
+  fontSize: 16,
+  marginBottom: 20,
+  textAlign: 'center',
+},
+modalButton: {
+  backgroundColor: '#58B368',
+  paddingVertical: 10,
+  paddingHorizontal: 30,
+  borderRadius: 8,
+  marginBottom: 10,
+  marginTop: 10,
+},
+modalButtonText: {
+  color: '#fff',
+  fontSize: 16,
+},
+modalCancelText: {
+  color: '#999',
+  marginTop: 5,
+},alertText: {
+  color: '#E63946',
+  fontSize: 15,
+  marginTop: 10,
+  textAlign: 'center',
+  fontWeight: '500',
+},
+
 
   
 

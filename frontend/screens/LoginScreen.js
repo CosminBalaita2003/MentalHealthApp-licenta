@@ -49,10 +49,10 @@ const LoginScreen = () => {
           // navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         }, 2000);
       } else {
-       showError("Eroare: " + userResponse.message);
+       showError("Error: " + userResponse.message);
       }
     } else {
-      showError("Eroare: " + response.message);
+      showError("Error: " + response.message);
     }
   };
 

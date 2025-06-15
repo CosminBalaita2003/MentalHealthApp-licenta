@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext, useCallback, useRef  } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
     KeyboardAvoidingView,
   Platform,
+  Modal, Linking, Animated, pulseAnim
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +19,7 @@ import StreakIndicator from '../components/StreakIndicator';
 import BreathingContainer from '../components/BreathingContainer';
 import { getPersonalizedDailyTips } from '../utils/getDailyTips';
 import { useFocusEffect } from '@react-navigation/native';
+import testService from '../services/testService';
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -26,6 +28,37 @@ export default function ProfileScreen({ navigation }) {
   const [error, setError] = useState(false);
   const [tips, setTips] = useState([]);
   const { setIsAuthenticated } = useContext(AuthContext);
+  const [supportVisible, setSupportVisible] = useState(false);
+  const [hasHighDepression, setHasHighDepression] = useState(false);
+
+ 
+
+
+const checkDepressionLevel = async () => {
+  try {
+    const { success, summaries } = await testService.getUserTestSummaries();
+    if (!success) return;
+
+    const phq = summaries["PHQ-9"];
+    if (!phq) return;
+
+    const { latestScore, averageScore, latestInterpretation } = phq;
+
+    if (latestScore >= 15 || averageScore >= 15) {
+      setHasHighDepression(true);
+      const pulseAnim = useRef(new Animated.Value(1)).current;
+
+      console.log(" High depression detected:", latestInterpretation);
+    }
+  } catch (err) {
+    console.log("Error checking depression summary:", err);
+  }
+};
+
+  const handleCallSupport = () => {
+  setSupportVisible(false);
+  Linking.openURL('tel:0800 801 200'); // număr generic pentru linia verde
+};
 
   // 1) Încarcă profilul o singură dată la mount
   useEffect(() => {
@@ -40,6 +73,8 @@ export default function ProfileScreen({ navigation }) {
         const result = await userService.getUser();
         if (result.success) {
           setUser(result.user);
+
+        
         } else {
           throw new Error(result.message);
         }
@@ -52,6 +87,28 @@ export default function ProfileScreen({ navigation }) {
     };
     fetchUserProfile();
   }, []);
+
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+useEffect(() => {
+  if (hasHighDepression) {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.2,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }
+}, [hasHighDepression]);
+
 
   // 2) La fiecare focus pe screen, regenerează Daily Tips
   useFocusEffect(
@@ -83,6 +140,13 @@ export default function ProfileScreen({ navigation }) {
     }, [])
   );
 
+useFocusEffect(
+  useCallback(() => {
+    checkDepressionLevel();
+  }, [user])
+);
+ 
+
   const handleLogout = async () => {
     await AsyncStorage.clear();
     setIsAuthenticated(false);
@@ -112,6 +176,15 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.header}>
           <Text style={styles.title}>Welcome, {user.fullName.split(" ")[0]}!</Text>
           <View style={styles.actions}>
+          <Animated.View style={{ transform: [{ scale: hasHighDepression ? pulseAnim : 1 }] }}>
+  <TouchableOpacity onPress={() => setSupportVisible(true)} style={styles.iconButton}>
+    <Ionicons name="help-buoy-outline" size={24} color="#fff" />
+  </TouchableOpacity>
+</Animated.View>
+
+
+
+
             <TouchableOpacity
               onPress={() => navigation.navigate('EditProfile')}
               style={styles.iconButton}
@@ -174,6 +247,48 @@ export default function ProfileScreen({ navigation }) {
           )}
         </BreathingContainer>
       </KeyboardAvoidingView>
+
+<Modal
+  transparent
+  visible={supportVisible}
+  animationType="fade"
+  onRequestClose={() => setSupportVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>You are not alone.</Text>
+      <Text style={styles.modalText}>
+  You can call the emotional support line whenever you need to talk. We're here for you.
+</Text>
+
+{hasHighDepression && (
+  <Text style={styles.alertText}>
+    Based on your recent results, we noticed signs of moderate to severe depression.
+    You’re not alone - please don’t hesitate to reach out.
+
+  </Text>
+)}
+
+      <TouchableOpacity
+  style={[
+    styles.modalButton,
+    hasHighDepression && { backgroundColor: '#E63946' } // roșu dacă depresia e mare
+  ]}
+  onPress={handleCallSupport}
+>
+  <Text style={styles.modalButtonText}>Call Support</Text>
+</TouchableOpacity>
+
+      <TouchableOpacity onPress={() => setSupportVisible(false)}>
+        <Text style={styles.modalCancelText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+
+
+
     </View>
   );
 }

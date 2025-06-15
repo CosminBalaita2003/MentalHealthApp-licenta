@@ -69,11 +69,15 @@ export const speakTextAndWait = async (text, lang = "en") => {
 export const stopTTS = async () => {
   if (soundObject) {
     try {
-      await soundObject.stopAsync();
-      await soundObject.unloadAsync();
-      soundObject = null;
+      const status = await soundObject.getStatusAsync();
+      if (status.isLoaded) {
+        await soundObject.stopAsync();
+        await soundObject.unloadAsync();
+      }
     } catch (e) {
-      console.warn("⚠️ Failed to stop TTS:", e);
+      console.warn("⚠️ Failed to stop TTS:", e.message);
+    } finally {
+      soundObject = null;
     }
   }
 };

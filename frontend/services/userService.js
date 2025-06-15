@@ -138,7 +138,7 @@ const userService = {
       return { success: true, message: response.data?.Message || "User registered successfully!" };
     } catch (error) {
       console.log(" Register error:", error.response?.data || error.message);
-      return { success: false, message: error.response?.data?.Message || "Eroare la înregistrare" };
+      return { success: false, message: error.response?.data?.Message || "Errors occurred during registration. " };
     }
   },
 

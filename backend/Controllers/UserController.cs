@@ -61,7 +61,7 @@ namespace MentalHealthApp.Controllers
                 return BadRequest(new
                 {
                     success = false,
-                    message = "Eroare la înregistrare.",
+                    message = "Errors occurred during registration.",
                     errors = result.Errors.Select(e => e.Description)
                 });
             }

@@ -55,7 +55,8 @@ const PMRExercise = ({ exercise, onClose, onRunningChange }) => {
 
   const stopExercise = async (completed = false) => {
     clearTimeout(intervalRef.current);
-    await stopTTS();
+    
+    stopTTS();
     setIsRunning(false);
     onRunningChange?.(false);
     setStepIndex(0);

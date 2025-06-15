@@ -103,4 +103,8 @@ export const interpretResults = (testType, score) => {
   }
 };
 
+testService.getUserTestSummaries = getUserTestSummaries;
+testService.interpretResults = interpretResults;
+
 export default testService;
+
