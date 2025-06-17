@@ -18,12 +18,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ExerciseModal = ({ visible, onClose, exercise, fromRecommend = false }) => {
   if (!visible || !exercise) return null;
 
-  // flag pentru secundar modal
   const [infoVisible, setInfoVisible] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
 
+ 
   // parsează pașii din JSON
   const steps = exercise.stepsJson ? JSON.parse(exercise.stepsJson) : [];
 
@@ -64,6 +64,9 @@ const ExerciseModal = ({ visible, onClose, exercise, fromRecommend = false }) =>
     } else {
       onClose();
     }
+
+    
+
   };
 
   return (

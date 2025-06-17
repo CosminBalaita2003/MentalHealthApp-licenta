@@ -81,6 +81,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
         const photo = await cameraRef.current.takePictureAsync({
           base64: true,
           quality: 0.2,
+        
         });
   
         await analyzeExpressionFromBase64(photo.base64, async (data) => {

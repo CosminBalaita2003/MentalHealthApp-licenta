@@ -16,10 +16,27 @@ const generateParticle = () => ({
 });
 
 const FloatingParticles = () => {
-  const [particles, setParticles] = useState(Array.from({ length: PARTICLE_COUNT }, generateParticle));
+  const [particles, setParticles] = useState([]);
 
-  // fade in inițial
+  // Inițializare particule (fără animație) la mount
   useEffect(() => {
+    const initialParticles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * (2 * RADIUS) - RADIUS,
+      y: Math.random() * (2 * RADIUS) - RADIUS,
+      dx: (Math.random() - 0.5) * 1,
+      dy: (Math.random() - 0.5) * 1,
+      radius: 2 + Math.random() * 2,
+      opacity: new Animated.Value(0),
+      fadingOut: false,
+    }));
+
+    setParticles(initialParticles);
+  }, []);
+
+  // fade in la toate după ce sunt create
+  useEffect(() => {
+    if (particles.length === 0) return;
+
     particles.forEach((p) => {
       Animated.timing(p.opacity, {
         toValue: 0.9,
@@ -27,36 +44,46 @@ const FloatingParticles = () => {
         useNativeDriver: false,
       }).start();
     });
-  }, []);
+  }, [particles]);
 
+  // animația de mișcare și regenerare
   useEffect(() => {
+    if (particles.length === 0) return;
+
     const interval = setInterval(() => {
       setParticles((prevParticles) => {
-        const newParticles = prevParticles.map((p, i) => {
+        return prevParticles.map((p, i) => {
           if (p.fadingOut) return p;
 
           let newX = p.x + p.dx;
           let newY = p.y + p.dy;
 
           if (Math.sqrt(newX * newX + newY * newY) > RADIUS) {
-            // Fade out și înlocuire cu una nouă
             Animated.timing(p.opacity, {
               toValue: 0,
               duration: 400,
               useNativeDriver: false,
             }).start(() => {
-              const newParticle = generateParticle();
+              const newParticle = {
+                x: Math.random() * (2 * RADIUS) - RADIUS,
+                y: Math.random() * (2 * RADIUS) - RADIUS,
+                dx: (Math.random() - 0.5) * 1,
+                dy: (Math.random() - 0.5) * 1,
+                radius: 2 + Math.random() * 2,
+                opacity: new Animated.Value(0),
+                fadingOut: false,
+              };
+
               Animated.timing(newParticle.opacity, {
                 toValue: 0.9,
                 duration: 500,
                 useNativeDriver: false,
               }).start();
 
-              // înlocuim particula cu una nouă
-              setParticles((current) => {
-                const updated = [...current];
-                updated[i] = newParticle;
-                return updated;
+              setParticles((curr) => {
+                const copy = [...curr];
+                copy[i] = newParticle;
+                return copy;
               });
             });
 
@@ -65,13 +92,11 @@ const FloatingParticles = () => {
 
           return { ...p, x: newX, y: newY };
         });
-
-        return newParticles;
       });
     }, 40);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [particles]);
 
   return (
     <Svg height={RADIUS * 2} width={RADIUS * 2}>
@@ -88,6 +113,7 @@ const FloatingParticles = () => {
     </Svg>
   );
 };
+
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
