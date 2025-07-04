@@ -1,4 +1,4 @@
-import { Audio } from "expo-av";
+import { Audio } from 'expo-av';
 import { TTS_API_URL } from "@env";
 
 let soundObject = null;

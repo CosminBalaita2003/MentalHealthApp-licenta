@@ -16,8 +16,7 @@ const getSuggestionForEmotion = (emotion) => {
       return "Focus on your breath and let go of distractions.";
     case "happy":
       return "You’re doing great, keep it up!";
-    case "neutral":
-      return "Focus on your breath and let go of distractions.";
+
     case "sad":
       return "Take a deep breath and focus on the present.";
     case "angry":
@@ -43,14 +42,15 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [allowCamera, setAllowCamera] = useState(null);
 
-  const emotionCountsRef = useRef({});
-  const [dominantEmotion, setDominantEmotion] = useState(null);
+const emotionCountsRef = useRef({});
+const [lastDetectedEmotion, setLastDetectedEmotion] = useState(null);
 
   const cameraRef = useRef(null);
   const isFocused = useIsFocused();
   const isAnalyzingRef = useRef(false);
   const prevEmotionRef = useRef(null);
   const lastEmotionUpdateRef = useRef(Date.now());
+  const MIN_TIME_BETWEEN_UPDATES = 1000; // 5 sec
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -66,11 +66,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     })();
   }, []);
 
-  const updateDominantEmotion = () => {
-    const counts = emotionCountsRef.current;
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    setDominantEmotion(sorted[0]?.[0] ?? null);
-  };
+ 
 
   const captureAndAnalyze = async () => {
     if (!allowCamera || isAnalyzingRef.current) return;
@@ -84,22 +80,28 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
         
         });
   
-        await analyzeExpressionFromBase64(photo.base64, async (data) => {
-          if (data.emotion) {
-            const emotionName = data.emotion.toLowerCase();
-        
-            // 👉 Doar dacă e o emoție nouă, o setăm
-            if (emotionName !== prevEmotionRef.current) {
-              prevEmotionRef.current = emotionName;
-        
-              const counts = emotionCountsRef.current;
-              counts[emotionName] = (counts[emotionName] || 0) + 1;
-              emotionCountsRef.current = { ...counts };
-        
-              updateDominantEmotion();
-            }
-          }
-        });
+await analyzeExpressionFromBase64(photo.base64, async (data) => {
+  if (data.emotion) {
+    const emotionName = data.emotion.toLowerCase();
+
+    if (
+      emotionName !== prevEmotionRef.current ||
+      Date.now() - lastEmotionUpdateRef.current > MIN_TIME_BETWEEN_UPDATES
+    ) {
+      prevEmotionRef.current = emotionName;
+      lastEmotionUpdateRef.current = Date.now();
+
+      setLastDetectedEmotion(emotionName);
+
+      const counts = emotionCountsRef.current;
+      counts[emotionName] = (counts[emotionName] || 0) + 1;
+      emotionCountsRef.current = { ...counts };
+    }
+  }
+});
+
+
+
         
       }
     } catch (err) {
@@ -108,7 +110,14 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
       isAnalyzingRef.current = false;
     }
   };
-  
+
+
+  useEffect(() => {
+  if (lastDetectedEmotion) {
+    console.log("🧠 Detected (live):", lastDetectedEmotion);
+  }
+}, [lastDetectedEmotion]);
+
   const animateScale = (step) => {
     let toValue = 1;
     const stepLower = step.toLowerCase();
@@ -137,7 +146,6 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
     progressAnim.setValue(0);
     exerciseStartTime.current = Date.now();
     emotionCountsRef.current = {};
-    setDominantEmotion(null);
 
     const totalDuration = exercise.duration || 60;
     Animated.timing(progressAnim, {
@@ -162,16 +170,17 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
 
     // ✅ Save top 3 detected emotions
     const sorted = Object.entries(emotionCountsRef.current)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 3);
 
-    for (const [emotionName] of sorted) {
-      await saveDetectedEmotion({
-        emotionName,
-        sentence: null,
-        source: "breathing"
-      });
-    }
+for (const [emotionName] of sorted) {
+  await saveDetectedEmotion({
+    emotionName,
+    sentence: null,
+    source: "breathing"
+  });
+}
+
 
     if (completed && onClose) {
       try {
@@ -332,7 +341,7 @@ const BreathingExercise = ({ exercise, onClose, onRunningChange }) => {
           </Text>
           {allowCamera && (
             <Text style={[styles.text, { fontSize: 14, color: theme.colors.semiaccent, marginTop: 4, textAlign: "center" }]}>
-              {getSuggestionForEmotion(dominantEmotion || "...analyzing")}
+{getSuggestionForEmotion(lastDetectedEmotion || "...analyzing")}
             </Text>
           )}
         </View>

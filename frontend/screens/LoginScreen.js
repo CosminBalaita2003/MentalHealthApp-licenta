@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/authStyles';
 import theme from '../styles/theme';
-import { AuthContext } from '../App';
+import AuthContext from '../utils/AuthContext';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');

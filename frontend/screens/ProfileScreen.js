@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthContext } from '../App';
+import AuthContext from '../utils/AuthContext'; 
 import userService from '../services/userService';
 import styles from '../styles/profileStyles';
 import StreakIndicator from '../components/StreakIndicator';

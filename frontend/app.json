@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo-black.png",
-     "userInterfaceStyle": "automatic",
-      "androidStatusBar": {
+    "userInterfaceStyle": "automatic",
+    "androidStatusBar": {
       "barStyle": "light-content",
       "backgroundColor": "#1E1A38",
       "translucent": true
@@ -27,23 +27,26 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff",
-          "androidStatusBar": {
-      "barStyle": "light-content",
-      "backgroundColor": "#1E1A38",
-      "translucent": true
+        "androidStatusBar": {
+          "barStyle": "light-content",
+          "backgroundColor": "#1E1A38",
+          "translucent": true
+        },
+        "androidNavigationBar": {
+          "barStyle": "light-content",
+          "backgroundColor": "#1E1A38"
+        }
+      }
     },
-    "androidNavigationBar": {
-      "barStyle": "light-content",
-      "backgroundColor": "#1E1A38"
-    }
-  }},
-  "web": {
-    "favicon": "./assets/favicon.png"
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-audio"
+    ]
   }
-}
 }

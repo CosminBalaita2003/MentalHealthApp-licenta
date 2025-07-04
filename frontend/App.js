@@ -38,7 +38,8 @@ LogBox.ignoreLogs([
   'useInsertionEffect must not schedule updates'
 ]);
 
-export const AuthContext = createContext();
+import AuthContext from './utils/AuthContext';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

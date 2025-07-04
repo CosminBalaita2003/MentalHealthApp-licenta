@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import userService from "../services/userService";
@@ -23,34 +24,39 @@ import theme from "../styles/theme";
 import EmotionSelector from "../components/EmotionSelector";
 import JournalTextBox from "../components/JournalTextBox";
 import { saveDetectedEmotion } from "../services/emotionService";
-
-const emotionMessages = {
-  anger:        "Anger is valid. Let it out in a healthy way! Don't bottle it up. ",
-  disgust:      "Disgust is a natural response. Acknowledge it! It's okay to feel this way. ",
-  fear:        "Believe in yourself. You’ve got this! You are stronger than you think. ",
-  joy:        "Joy is a wonderful feeling. Embrace it!  Celebrate the little things. ",
-  neutral:     "Neutral is okay sometimes it’s good to just be. Don't feel pressured to feel something. ",
-  sadness:          "It’s okay to feel sad. Be gentle with yourself. It's okay to take a break. ",
-  surprise:            "Surprise can be exciting. What’s next?  Embrace the unexpected! ",
-  
-};
+import { getChatCompletion } from "../services/openaiService";
 
 export default function NewEntryScreen() {
-  const [content, setContent]           = useState("");
-  const [emotionId, setEmotionId]       = useState(null);
-  const [emotions, setEmotions]         = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [user, setUser]                 = useState(null);
-  const [analyzing, setAnalyzing]       = useState(false);
-
-  // States for the new flow:
-  const [saving, setSaving]             = useState(false);
+  const [content, setContent] = useState("");
+  const [emotionId, setEmotionId] = useState(null);
+  const [emotions, setEmotions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
-  const [dominantEmotion, setDominantEmotion]         = useState(null);
+  const [dominantEmotion, setDominantEmotion] = useState(null);
+  const [aiAdvice, setAiAdvice] = useState("");
+  const [empatheticMessage, setEmpatheticMessage] = useState("");
+const empatheticMessages = [
+  "Thank you for showing up for yourself today.",
+  "Your emotions are valid and important.",
+  "Every word you wrote matters.",
+  "You’re doing better than you think.",
+  "It’s okay to feel everything you’re feeling.",
+  "You’ve taken an important step toward healing.",
+  "Your honesty with yourself is powerful.",
+  "You are not alone in this journey.",
+  "Even small steps count — and this one does too.",
+  "Be proud of yourself for expressing how you feel.",
+  "You're allowed to take time to reflect.",
+  "Writing this down is a form of self-care.",
+  "This entry is a quiet act of courage.",
+  "You're doing something meaningful just by being here.",
+  "One page at a time, you're understanding yourself better."
+];
 
   const navigation = useNavigation();
 
-  // Load user + emotions on mount
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -69,7 +75,6 @@ export default function NewEntryScreen() {
     loadData();
   }, []);
 
-  // Utility to split text
   const splitByPara = (text) =>
     text
       .split(/\n+/)
@@ -77,7 +82,6 @@ export default function NewEntryScreen() {
         p.split(/(?<=[.?!])\s+/).map(s => s.trim()).filter(Boolean)
       );
 
-  // Submit handler: 1) send to backend, 2) compute dominant emotion, 3) show confirmation
   const handleSubmit = async () => {
     if (!content.trim() || !emotionId) {
       return Alert.alert("Error", "Write something and pick how you feel.");
@@ -88,27 +92,61 @@ export default function NewEntryScreen() {
 
     setSaving(true);
     try {
-      // 1) Save the journal entry
+      // 1. Save journal entry
       const response = await addJournalEntry(content, emotionId, user);
       if (!response.id) throw new Error("No entry ID returned");
 
-      // 2) Analyze text to find dominant emotion
+      // 2. Analyze text to detect top 3 emotions
       const sentences = splitByPara(content);
       const counts = {};
       for (const s of sentences) {
         const res = await analyzeTextEmotion(s);
         if (res.success) {
-          console.log(`Analyzed sentence: "${s}" -> ${res.dominantEmotion}`);
           const em = res.dominantEmotion.toLowerCase();
-          counts[em] = (counts[em]||0) + 1;
+          counts[em] = (counts[em] || 0) + 1;
         }
+        console.log(`Analyzed sentence: "${s}" - Detected emotion: ${res.dominantEmotion}`);
       }
-      // pick the top one
-      const dominant = Object.entries(counts)
-        .sort((a,b)=>b[1]-a[1])[0]?.[0] ?? null;
-      setDominantEmotion(dominant);
 
-      // 3) show the confirmation modal
+      const sortedEmotions = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([emotion]) => emotion);
+      const top3Emotions = sortedEmotions.slice(0, 3);
+      setDominantEmotion(top3Emotions[0]);
+
+      // 3. Save emotions separately in backend
+      console.log("Detected emotions saved:", top3Emotions);
+  for (const emotion of top3Emotions) {
+  await saveDetectedEmotion({
+    emotionName: emotion,
+    sentence: content, // sau poți trece ultima propoziție relevantă
+    source: "journal",
+    journalEntryId: response.id
+  });
+}
+
+
+
+
+      // 4. Get AI message from OpenAI
+      try {
+        const systemMessage = {
+          role: "system",
+          content: "You are a warm and empathetic mental health coach. Given the user's emotional state, provide a supportive, motivational message that acknowledges their feelings."
+        };
+        const userMessage = {
+          role: "user",
+          content: `The user wrote a journal. The top detected emotions are: ${top3Emotions.join(", ")}. Based on this, write a compassionate and encouraging message.`
+        };
+        const aiResponse = await getChatCompletion([systemMessage, userMessage]);
+        setAiAdvice(aiResponse);
+      } catch (e) {
+        console.warn("OpenAI failed:", e.message);
+        setAiAdvice("Be kind to yourself today. Emotions are valid and you're not alone.");
+      }
+      const randomMessage = empatheticMessages[Math.floor(Math.random() * empatheticMessages.length)];
+setEmpatheticMessage(randomMessage);
+      // 5. Show confirmation modal
       setConfirmationVisible(true);
     } catch (e) {
       console.error(e);
@@ -118,7 +156,6 @@ export default function NewEntryScreen() {
     }
   };
 
-  // Final save confirmation
   const handleFinalSave = () => {
     setConfirmationVisible(false);
     navigation.goBack();
@@ -136,17 +173,12 @@ export default function NewEntryScreen() {
           <ActivityIndicator size="large" color={theme.colors.primary} />
         ) : (
           <View style={{ flex: 1, width: "100%" }}>
-            <JournalTextBox
-              value={content}
-              onChangeText={setContent}
-            />
-
+            <JournalTextBox value={content} onChangeText={setContent} />
             <EmotionSelector
               emotions={emotions}
               selectedEmotionId={emotionId}
               onSelectEmotion={setEmotionId}
             />
-
             <TouchableOpacity
               style={JournalStyles.button}
               onPress={handleSubmit}
@@ -160,10 +192,7 @@ export default function NewEntryScreen() {
         <Modal visible={saving} transparent>
           <View style={styles.loadingOverlay}>
             <View style={styles.loadingContent}>
-              <ActivityIndicator
-                size="large"
-                color={theme.colors.semiaccent}
-              />
+              <ActivityIndicator size="large" color={theme.colors.semiaccent} />
               <Text style={styles.loadingText}>Saving your entry…</Text>
             </View>
           </View>
@@ -173,15 +202,8 @@ export default function NewEntryScreen() {
         <Modal visible={confirmationVisible} transparent animationType="fade">
           <View style={styles.errorOverlay}>
             <View style={styles.errorContent}>
-              <Text style={styles.modalTitle}>
-                You seem to feel{" "}
-                <Text style={{ fontWeight: "bold" }}>
-                  {dominantEmotion}
-                </Text>
-              </Text>
-              <Text style={styles.modalDescription}>
-                {emotionMessages[dominantEmotion] ?? ""}
-              </Text>
+              <Text style={styles.modalTitle}>{empatheticMessage}</Text>
+              <Text style={styles.modalDescription}>{aiAdvice}</Text>
               <TouchableOpacity
                 style={styles.errorButton}
                 onPress={handleFinalSave}
@@ -219,8 +241,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 5,
   },
-
-  // we reuse the errorOverlay & errorContent styles for the confirmation
   errorOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.64)",
@@ -229,7 +249,7 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   errorContent: {
-   backgroundColor: "#1E1A38",
+    backgroundColor: "#1E1A38",
     borderRadius: 16,
     padding: 20,
     maxHeight: "80%",
@@ -250,7 +270,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   modalDescription: {
-   fontSize: 16,
+    fontSize: 16,
     color: "#E8BCB9",
     marginBottom: 10,
     letterSpacing: 0.5,
@@ -261,10 +281,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    alignSelf: "flex-center",
+    alignSelf: "center",
   },
   errorButtonText: {
-     color: "#fff",
+    color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
   },

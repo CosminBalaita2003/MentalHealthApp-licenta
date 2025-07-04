@@ -50,14 +50,31 @@ autoencoder = keras.Model(inputs, outputs)
 autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
 autoencoder.summary()
 
-# 5) Antrenează modelul
-autoencoder.fit(
+# 5) Antrenează modelul și salvează istoric
+history = autoencoder.fit(
     matrix, matrix,
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     validation_split=0.1,
     shuffle=True
 )
+
+# === Grafic Loss ===
+import matplotlib.pyplot as plt
+
+plt.plot(history.history["loss"], label="Train Loss")
+plt.plot(history.history["val_loss"], label="Validation Loss")
+plt.xlabel("Epocă")
+plt.ylabel("Loss")
+plt.title("Evoluția pierderii (Autoencoder)")
+plt.legend()
+plt.grid(True)
+
+# Salvează graficul în fișier
+os.makedirs("plots", exist_ok=True)
+plt.savefig("plots/autoencoder_loss.png")
+plt.close()
+
 
 # 6) Salvează modelul și artefactele
 os.makedirs(MODELS_DIR, exist_ok=True)

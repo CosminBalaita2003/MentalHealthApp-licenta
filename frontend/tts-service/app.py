@@ -202,18 +202,18 @@ def get_recommendation(user_id):
     if not auth_header.startswith("Bearer "):
         return jsonify({"error": "Missing or invalid Authorization header"}), 401
     # citim parametrul k, default 10
-    k = request.args.get("k", default=10, type=int)
+    k = request.args.get("k", default=3, type=int)
 
     try:
         # recs e o listă de (id, score) de lungime k
-        recs = recommend_for_user(user_id, k=k)
+        recs = recommend_for_user(user_id, k=3)
         if not recs:
             return jsonify({"error": "No recommendations available"}), 404
 
         # extragem doar ID-urile și le forțăm la int
         exercise_ids = [int(r[0]) if isinstance(r, (list, tuple)) else int(r)
                         for r in recs]
-
+        print (f"🔍 Recommendations for user '{user_id}': {exercise_ids}")
         return jsonify({ "exerciseIds": exercise_ids })
     except KeyError as ke:
         return jsonify({"error": str(ke)}), 404
